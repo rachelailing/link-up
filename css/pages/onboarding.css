@@ -1,0 +1,132 @@
+/* css/pages/onboarding.css */
+
+.onboard-wrap{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px 24px 40px;
+  display:grid;
+  grid-template-columns: 1.15fr .85fr;
+  gap: 18px;
+  align-items:start;
+}
+
+.onboard-card{
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+}
+
+.onboard-head{
+  padding: 24px 26px 18px;
+  border-bottom: 1px solid var(--border);
+  display:flex;
+  gap: 16px;
+  justify-content:space-between;
+  align-items:flex-start;
+}
+
+.onboard-head h1{ font-size: 28px; margin-bottom: 6px; }
+.onboard-head p{ margin: 0; }
+
+.onboard-progress{
+  width: 180px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.06);
+  overflow:hidden;
+  margin-top: 8px;
+}
+.onboard-progress__bar{
+  width: 33%;
+  height: 100%;
+  background: var(--linkup-green);
+}
+
+.onboard-body{
+  padding: 22px 26px 26px;
+}
+
+.step-panel{ display:none; }
+.step-panel.show{ display:block; }
+
+.step-title{
+  margin-bottom: 14px;
+}
+.step-title h2{
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+.step-title p{ margin: 0; }
+
+.chip-grid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.chip{
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  cursor:pointer;
+  transition: .15s ease;
+  user-select:none;
+}
+.chip:hover{
+  border-color: rgba(46,84,143,.25);
+  background: rgba(46,84,143,.05);
+}
+.chip.active{
+  border-color: rgba(115,187,59,.55);
+  background: rgba(115,187,59,.12);
+  box-shadow: 0 0 0 4px rgba(115,187,59,.12);
+}
+.chip b{ display:block; margin-bottom: 4px; }
+.chip small{ color: var(--muted); }
+
+.step-actions{
+  margin-top: 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+}
+.step-hint{
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.form-grid-2{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 12px;
+}
+textarea{
+  padding: 12px 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  outline:none;
+  resize: vertical;
+}
+textarea:focus{
+  border-color: rgba(46,84,143,.35);
+  box-shadow: 0 0 0 4px rgba(46,84,143,.10);
+}
+
+.muted{
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.onboard-side{
+  border-radius: 18px;
+}
+
+@media (max-width: 960px){
+  .onboard-wrap{ grid-template-columns: 1fr; }
+  .chip-grid{ grid-template-columns: repeat(2, 1fr); }
+  .form-grid-2{ grid-template-columns: 1fr; }
+  .onboard-progress{ width: 140px; }
+}

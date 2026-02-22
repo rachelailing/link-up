@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Link Up — Student Dashboard</title>
+  <link rel="stylesheet" href="../../css/main.css" />
+</head>
+<body>
+  <div class="app">
+
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="../../assets/images/logo.png" alt="Link Up Logo">
+        <div class="logo-title">Link <span>Up</span></div>
+      </div>
+
+      <nav class="nav">
+        <a data-nav href="dashboard.html" class="active">🏠 Dashboard</a>
+        <a data-nav href="jobs.html">🧰 Find Jobs</a>
+        <a data-nav href="applications.html">📨 My Applications</a>
+        <a data-nav href="active-job.html">✅ Active Jobs</a>
+        <a data-nav href="commitment-fee.html">💳 Commitment Fee</a>
+        <a data-nav href="earnings.html">💰 Earnings</a>
+        <a data-nav href="marketplace.html">🛒 Marketplace</a>
+      </nav>
+    </aside>
+
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:12px; font-weight:700;">
+        <span style="width:10px;height:10px;border-radius:999px;background:var(--linkup-green);
+          box-shadow: 0 0 0 6px rgba(115,187,59,.15);"></span>
+        Student Dashboard
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-outline">🔔</button>
+        <button class="btn btn-blue">My Profile</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="container">
+
+        <div class="section-title">
+          <h2>Overview</h2>
+        </div>
+
+        <div class="grid cols-4">
+          <div class="card pad"><h3>Active Jobs</h3><p id="statActive">0</p></div>
+          <div class="card pad"><h3>Pending Apps</h3><p id="statPending">0</p></div>
+          <div class="card pad"><h3>Earnings</h3><p id="statEarnings">RM 0</p></div>
+          <div class="card pad"><h3>Commitment Fee</h3><p id="statDeposit">Unpaid</p></div>
+        </div>
+
+        <div style="height:24px;"></div>
+
+        <div class="section-title">
+          <h2>Recommended Jobs</h2>
+          <button class="btn btn-outline">See all</button>
+        </div>
+
+        <div id="recommendedJobs" class="list"></div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-backdrop" id="applyModal">
+    <div class="modal">
+      <h3>Apply for <span id="applyJobTitle">Job</span></h3>
+      <p>Submit a short message and availability. (MVP demo modal)</p>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" data-modal-close="applyModal">Cancel</button>
+        <button class="btn btn-primary" data-modal-close="applyModal">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../../js/pages/student/dashboard.js"></script>
+</body>
+</html>

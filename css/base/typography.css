@@ -1,0 +1,13 @@
+body{
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--bg);
+}
+p{ color: var(--muted); }
+h1,h2,h3{ color: var(--text); margin:0; }
+
+.link{
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

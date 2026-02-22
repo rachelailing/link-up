@@ -1,0 +1,43 @@
+.list{
+  display:flex;
+  flex-direction:column;
+  gap: var(--s-3);
+}
+
+.job{
+  display:flex;
+  gap: var(--s-4);
+  align-items:flex-start;
+  justify-content:space-between;
+  padding: var(--s-4);
+}
+
+.job-left{
+  display:flex;
+  flex-direction:column;
+  gap: 6px;
+}
+
+.job-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.kv{
+  display:inline-flex;
+  align-items:center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.03);
+  border: 1px solid rgba(0,0,0,.05);
+}
+
+.job-actions{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+}

@@ -1,0 +1,54 @@
+/* css/pages/employer-dashboard.css */
+
+.topbar-title{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  font-weight: 800;
+}
+
+.topbar-title .dot{
+  width:10px;height:10px;border-radius:999px;
+  background: var(--linkup-green);
+  box-shadow: 0 0 0 6px rgba(115,187,59,.15);
+}
+
+.h2-sm{
+  font-size: 18px;
+  margin: 0;
+}
+
+.stat-card p{
+  margin-top: 10px;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--linkup-blue);
+}
+
+.item-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap: 14px;
+  padding: 14px;
+}
+
+.item-left{
+  display:flex;
+  flex-direction:column;
+  gap: 6px;
+}
+
+.item-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.item-actions{
+  display:flex;
+  gap: 10px;
+  align-items:center;
+}

@@ -1,0 +1,29 @@
+.btn{
+  border: 1px solid transparent;
+  background: #fff;
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 14px;
+  cursor:pointer;
+  transition: .15s ease;
+}
+.btn:hover{ transform: translateY(-1px); }
+.btn:active{ transform: translateY(0); }
+
+.btn-primary{
+  background: var(--linkup-green);
+  color: #0B1B0F;
+  border-color: rgba(0,0,0,.06);
+}
+.btn-outline{
+  background: transparent;
+  border-color: var(--border);
+}
+.btn-outline:hover{
+  border-color: rgba(46,84,143,.25);
+  background: rgba(46,84,143,.06);
+}
+.btn-blue{
+  background: var(--linkup-blue);
+  color: white;
+}

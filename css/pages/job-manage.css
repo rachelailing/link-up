@@ -1,0 +1,33 @@
+/* css/pages/job-manage.css */
+
+.manage-card{
+  display:flex;
+  justify-content:space-between;
+  gap: 16px;
+  padding: 18px;
+}
+
+.manage-left{
+  display:flex;
+  flex-direction:column;
+  gap: 8px;
+}
+
+.manage-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.manage-actions{
+  display:flex;
+  gap: 10px;
+  align-items:flex-start;
+  flex-wrap:wrap;
+}
+
+.manage-actions .btn{
+  font-size: 13px;
+}

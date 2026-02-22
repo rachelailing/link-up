@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Marketplace — Link Up</title>
+
+  <link rel="stylesheet" href="../../css/main.css" />
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up">
+        <div class="logo-title">Link <span>Up</span></div>
+      </div>
+
+      <nav class="nav">
+        <a data-nav href="dashboard.html">🏠 Dashboard</a>
+        <a data-nav href="jobs.html">🧰 Find Jobs</a>
+        <a data-nav href="active-job.html">✅ Active Jobs</a>
+        <a data-nav href="earnings.html">💰 Earnings</a>
+        <a data-nav href="marketplace.html" class="active">🛒 Marketplace</a>
+      </nav>
+    </aside>
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div style="font-weight:700;">Marketplace</div>
+      <button class="btn btn-blue">My Profile</button>
+    </header>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="container">
+
+        <!-- Filters -->
+        <div class="card pad marketplace-filter">
+          <input id="marketSearch" type="text" placeholder="Search services (design, tutoring, food...)" />
+
+          <select id="marketCategory">
+            <option value="all">All Categories</option>
+            <option value="creative">Creative</option>
+            <option value="academic">Academic</option>
+            <option value="food">Food</option>
+            <option value="tech">Tech</option>
+          </select>
+
+          <select id="marketSort">
+            <option value="latest">Latest</option>
+            <option value="priceLow">Price: Low → High</option>
+            <option value="priceHigh">Price: High → Low</option>
+          </select>
+        </div>
+
+        <div style="height:20px;"></div>
+
+        <!-- Product Grid -->
+        <div id="marketList" class="market-grid"></div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script type="module" src="../../js/pages/student/marketplace.js"></script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Onboarding — Link Up</title>
+
+  <link rel="stylesheet" href="../../css/main.css" />
+</head>
+
+<body class="auth-body">
+  <header class="auth-top">
+    <a class="auth-brand" href="../../index.html">
+      <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up icon" class="auth-logo">
+      <span class="auth-brand__text">Link <b>Up</b></span>
+    </a>
+
+    <a class="btn btn-outline" href="./student-login.html">Back to Login</a>
+  </header>
+
+  <main class="onboard-wrap">
+    <section class="card onboard-card">
+      <div class="onboard-head">
+        <div>
+          <h1>Set up your student profile</h1>
+          <p>Pick your skills and interests so we can recommend better jobs for you.</p>
+        </div>
+
+        <div class="onboard-progress" aria-label="progress">
+          <div class="onboard-progress__bar" id="progressBar"></div>
+        </div>
+      </div>
+
+      <form id="onboardingForm" class="onboard-body">
+        <!-- Step 1: Skills -->
+        <div class="step-panel show" data-step="1">
+          <div class="step-title">
+            <h2>1) Your skills</h2>
+            <p>Select at least <b>2</b> skills.</p>
+          </div>
+
+          <div class="chip-grid" id="skillsGrid"></div>
+          <small class="error" id="skillsError"></small>
+
+          <div class="step-actions">
+            <span class="step-hint">Tip: Choose skills you can confidently deliver.</span>
+            <button class="btn btn-primary" type="button" data-next>Next</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Interests -->
+        <div class="step-panel" data-step="2">
+          <div class="step-title">
+            <h2>2) What jobs do you like?</h2>
+            <p>Select a few categories you’re interested in.</p>
+          </div>
+
+          <div class="chip-grid" id="interestsGrid"></div>
+          <small class="error" id="interestsError"></small>
+
+          <div class="step-actions">
+            <button class="btn btn-outline" type="button" data-back>Back</button>
+            <button class="btn btn-primary" type="button" data-next>Next</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Availability -->
+        <div class="step-panel" data-step="3">
+          <div class="step-title">
+            <h2>3) Availability</h2>
+            <p>This helps employers know when you can work.</p>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="campus">Campus / Area</label>
+              <input id="campus" type="text" placeholder="e.g., UTP — Tronoh" />
+              <small class="muted">Optional, but helps recommendations.</small>
+            </div>
+
+            <div class="field">
+              <label for="availability">Preferred time</label>
+              <select id="availability">
+                <option value="weekdays">Weekdays</option>
+                <option value="weekends">Weekends</option>
+                <option value="evenings">Evenings</option>
+                <option value="flexible" selected>Flexible</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="bio">Short bio</label>
+              <textarea id="bio" rows="4" placeholder="Tell employers what you’re good at (2–3 lines)."></textarea>
+            </div>
+
+            <div class="field">
+              <label for="portfolio">Portfolio link</label>
+              <input id="portfolio" type="url" placeholder="e.g., https://..." />
+              <small class="muted">Optional. Great for design/video/tutoring.</small>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button class="btn btn-outline" type="button" data-back>Back</button>
+            <button class="btn btn-primary" type="submit">Finish</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <aside class="card onboard-side">
+      <div class="pad">
+        <h3>Why we ask this</h3>
+        <p>
+          Your dashboard will show:
+        </p>
+
+        <div class="mini-list">
+          <span class="kv">Recommended jobs</span>
+          <span class="kv">Applied jobs</span>
+          <span class="kv">Job status</span>
+          <span class="kv">Commitment fee status</span>
+          <span class="kv">Earnings summary</span>
+        </div>
+
+        <div class="note" style="margin-top:12px;">
+          Don’t worry — you can edit your profile later in Settings.
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script type="module" src="../../js/pages/auth/onboarding.js"></script>
+</body>
+</html>

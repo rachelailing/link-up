@@ -1,0 +1,212 @@
+/* css/pages/landing.css */
+
+.landing-nav{
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(255,255,255,.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+.landing-nav__inner{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+}
+
+.landing-brand{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  font-weight: 900;
+}
+.landing-brand img{ width: 38px; height: 38px; object-fit:contain; }
+.landing-brand__text b{ color: var(--linkup-green); }
+
+.landing-menu{
+  display:flex;
+  gap: 18px;
+  color: var(--muted);
+}
+.landing-menu a:hover{ color: var(--linkup-blue); }
+
+.landing-actions{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+}
+.landing-burger{ display:none; }
+
+.landing-logo{
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  border-radius: 12px; /* makes it slightly modern if square */
+}
+
+.hero{
+  padding: 56px 0 28px;
+}
+.hero__inner{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display:grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 28px;
+  align-items:start;
+}
+.hero__pill{
+  display:inline-flex;
+  align-items:center;
+  gap: 10px;
+  background: rgba(46,84,143,.08);
+  border: 1px solid rgba(46,84,143,.14);
+  color: var(--linkup-blue);
+  padding: 10px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+.hero__pill .dot{
+  width:10px;height:10px;border-radius:999px;
+  background: var(--linkup-green);
+  box-shadow: 0 0 0 6px rgba(115,187,59,.15);
+}
+.hero h1{
+  font-size: 44px;
+  line-height: 1.05;
+  margin: 0 0 12px;
+}
+.hero p{
+  margin: 0 0 16px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.hero__cta{
+  display:flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hero__stats{
+  display:flex;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.stat{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  min-width: 160px;
+  box-shadow: var(--shadow-sm);
+}
+.stat__num{
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--linkup-blue);
+}
+.stat__label{
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.hero__card .quick-grid{
+  display:grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+.quick{
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  display:block;
+  transition: .15s ease;
+  background: rgba(115,187,59,.06);
+}
+.quick:hover{
+  transform: translateY(-1px);
+  border-color: rgba(46,84,143,.22);
+  background: rgba(46,84,143,.06);
+}
+.quick__title{ font-weight: 800; }
+.quick__desc{ margin-top: 6px; color: var(--muted); font-size: 13px; }
+
+.note{
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--muted);
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px dashed rgba(46,84,143,.28);
+  background: rgba(46,84,143,.05);
+}
+
+.section{
+  padding: 42px 0;
+}
+.section--alt{
+  background: rgba(115,187,59,.06);
+  border-top: 1px solid rgba(0,0,0,.04);
+  border-bottom: 1px solid rgba(0,0,0,.04);
+}
+
+.mini-list{
+  margin-top: 12px;
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.footer{
+  padding: 28px 0;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+.footer__inner{
+  display:flex;
+  justify-content:space-between;
+  gap: 18px;
+  align-items:flex-start;
+}
+.footer__brand{
+  font-weight: 900;
+  font-size: 18px;
+}
+.footer__brand span{ color: var(--linkup-green); }
+.footer__links{
+  display:flex;
+  flex-direction:column;
+  gap: 8px;
+  color: var(--muted);
+}
+.footer__links a:hover{ color: var(--linkup-blue); }
+
+/* Mobile */
+@media (max-width: 960px){
+  .hero__inner{ grid-template-columns: 1fr; }
+  .landing-menu{ display:none; }
+  .landing-burger{ display:inline-flex; }
+  .landing-menu.show{
+    display:flex;
+    position:absolute;
+    top: 64px;
+    right: 24px;
+    flex-direction:column;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px;
+    box-shadow: var(--shadow-sm);
+  }
+  .hero h1{ font-size: 36px; }
+  .footer__inner{ flex-direction:column; }
+}

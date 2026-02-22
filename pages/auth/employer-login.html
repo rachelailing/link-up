@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" data-page="auth/employer-login">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employer Login | Link Up</title>
+
+  <link rel="stylesheet" href="../../css/main.css" />
+</head>
+
+<body class="auth-body">
+  <!-- Top bar -->
+  <header class="auth-top">
+    <a class="auth-brand" href="../../index.html" aria-label="Go to landing page">
+      <img src="../../assets/images/logo.png" alt="Link Up logo" class="auth-logo" />
+      <span class="auth-brand__text">Link <b>Up</b></span>
+    </a>
+  </header>
+
+  <main class="auth-wrap">
+    <!-- Left: Login card -->
+    <section class="auth-card card">
+      <div class="auth-card__inner">
+        <h1>Employer Login</h1>
+        <p class="auth-subtitle">Welcome back. Log in to manage jobs and applications.</p>
+
+        <!-- Error banner (JS toggles .show) -->
+        <div class="error-banner" id="errorBanner"></div>
+
+        <form class="form" id="employerLoginForm" novalidate>
+          <div class="field">
+            <label for="email">Business Email</label>
+            <input id="email" name="email" type="email" placeholder="e.g., hr@company.com" required />
+            <small class="error" data-error-for="email"></small>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+
+            <div class="input-with-action">
+              <input id="password" name="password" type="password" placeholder="Enter your password" required />
+              <button class="input-action" type="button" data-toggle-password="#password">Show</button>
+            </div>
+
+            <small class="error" data-error-for="password"></small>
+          </div>
+
+          <div class="auth-row">
+            <label class="check">
+              <input id="remember" type="checkbox" />
+              <span>Remember me</span>
+            </label>
+
+            <a class="auth-link" href="#">Forgot password?</a>
+          </div>
+
+          <button class="btn btn--primary btn-full" type="submit">Login</button>
+
+          <div class="auth-bottom">
+            <span>New employer?</span>
+            <a href="./employer-register.html">Create an account</a>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Right: Side info -->
+    <aside class="auth-side">
+      <div class="card auth-card__inner">
+        <h2 style="margin:0;">Quick reminder</h2>
+
+        <div class="auth-steps">
+          <div class="step">
+            <span class="step-dot"></span>
+            <div>
+              <b>Use your business email</b>
+              <p>It helps students recognize your brand and trust your job posts.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <span class="step-dot"></span>
+            <div>
+              <b>Keep your password safe</b>
+              <p>Never share your password with applicants.</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="hint">Tip: If you haven’t registered yet, create an employer account first.</p>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Use module if main.js uses imports -->
+  <script type="module" src="../../js/main.js"></script>
+</body>
+</html>

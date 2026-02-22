@@ -1,0 +1,37 @@
+:root{
+  /* Brand */
+  --linkup-blue:  #2E548F;
+  --linkup-green: #73BB3B;
+
+  /* Neutrals */
+  --bg:           #F7FAF8;
+  --surface:      #FFFFFF;
+  --text:         #1F2937;
+  --muted:        #6B7280;
+  --border:       #E5E7EB;
+
+  /* Feedback */
+  --success:      #16A34A;
+  --warning:      #F59E0B;
+  --danger:       #EF4444;
+  --info:         #2563EB;
+
+  /* Layout */
+  --radius:       16px;
+  --shadow:       0 10px 24px rgba(0,0,0,.08);
+  --shadow-sm:    0 6px 14px rgba(0,0,0,.06);
+
+  --sidebar-w:    260px;
+  --nav-h:        64px;
+
+  /* Spacing */
+  --s-1: 8px;
+  --s-2: 12px;
+  --s-3: 16px;
+  --s-4: 20px;
+  --s-5: 24px;
+  --s-6: 32px;
+
+  /* Typography */
+  --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+}

@@ -1,0 +1,22 @@
+/* css/pages/jobs.css */
+
+.filter-bar{
+  display:flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-bar input,
+.filter-bar select{
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  min-width: 180px;
+}
+
+.filter-bar input:focus,
+.filter-bar select:focus{
+  outline:none;
+  border-color: rgba(46,84,143,.4);
+  box-shadow: 0 0 0 4px rgba(46,84,143,.1);
+}
