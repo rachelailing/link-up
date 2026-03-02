@@ -1,69 +1,75 @@
+// js/pages/student/dashboard.js
 import { setActiveNav } from "../../components/navbar.js";
-import { statusToBadgeClass } from "../../components/status-badge.js";
 import { openModal, wireModalClose } from "../../components/modal.js";
 import { $ } from "../../utils/dom.js";
+import { jobsService } from "../../services/jobs.service.js";
+import { renderJobCard, wireJobCardEvents } from "../../components/job-card.js";
 
-const jobs = [
-  { title:"Freelance Video Editor", employer:"Campus Media Club", location:"UTP, Block A", pay:150, status:"Open" },
-  { title:"Booth Helper (Weekend)", employer:"Student Biz Society", location:"UTP, Main Hall", pay:80, status:"Open" },
-  { title:"Poster Design", employer:"Event Committee", location:"Remote", pay:60, status:"Pending" },
-];
+/**
+ * Dashboard Controller
+ */
+class StudentDashboard {
+  constructor() {
+    this.listEl = $("#recommendedJobs");
+  }
 
-function renderJobs(){
-  const listEl = $("#recommendedJobs");
-  listEl.innerHTML = jobs.map((job, idx) => {
-    const badgeClass = statusToBadgeClass(job.status);
-    return `
-      <div class="card job">
-        <div class="job-left">
-          <div style="display:flex; justify-content:space-between; gap:12px;">
-            <div>
-              <h3 style="margin:0;">${job.title}</h3>
-              <p style="margin:6px 0 0;">${job.employer}</p>
-            </div>
-            <span class="badge ${badgeClass}">${job.status}</span>
-          </div>
+  async init() {
+    setActiveNav();
+    wireModalClose();
+    
+    await this.renderJobs();
+    this.wireEvents();
+    this.loadStats();
+  }
 
-          <div class="job-meta">
-            <span class="kv">📍 ${job.location}</span>
-            <span class="kv">💰 RM ${job.pay}</span>
-          </div>
-        </div>
+  async renderJobs() {
+    const jobs = await jobsService.getRecommendedJobs();
+    
+    if (jobs.length === 0) {
+      this.listEl.innerHTML = `<p class="muted">No recommended jobs found at the moment.</p>`;
+      return;
+    }
 
-        <div class="job-actions">
-          <button class="btn btn-outline" data-view="${idx}">View</button>
-          <button class="btn btn-primary" data-apply="${idx}">Apply</button>
-        </div>
-      </div>
-    `;
-  }).join("");
+    this.listEl.innerHTML = jobs
+      .map(job => renderJobCard(job, {}))
+      .join("");
+  }
 
-  listEl.querySelectorAll("[data-apply]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const job = jobs[Number(btn.dataset.apply)];
-      $("#applyJobTitle").textContent = job.title;
-      openModal("applyModal");
+  wireEvents() {
+    wireJobCardEvents(this.listEl, {
+      onView: (id) => this.handleViewJob(id),
+      onApply: (id) => this.handleApplyJob(id),
     });
-  });
+  }
 
-  listEl.querySelectorAll("[data-view]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const job = jobs[Number(btn.dataset.view)];
+  async handleViewJob(jobId) {
+    const job = await jobsService.getJobById(jobId);
+    if (job) {
       alert(`Job Details:\n${job.title}\n${job.employer}\n${job.location}\nRM ${job.pay}`);
-    });
-  });
+    }
+  }
+
+  async handleApplyJob(jobId) {
+    const job = await jobsService.getJobById(jobId);
+    if (job) {
+      $("#applyJobTitle").textContent = job.title;
+      // We could pass the ID to the modal for the final submission
+      $("#applyModal").dataset.activeJobId = jobId; 
+      openModal("applyModal");
+    }
+  }
+
+  loadStats() {
+    // In a real app, this would also come from a service (e.g., studentProfileService)
+    $("#statActive").textContent = "1";
+    $("#statPending").textContent = "2";
+    $("#statEarnings").textContent = "RM 320";
+    $("#statDeposit").textContent = "Held: RM 50";
+  }
 }
 
-function init(){
-  setActiveNav();
-  wireModalClose();
-  renderJobs();
-
-  // sample stats
-  $("#statActive").textContent = "1";
-  $("#statPending").textContent = "2";
-  $("#statEarnings").textContent = "RM 320";
-  $("#statDeposit").textContent = "Held: RM 50";
-}
-
-document.addEventListener("DOMContentLoaded", init);
+// Bootstrap the page
+document.addEventListener("DOMContentLoaded", () => {
+  const dashboard = new StudentDashboard();
+  dashboard.init();
+});

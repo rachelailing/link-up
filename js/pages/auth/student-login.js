@@ -1,78 +1,90 @@
+// js/pages/auth/student-login.js
 import { $, $$ } from "../../utils/dom.js";
+import { isEmail, minLength } from "../../utils/validators.js";
+import { authService } from "../../services/auth.service.js";
 
-function setError(id, message){
-  const el = document.querySelector(`[data-error-for="${id}"]`);
-  if (el) el.textContent = message || "";
-}
+/**
+ * Student Login Controller
+ */
+class StudentLogin {
+  constructor() {
+    this.form = $("#studentLoginForm");
+    this.emailInput = $("#studentEmail");
+    this.passwordInput = $("#password");
+    this.rememberMe = $("#rememberMe");
+    this.banner = $("#loginError");
+  }
 
-function clearErrors(){
-  $$("[data-error-for]").forEach(e => e.textContent = "");
-  $("#loginError").classList.remove("show");
-  $("#loginError").textContent = "";
-}
+  init() {
+    this.prefillEmail();
+    this.form.addEventListener("submit", (e) => this.handleSubmit(e));
+  }
 
-function validateEmail(email){
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
+  prefillEmail() {
+    const remembered = authService.getRememberedEmail();
+    if (remembered) this.emailInput.value = remembered;
+  }
 
-function showBanner(msg){
-  const b = $("#loginError");
-  b.textContent = msg;
-  b.classList.add("show");
-}
-
-function getStoredStudent(){
-  // from register.js
-  const raw = localStorage.getItem("linkup_student_profile");
-  if (!raw) return null;
-  try { return JSON.parse(raw); } catch { return null; }
-}
-
-function init(){
-  // optional: prefill remembered email
-  const remembered = localStorage.getItem("linkup_remember_email");
-  if (remembered) $("#studentEmail").value = remembered;
-
-  $("#studentLoginForm").addEventListener("submit", (e) => {
+  async handleSubmit(e) {
     e.preventDefault();
-    clearErrors();
+    this.clearErrors();
 
-    const email = $("#studentEmail").value.trim();
-    const pass = $("#password").value;
+    const email = this.emailInput.value.trim();
+    const pass = this.passwordInput.value;
 
-    let ok = true;
-    if (!validateEmail(email)) { setError("studentEmail", "Please enter a valid email."); ok = false; }
-    if (!pass || pass.length < 8) { setError("password", "Please enter your password (min 8 chars)."); ok = false; }
-    if (!ok) return;
+    if (!this.validate(email, pass)) return;
 
-    const student = getStoredStudent();
+    try {
+      const user = await authService.login(email, pass, "student");
+      
+      authService.setRememberMe(email, this.rememberMe.checked);
 
-    // MVP: check if registered email matches (no real password storage yet)
-    if (!student || student.email.toLowerCase() !== email.toLowerCase()){
-      showBanner("No account found for this email. Please register first.");
-      return;
+      // Redirect based on onboarding
+      const onboardingDone = !!user.onboardingDone;
+      window.location.href = onboardingDone
+        ? "../student/dashboard.html"
+        : "./onboarding.html";
+
+    } catch (err) {
+      this.showBanner(err.message);
+    }
+  }
+
+  validate(email, pass) {
+    let isValid = true;
+    
+    if (!isEmail(email)) {
+      this.setError("studentEmail", "Please enter a valid email.");
+      isValid = false;
+    }
+    
+    if (!minLength(pass, 8)) {
+      this.setError("password", "Please enter your password (min 8 chars).");
+      isValid = false;
     }
 
-    // Remember email if checked
-    if ($("#rememberMe").checked) {
-      localStorage.setItem("linkup_remember_email", email);
-    } else {
-      localStorage.removeItem("linkup_remember_email");
-    }
+    return isValid;
+  }
 
-    // Set current user session (MVP)
-    localStorage.setItem("linkup_currentUser", JSON.stringify({
-      ...student,
-      role: "student",
-      loggedInAt: new Date().toISOString()
-    }));
+  setError(id, message) {
+    const el = $(`[data-error-for="${id}"]`);
+    if (el) el.textContent = message || "";
+  }
 
-    // Redirect based on onboarding
-    const onboardingDone = !!student.onboardingDone;
-    window.location.href = onboardingDone
-      ? "../student/dashboard.html"
-      : "./onboarding.html";
-  });
+  clearErrors() {
+    $$("[data-error-for]").forEach(e => e.textContent = "");
+    this.banner.classList.remove("show");
+    this.banner.textContent = "";
+  }
+
+  showBanner(msg) {
+    this.banner.textContent = msg;
+    this.banner.classList.add("show");
+  }
 }
 
-document.addEventListener("DOMContentLoaded", init);
+// Bootstrap
+document.addEventListener("DOMContentLoaded", () => {
+  const page = new StudentLogin();
+  page.init();
+});
