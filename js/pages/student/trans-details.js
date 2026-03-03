@@ -87,7 +87,7 @@ function renderDetail(job, app, feeStatus){
 
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
       ${showPayBtn ? `<button class="btn btn-primary" id="payNowBtn">Pay Now</button>` : ""}
-      <a class="btn btn-outline" href="./applications.html">Back to My Applications</a>
+      <a class="btn btn-outline" href="./job-section.html">Back to Home</a>
       <a class="btn btn-outline" href="./job-details.html">Job Details</a>
     </div>
   `;
@@ -127,7 +127,8 @@ function payFee(jobId){
     studentName,
     amount: Number(job.deposit || 0),
     status: "Held",
-    paidAt: new Date().toISOString()
+    paidAt: new Date().toISOString(),
+    type: "Commitment" // Default type for this app flow
   });
 
   // Update statuses
@@ -141,41 +142,81 @@ function payFee(jobId){
   window.location.href = "./job-details.html";
 }
 
-function renderList(records){
+function renderList(){
+  const fees = getFees();
   const el = $("#feeList");
+  
+  const searchQuery = normalize($("#searchInput").value);
+  const statusFilter = $("#statusFilter").value;
+  const typeFilter = $("#typeFilter").value;
+  const dateSort = $("#dateSort").value;
 
-  $("#feeCountBadge").textContent = `${records.length} record(s)`;
-  $("#feeCountBadge").className = "badge " + (records.length ? "pending" : "accepted");
+  let filtered = fees.filter(f => {
+    // Search
+    if (searchQuery && !normalize(f.jobTitle).includes(searchQuery)) return false;
 
-  if (!records.length){
+    // Status
+    if (statusFilter !== "all") {
+      if (normalize(f.status) !== statusFilter) return false;
+    }
+
+    // Type
+    if (typeFilter !== "all") {
+      const t = normalize(f.type || "Commitment");
+      if (typeFilter === "both") {
+         if (t !== "salary + commitment" && t !== "both") return false;
+      } else {
+         if (t !== typeFilter) return false;
+      }
+    }
+
+    return true;
+  });
+// Sort
+filtered.sort((a, b) => {
+  const da = new Date(a.paidAt);
+  const db = new Date(b.paidAt);
+  return dateSort === "newest" ? db - da : da - db;
+});
+
+const badgeEl = $("#feeCountBadge");
+if (badgeEl) {
+  badgeEl.textContent = `${filtered.length} record(s)`;
+  badgeEl.className = "badge " + (filtered.length ? "pending" : "accepted");
+}
+
+const el = $("#feeList");
+if (!filtered.length){
     el.innerHTML = `
       <div class="card pad">
-        <p>No commitment fee records yet.</p>
-        <p class="small-note">Once you pay a commitment fee, it will appear here.</p>
+        <p>No transaction records found matching your filters.</p>
       </div>
     `;
     return;
   }
 
-  el.innerHTML = records.map(r => {
+  el.innerHTML = filtered.map(r => {
     const badge = statusToBadgeClass(r.status);
+    const typeLabel = r.type || "Commitment Fee";
     return `
       <div class="card fee-row">
         <div class="fee-left">
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
             <h3 style="margin:0;">${r.jobTitle}</h3>
             <span class="badge ${badge}">${r.status}</span>
+            <span class="badge outline" style="font-size:10px;">${typeLabel}</span>
           </div>
 
           <div class="fee-meta">
-            <span class="kv">💳 RM ${r.amount}</span>
+            <span class="kv">💰 RM ${r.amount}</span>
             <span class="kv">👤 ${r.studentName}</span>
-            <span class="kv">🕒 ${new Date(r.paidAt).toLocaleString()}</span>
+            <span class="kv">📅 ${new Date(r.paidAt).toLocaleDateString()}</span>
+            <span class="kv">🕒 ${new Date(r.paidAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
           </div>
         </div>
 
         <div class="fee-actions">
-          <a class="btn btn-outline" href="./trans-details.html?job=${r.jobId}">View</a>
+          <a class="btn btn-outline" href="./trans-details.html?job=${r.jobId}">Details</a>
         </div>
       </div>
     `;
@@ -191,8 +232,13 @@ function init(){
     return;
   }
 
-  const fees = getFees();
-  renderList(fees);
+  // Wire up filters
+  $("#searchInput").addEventListener("input", renderList);
+  $("#statusFilter").addEventListener("change", renderList);
+  $("#typeFilter").addEventListener("change", renderList);
+  $("#dateSort").addEventListener("change", renderList);
+
+  renderList();
 
   // If open from "Pay Commitment Fee" button, show detail
   const params = new URLSearchParams(window.location.search);
@@ -215,11 +261,12 @@ function init(){
     $("#feeDetail").innerHTML = `
       <h3>Job: ${job.title}</h3>
       <p>No application found for your account.</p>
-      <a class="btn btn-outline" href="./applications.html">Back</a>
+      <a class="btn btn-outline" href="./job-section.html">Back</a>
     `;
     return;
   }
 
+  const fees = getFees();
   const feeStatus = computeFeeStatus(job, app, fees);
   renderDetail(job, app, feeStatus);
 }

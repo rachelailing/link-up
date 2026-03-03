@@ -44,7 +44,6 @@
 
         <div class="section-title">
           <h2>Commitment Fee Status</h2>
-          <span class="badge pending" id="feeCountBadge">0</span>
         </div>
 
         <!-- If job query is present -->
@@ -52,12 +51,119 @@
 
         <div style="height:18px;"></div>
 
+        <!-- Filters -->
+        <div class="card pad filter-bar">
+          <input id="searchInput" type="text" placeholder="Search by job title..." />
+
+          <select id="statusFilter">
+            <option value="all">All Status</option>
+            <option value="unpaid">Unpaid</option>
+            <option value="held">Held (Pending)</option>
+            <option value="refunded">Refunded</option>
+            <option value="forfeited">Cancelled/Forfeited</option>
+          </select>
+
+          <select id="typeFilter">
+            <option value="all">All Types</option>
+            <option value="salary">Salary</option>
+            <option value="commitment">Commitment Fee</option>
+            <option value="both">Salary + Commitment</option>
+          </select>
+
+          <select id="dateSort">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
+        </div>
+
+        <div style="height:20px;"></div>
+
         <!-- Overview -->
         <div class="section-title">
           <h2>All Records</h2>
         </div>
 
-        <div id="feeList" class="list"></div>
+        <div class="list">
+          
+          <!-- START OF HARDCODED TRANSACTIONS -->
+          <!-- You can copy-paste this block to add more records -->
+          
+          <!-- Record 1: Salary + Commitment (Completed) -->
+          <div class="card fee-row">
+            <div class="fee-left">
+              <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <!-- Job Title -->
+                <h3 style="margin:0;">Senior Graphic Designer</h3>
+                <!-- Status Badge (refunded = green/success) -->
+                <span class="badge refunded">Refunded</span>
+                <!-- Transaction Type Badge -->
+                <span class="badge outline" style="font-size:10px;">Salary + Commitment</span>
+              </div>
+
+              <div class="fee-meta">
+                <!-- Amount Paid -->
+                <span class="kv">💰 RM 1,250.00</span>
+                <!-- Employer Name (Changed from Student Name) -->
+                <span class="kv">🏢 Google Malaysia</span>
+                <!-- Date and Time -->
+                <span class="kv">📅 2026-03-01</span>
+                <span class="kv">🕒 10:30 AM</span>
+              </div>
+            </div>
+            <div class="fee-actions">
+              <button class="btn btn-outline">Details</button>
+            </div>
+          </div>
+
+          <!-- Record 2: Commitment Fee (Held) -->
+          <div class="card fee-row">
+            <div class="fee-left">
+              <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <h3 style="margin:0;">UI/UX Designer Intern</h3>
+                <!-- Status Badge (held = blue/pending) -->
+                <span class="badge held">Held</span>
+                <span class="badge outline" style="font-size:10px;">Commitment Fee</span>
+              </div>
+
+              <div class="fee-meta">
+                <span class="kv">💰 RM 50.00</span>
+                <span class="kv">🏢 Creative Agency</span>
+                <span class="kv">📅 2026-02-28</span>
+                <span class="kv">🕒 02:15 PM</span>
+              </div>
+            </div>
+            <div class="fee-actions">
+              <button class="btn btn-outline">Details</button>
+            </div>
+          </div>
+
+          <!-- Record 3: Salary (Pending) -->
+          <div class="card fee-row">
+            <div class="fee-left">
+              <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <h3 style="margin:0;">Social Media Manager</h3>
+                <!-- Status Badge (unpaid = orange/warning) -->
+                <span class="badge unpaid">Unpaid</span>
+                <span class="badge outline" style="font-size:10px;">Salary</span>
+              </div>
+
+              <div class="fee-meta">
+                <span class="kv">💰 RM 800.00</span>
+                <span class="kv">🏢 Tech Startup Inc.</span>
+                <span class="kv">📅 2026-02-25</span>
+                <span class="kv">🕒 09:00 AM</span>
+              </div>
+            </div>
+            <div class="fee-actions">
+              <button class="btn btn-outline">Details</button>
+            </div>
+          </div>
+
+          <!-- END OF HARDCODED TRANSACTIONS -->
+
+          <!-- Dynamic records from script will appear here -->
+          <div id="feeList"></div>
+        </div>
 
       </div>
     </main>
