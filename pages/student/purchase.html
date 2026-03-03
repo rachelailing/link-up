@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Marketplace — Link Up</title>
+  <title>Purchase History — Link Up</title>
 
   <link rel="stylesheet" href="../../css/main.css" />
 </head>
@@ -19,9 +19,9 @@
       </div>
 
       <nav class="nav">
-        <a data-nav href="marketplace.html" class="active">🏠 Home Page</a>
+        <a data-nav href="marketplace.html">🏠 Home Page</a>
         <a data-nav href="earnings.html">💰 Earning History</a>
-        <a data-nav href="purchase.html">🛍️ Purchase History</a>
+        <a data-nav href="purchase.html" class="active">🛍️ Purchase History</a>
       </nav>
     </aside>
 
@@ -41,36 +41,38 @@
     <!-- Main -->
     <main class="main">
       <div class="container">
+        <div class="section-title">
+          <h2>Purchase History</h2>
+        </div>
 
-        <!-- Filters -->
-        <div class="card pad marketplace-filter">
-          <input id="marketSearch" type="text" placeholder="Search services (design, tutoring, food...)" />
-
-          <select id="marketCategory">
-            <option value="all">All Categories</option>
-            <option value="creative">Creative</option>
-            <option value="academic">Academic</option>
-            <option value="food">Food</option>
-            <option value="tech">Tech</option>
-          </select>
-
-          <select id="marketSort">
-            <option value="latest">Latest</option>
-            <option value="priceLow">Price: Low → High</option>
-            <option value="priceHigh">Price: High → Low</option>
-          </select>
+        <div class="card pad">
+          <p class="muted">You haven't made any purchases yet.</p>
         </div>
 
         <div style="height:20px;"></div>
 
-        <!-- Product Grid -->
-        <div id="marketList" class="market-grid"></div>
+        <!-- Example of how a purchase might look -->
+        <div class="list">
+          <div class="card pad" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div>
+              <h3 style="margin:0;">UI Design Component Pack</h3>
+              <p class="muted" style="margin:4px 0 0 0;">Purchased on: 2026-03-04</p>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-weight: bold; color: var(--blue);">RM 45.00</div>
+              <span class="badge inprogress">Completed</span>
+            </div>
+          </div>
+        </div>
 
       </div>
     </main>
 
   </div>
 
-  <script type="module" src="../../js/pages/student/marketplace.js"></script>
+  <!-- Placeholder script -->
+  <script type="module">
+    console.log("Purchase History page loaded");
+  </script>
 </body>
 </html>
