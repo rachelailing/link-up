@@ -42,7 +42,7 @@ class StudentLogin {
       // Redirect based on onboarding
       const onboardingDone = !!user.onboardingDone;
       window.location.href = onboardingDone
-        ? "../student/dashboard.html"
+        ? "../student/job-section.html"
         : "./onboarding.html";
 
     } catch (err) {

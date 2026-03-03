@@ -135,7 +135,7 @@ function init(){
     if (!validateStep()) return;
 
     saveOnboarding();
-    window.location.href = "../student/dashboard.html";
+    window.location.href = "../student/job-section.html";
   });
 }
 
