@@ -92,16 +92,25 @@ function renderJobs(){
 
   // Update counter
   const activeCount = filtered.filter(isActive).length;
-  $("#activeCountBadge").textContent = `${activeCount} Active`;
+  const badgeEl = $("#activeCountBadge");
+  if (badgeEl) badgeEl.textContent = `${activeCount} Active`;
 
   const el = $("#activeJobsList");
+  const listContainer = el.closest(".list");
+  const hasHardcoded = listContainer && listContainer.querySelector(".active-row:not(#activeJobsList .active-row)");
+
   if (!filtered.length) {
-    el.innerHTML = `
-      <div class="card pad">
-        <p>No jobs found right now.</p>
-        <a class="btn btn-primary" href="./jobs.html">Find Jobs</a>
-      </div>
-    `;
+    // If no dynamic jobs, only show empty state if there are NO other jobs (like hardcoded ones)
+    if (!hasHardcoded) {
+      el.innerHTML = `
+        <div class="card pad">
+          <p>No jobs found right now.</p>
+          <a class="btn btn-primary" href="./jobs.html">Find Jobs</a>
+        </div>
+      `;
+    } else {
+      el.innerHTML = "";
+    }
     return;
   }
 
@@ -116,22 +125,39 @@ function renderJobs(){
 
     return `
       <div class="card active-row">
-        <div class="active-left">
-          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-            <h3 style="margin:0;">${job.title}</h3>
-            <span class="badge ${badge}">${displayStatus}</span>
-            ${countdown ? `<span class="countdown">⏳ ${countdown}</span>` : ""}
+        <div class="active-image">
+           <img src="../../assets/images/link_up_icon.jpeg" alt="job icon" />
+        </div>
+
+        <div class="active-content">
+          <div class="active-main-info">
+            <div class="active-title-row">
+              <h3 style="margin:0;">${job.title}</h3>
+              <span class="badge ${badge}">${displayStatus}</span>
+            </div>
+            
+            <div class="active-details-row">
+              <div class="active-col">
+                <span class="label">Location</span>
+                <span class="value">📍 ${job.location}</span>
+              </div>
+              <div class="active-col">
+                <span class="label">Payment</span>
+                <span class="value">💰 RM ${job.salary}</span>
+              </div>
+              <div class="active-col">
+                <span class="label">Deadline</span>
+                <span class="value">📅 ${job.deadline || "-"}</span>
+              </div>
+              ${countdown ? `
+              <div class="active-col">
+                <span class="label">Time Left</span>
+                <span class="countdown">⏳ ${countdown}</span>
+              </div>` : ""}
+            </div>
           </div>
 
-          <div class="active-meta">
-            <span class="kv">👤 You: ${studentName}</span>
-            <span class="kv">📍 ${job.location}</span>
-            <span class="kv">💰 RM ${job.salary}</span>
-            <span class="kv">💳 Fee RM ${job.deposit}</span>
-            <span class="kv">📅 ${job.deadline || "-"}</span>
-          </div>
-
-          <p style="margin:0; color:var(--muted);">
+          <p class="active-desc">
             ${job.description ? job.description.slice(0, 110) + (job.description.length > 110 ? "..." : "") : ""}
           </p>
         </div>
