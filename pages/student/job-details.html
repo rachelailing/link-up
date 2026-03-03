@@ -36,9 +36,29 @@
       <div class="container">
 
         <div class="section-title">
-          <h2>My Active Jobs</h2>
+          <h2>My Jobs</h2>
           <span class="badge inprogress" id="activeCountBadge">0 Active</span>
         </div>
+
+        <!-- Filters -->
+        <div class="card pad filter-bar">
+          <input id="searchInput" type="text" placeholder="Search by job title..." />
+
+          <select id="statusFilter">
+            <option value="all">All Status</option>
+            <option value="applied">Applied</option>
+            <option value="current">Current</option>
+            <option value="done">Done</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+
+          <select id="dateFilter">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
+        </div>
+
+        <div style="height:20px;"></div>
 
         <div id="activeJobsList" class="list"></div>
 
