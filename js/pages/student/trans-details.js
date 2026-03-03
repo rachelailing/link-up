@@ -88,7 +88,7 @@ function renderDetail(job, app, feeStatus){
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
       ${showPayBtn ? `<button class="btn btn-primary" id="payNowBtn">Pay Now</button>` : ""}
       <a class="btn btn-outline" href="./applications.html">Back to My Applications</a>
-      <a class="btn btn-outline" href="./active-job.html">Active Jobs</a>
+      <a class="btn btn-outline" href="./job-details.html">Job Details</a>
     </div>
   `;
 
@@ -138,7 +138,7 @@ function payFee(jobId){
   saveJobs(jobs);
 
   alert("Commitment fee paid ✅ Job is now In Progress.");
-  window.location.href = "./active-job.html";
+  window.location.href = "./job-details.html";
 }
 
 function renderList(records){
@@ -175,7 +175,7 @@ function renderList(records){
         </div>
 
         <div class="fee-actions">
-          <a class="btn btn-outline" href="./commitment-fee.html?job=${r.jobId}">View</a>
+          <a class="btn btn-outline" href="./trans-details.html?job=${r.jobId}">View</a>
         </div>
       </div>
     `;
