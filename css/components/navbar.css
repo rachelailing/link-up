@@ -31,3 +31,30 @@
   color: var(--linkup-blue);
   border: 1px solid rgba(46,84,143,.18);
 }
+
+/* Topbar Navigation */
+.topbar-nav {
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+}
+
+.topbar-nav-link {
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.topbar-nav-link:hover {
+  background: rgba(46, 84, 143, 0.05);
+  color: var(--text);
+}
+
+.topbar-nav-link.active {
+  color: var(--linkup-blue);
+  background: rgba(46, 84, 143, 0.1);
+}
