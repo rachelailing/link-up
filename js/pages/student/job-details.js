@@ -222,10 +222,12 @@ function init(){
   setActiveNav();
 
   const user = getCurrentUser();
+  /*
   if (!user) {
     window.location.href = "../auth/student-login.html";
     return;
   }
+  */
 
   // Event Listeners for filters
   $("#searchInput").addEventListener("input", renderJobs);

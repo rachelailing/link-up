@@ -227,10 +227,12 @@ function init(){
   setActiveNav();
 
   const user = getCurrentUser();
+  /*
   if (!user){
     window.location.href = "../auth/student-login.html";
     return;
   }
+  */
 
   // Wire up filters
   $("#searchInput").addEventListener("input", renderList);
@@ -253,7 +255,7 @@ function init(){
     return;
   }
 
-  const studentName = user.fullName || "Student";
+  const studentName = (user ? user.fullName : "Student") || "Student";
   const app = findMyApplication(job, studentName);
 
   if (!app){
