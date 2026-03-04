@@ -8,14 +8,84 @@ class ProductManage {
     this.imageUpload = $("#imageUpload");
     this.fileInput = $("#fileInput");
     this.tagsContainer = $("#productTags");
+    this.toggleEditBtn = $("#toggleEditBtn");
+    this.submitBtn = $("button[type='submit']");
     this.selectedImageData = null;
     this.selectedTags = new Set();
+    this.editId = null;
+    this.isEditMode = false;
   }
 
   init() {
     setActiveNav();
+    this.checkEditMode();
     this.wireEvents();
-    this.setDefaultDate();
+    if (!this.editId) {
+      this.setDefaultDate();
+      this.isEditMode = true; // New listing is always in edit mode
+    }
+  }
+
+  checkEditMode() {
+    const params = new URLSearchParams(window.location.search);
+    const id = parseInt(params.get("id"));
+    if (id) {
+      this.editId = id;
+      this.isEditMode = false; // Start in View mode
+      $("#pageTitle").textContent = "Product Details";
+      this.toggleEditBtn.style.display = "block";
+      this.submitBtn.style.display = "none";
+      
+      this.loadExistingData(id);
+      this.setFormDisabled(true);
+    }
+  }
+
+  setFormDisabled(disabled) {
+    const inputs = this.form.querySelectorAll("input, textarea, select");
+    inputs.forEach(input => {
+      if (input.id !== "toggleEditBtn") input.disabled = disabled;
+    });
+    
+    // Disable chips
+    const chips = this.tagsContainer.querySelectorAll(".chip");
+    chips.forEach(chip => {
+      chip.style.pointerEvents = disabled ? "none" : "auto";
+      chip.style.opacity = disabled ? "0.7" : "1";
+    });
+
+    // Disable image upload
+    this.imageUpload.style.pointerEvents = disabled ? "none" : "auto";
+    this.imageUpload.style.opacity = disabled ? "0.8" : "1";
+  }
+
+  loadExistingData(id) {
+    const myListings = JSON.parse(localStorage.getItem("linkup_my_market_listings") || "[]");
+    const item = myListings.find(i => i.id === id);
+    
+    if (item) {
+      $("#title").value = item.title;
+      $("#price").value = (item.price || "").replace("RM ", "");
+      $("#quantity").value = item.quantity || 1;
+      $("#location").value = item.location;
+      $("#description").value = item.description || "";
+      $("#date").value = item.date;
+      
+      if (item.image) {
+        this.selectedImageData = item.image;
+        this.imageUpload.innerHTML = `<img src="${item.image}" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">`;
+      }
+
+      if (item.tags) {
+        item.tags.forEach(tag => {
+          this.selectedTags.add(tag);
+          const chip = this.tagsContainer.querySelector(`[data-value="${tag}"]`);
+          if (chip) chip.classList.add("active");
+        });
+      }
+      
+      $("#terms").checked = true;
+    }
   }
 
   setDefaultDate() {
@@ -24,12 +94,18 @@ class ProductManage {
   }
 
   wireEvents() {
-    // Image upload trigger
-    this.imageUpload.addEventListener("click", () => {
-      this.fileInput.click();
+    // Toggle Edit Mode
+    this.toggleEditBtn.addEventListener("click", () => {
+      this.isEditMode = true;
+      this.setFormDisabled(false);
+      this.toggleEditBtn.style.display = "none";
+      this.submitBtn.style.display = "block";
+      this.submitBtn.textContent = "Update Product";
+      $("#pageTitle").textContent = "Edit Product";
     });
 
-    // Handle file selection
+    this.imageUpload.addEventListener("click", () => this.fileInput.click());
+
     this.fileInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (file) {
@@ -42,12 +118,11 @@ class ProductManage {
       }
     });
 
-    // Tag Selection (Chips)
     if (this.tagsContainer) {
       this.tagsContainer.addEventListener("click", (e) => {
+        if (!this.isEditMode) return;
         const chip = e.target.closest(".chip");
         if (!chip) return;
-
         const val = chip.dataset.value;
         if (this.selectedTags.has(val)) {
           this.selectedTags.delete(val);
@@ -59,7 +134,6 @@ class ProductManage {
       });
     }
 
-    // Form submission
     this.form.addEventListener("submit", (e) => {
       e.preventDefault();
       this.handlePost();
@@ -79,8 +153,8 @@ class ProductManage {
       return;
     }
 
-    const newListing = {
-      id: Date.now(),
+    const listingData = {
+      id: this.editId || Date.now(),
       title,
       price: `RM ${priceValue}`,
       quantity,
@@ -92,12 +166,16 @@ class ProductManage {
       type: "Product"
     };
 
-    // Save to localStorage
-    const existingListings = JSON.parse(localStorage.getItem("linkup_my_market_listings") || "[]");
-    existingListings.unshift(newListing);
-    localStorage.setItem("linkup_my_market_listings", JSON.stringify(existingListings));
+    let existingListings = JSON.parse(localStorage.getItem("linkup_my_market_listings") || "[]");
+    
+    if (this.editId) {
+      existingListings = existingListings.map(i => i.id === this.editId ? listingData : i);
+    } else {
+      existingListings.unshift(listingData);
+    }
 
-    alert("Success! Your item has been posted to the marketplace.");
+    localStorage.setItem("linkup_my_market_listings", JSON.stringify(existingListings));
+    alert(this.editId ? "Product updated successfully!" : "Success! Your item has been posted to the marketplace.");
     window.location.href = "marketplace-listings.html";
   }
 }
