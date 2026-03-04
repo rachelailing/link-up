@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Item Details — Marketplace — Link Up</title>
+
+  <link rel="stylesheet" href="../../css/main.css" />
+  <style>
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 30px;
+      align-items: start;
+    }
+    .item-image-large {
+      width: 100%;
+      height: 400px;
+      background: #f0f0f0;
+      border-radius: 16px;
+      object-fit: cover;
+      margin-bottom: 24px;
+      border: 1px solid #eee;
+    }
+    .item-info-section h1 {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+    .item-info-section .price-tag {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #007bff;
+      margin-bottom: 16px;
+    }
+    .item-info-section .rating-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .description-box {
+      line-height: 1.6;
+      color: #444;
+      margin-bottom: 32px;
+    }
+    .payment-card {
+      position: sticky;
+      top: 20px;
+    }
+    .payment-summary {
+      border-top: 1px solid #eee;
+      margin-top: 16px;
+      padding-top: 16px;
+    }
+    .fpx-selector {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
+    .bank-option {
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    .bank-option:hover {
+      border-color: #007bff;
+      background: #f0f7ff;
+    }
+    .bank-option.selected {
+      border-color: #007bff;
+      background: #e7f3ff;
+      font-weight: bold;
+    }
+    .tag-list {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up">
+        <div class="logo-title">Link <span>Up</span></div>
+      </div>
+
+      <nav class="nav">
+        <a data-nav href="marketplace.html">🏠 Home Page</a>
+        <a data-nav href="earnings.html">💰 Earning History</a>
+        <a data-nav href="purchase.html">🛍️ Purchase History</a>
+      </nav>
+    </aside>
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-nav">
+        <a href="job-section.html" class="topbar-nav-link">Job Section</a>
+        <a href="marketplace.html" class="topbar-nav-link active">Marketplace Section</a>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-outline">🔔</button>
+        <button class="btn btn-blue">My Profile</button>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="container">
+        <div style="margin-bottom: 24px;">
+           <a href="javascript:history.back()" style="text-decoration:none; color:#007bff;">← Back</a>
+        </div>
+
+        <div id="loadingState" style="text-align:center; padding: 50px;">
+          <p>Loading item details...</p>
+        </div>
+
+        <div id="detailsContent" class="details-grid" style="display:none;">
+          <!-- Left Column: Details -->
+          <div class="item-info-section">
+            <img id="itemImage" src="" alt="Item" class="item-image-large">
+            
+            <div class="rating-row">
+              <span id="itemRating" style="color:#f39c12; font-weight:800; font-size:1.2rem;">⭐ 4.8</span>
+              <span id="itemReviews" class="muted">(12 reviews)</span>
+              <span id="itemType" class="badge outline">Product</span>
+            </div>
+
+            <h1 id="itemTitle">Item Title</h1>
+            <div id="itemPrice" class="price-tag">RM 0.00</div>
+            
+            <div class="meta" style="margin-bottom: 24px;">
+              <span id="itemLocation">📍 Location</span> • 
+              <span id="itemDate">📅 Posted: Date</span>
+            </div>
+
+            <h3>Description</h3>
+            <div id="itemDescription" class="description-box">
+              Detailed description goes here...
+            </div>
+
+            <h3>Tags</h3>
+            <div id="itemTags" class="tag-list">
+              <!-- JS dynamic tags -->
+            </div>
+          </div>
+
+          <!-- Right Column: Payment -->
+          <div class="card pad payment-card">
+            <h3 style="margin-top:0;">Secure Checkout</h3>
+            <p class="small muted">Complete your purchase using FPX Online Banking.</p>
+
+            <div class="payment-summary">
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                <span>Subtotal</span>
+                <span id="subtotal">RM 0.00</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                <span>Service Fee (2%)</span>
+                <span id="serviceFee">RM 0.00</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.2rem; margin-top:12px; border-top:1px dashed #ddd; padding-top:12px;">
+                <span>Total</span>
+                <span id="totalAmount">RM 0.00</span>
+              </div>
+            </div>
+
+            <div style="margin-top:24px;">
+              <label style="font-weight:600; font-size:0.9rem;">Select Bank</label>
+              <div class="fpx-selector" id="bankSelector">
+                <div class="bank-option" data-bank="maybank">Maybank2u</div>
+                <div class="bank-option" data-bank="cimb">CIMB Clicks</div>
+                <div class="bank-option" data-bank="bankislam">Bank Islam</div>
+                <div class="bank-option" data-bank="rhb">RHB Now</div>
+                <div class="bank-option" data-bank="pbe">Public Bank</div>
+                <div class="bank-option" data-bank="hlb">Hong Leong</div>
+              </div>
+            </div>
+
+            <button id="payButton" class="btn btn-primary" style="width:100%; padding:16px; font-size:1.1rem; margin-top:16px;">
+              Pay via FPX
+            </button>
+            <p style="text-align:center; font-size:0.75rem; color:#888; margin-top:12px;">
+              🛡️ Secure payment powered by Link Up Pay
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <script type="module" src="../../js/pages/student/marketplace-details.js"></script>
+</body>
+</html>
