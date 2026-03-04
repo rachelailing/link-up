@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Listings — Marketplace — Link Up</title>
+
+  <link rel="stylesheet" href="../../css/main.css" />
+  <style>
+    .section-title {
+      margin-bottom: 20px;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+    }
+    .market-grid {
+      display: flex;
+      overflow-x: auto;
+      gap: 20px;
+      padding: 10px 5px 20px 5px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .market-grid::-webkit-scrollbar {
+      height: 6px;
+    }
+    .market-grid::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    .market-grid::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 10px;
+    }
+    .market-grid::-webkit-scrollbar-thumb:hover {
+      background: #bbb;
+    }
+    .market-card {
+      flex: 0 0 280px; /* Fixed width for slider items */
+      scroll-snap-align: start;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      border: 1px solid #eee;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+    .market-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+    .market-card-image {
+      width: 100%;
+      height: 160px;
+      background: #f0f0f0;
+      object-fit: cover;
+    }
+    .market-card-content {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .market-card h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: #333;
+    }
+    .market-card .price {
+      font-weight: 700;
+      color: #007bff;
+      font-size: 1.2rem;
+    }
+    .market-card .meta {
+      font-size: 0.85rem;
+      color: #666;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up">
+        <div class="logo-title">Link <span>Up</span></div>
+      </div>
+
+      <nav class="nav">
+        <a data-nav href="marketplace.html">🏠 Home Page</a>
+        <a data-nav href="earnings.html">💰 Earning History</a>
+        <a data-nav href="purchase.html">🛍️ Purchase History</a>
+      </nav>
+    </aside>
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-nav">
+        <a href="job-section.html" class="topbar-nav-link">Job Section</a>
+        <a href="marketplace.html" class="topbar-nav-link active">Marketplace Section</a>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-outline">🔔</button>
+        <button class="btn btn-blue">My Profile</button>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="container">
+        <div style="margin-bottom: 24px;">
+           <a href="marketplace.html" style="text-decoration:none; color:#007bff;">← Back to Marketplace</a>
+        </div>
+
+        <!-- My Products Section -->
+        <section class="market-section">
+          <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>My Products</h2>
+            <a href="product-manage.html" class="btn btn-primary" style="margin-bottom: 10px;">+ Add New Product</a>
+          </div>
+          <div id="myProductsGrid" class="market-grid">
+            <!-- JS dynamic content -->
+          </div>
+        </section>
+
+        <div style="height:40px;"></div>
+
+        <!-- My Services Section -->
+        <section class="market-section">
+          <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>My Services</h2>
+            <a href="service-manage.html" class="btn btn-primary" style="margin-bottom: 10px;">+ Add New Service</a>
+          </div>
+          <div id="myServicesGrid" class="market-grid">
+            <!-- JS dynamic content -->
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script type="module" src="../../js/pages/student/marketplace-listings.js"></script>
+</body>
+</html>

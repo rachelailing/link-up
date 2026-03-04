@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Post New Listing — Link Up</title>
+  <title>Post New Service — Link Up</title>
 
   <link rel="stylesheet" href="../../css/main.css" />
   <style>
@@ -84,11 +84,11 @@
         </div>
 
         <div class="manage-container card pad">
-          <h2 style="margin-bottom: 24px;">Add New Product</h2>
+          <h2 style="margin-bottom: 24px;">Add New Service</h2>
 
-          <form id="listingForm">
+          <form id="serviceForm">
             <div class="form-group">
-              <label>Product Photo</label>
+              <label>Service Cover Photo</label>
               <div class="image-upload-placeholder" id="imageUpload">
                 <span>📷</span>
                 <span>Click to upload photo</span>
@@ -97,44 +97,38 @@
             </div>
 
             <div class="form-group">
-              <label for="title">Title</label>
-              <input type="text" id="title" placeholder="e.g. Calculus Textbook" required>
-            </div>
-
-            <div class="grid cols-2 gap-16">
-              <div class="form-group">
-                <label for="price">Price (RM)</label>
-                <input type="text" id="price" placeholder="e.g. 30" required>
-              </div>
-              <div class="form-group">
-                <label for="quantity">Quantity</label>
-                <input type="number" id="quantity" value="1" min="1" required>
-              </div>
+              <label for="title">Service Title</label>
+              <input type="text" id="title" placeholder="e.g. Video Editing Service" required>
             </div>
 
             <div class="form-group">
-              <label for="location">Location</label>
-              <input type="text" id="location" placeholder="e.g. V2, Block A" required>
+              <label for="price">Starting Price (RM)</label>
+              <input type="text" id="price" placeholder="e.g. 50" required>
             </div>
 
             <div class="form-group">
-              <label>Product Categories (Select tags)</label>
-              <div class="chip-grid" id="productTags">
-                <div class="chip" data-value="textbooks">Textbooks</div>
-                <div class="chip" data-value="electronics">Electronics</div>
-                <div class="chip" data-value="stationery">Stationery</div>
-                <div class="chip" data-value="clothing">Clothing</div>
-                <div class="chip" data-value="household">Household</div>
-                <div class="chip" data-value="food">Food & Snacks</div>
-                <div class="chip" data-value="sports">Sports Gear</div>
-                <div class="chip" data-value="others">Others</div>
+              <label for="location">Location / Coverage</label>
+              <input type="text" id="location" placeholder="e.g. Online / UTP Campus" required>
+            </div>
+
+            <div class="form-group">
+              <label>Service Categories (Select tags)</label>
+              <div class="chip-grid" id="serviceTags">
+                <div class="chip" data-value="creative">Creative</div>
+                <div class="chip" data-value="video">Video Editing</div>
+                <div class="chip" data-value="design">Graphic Design</div>
+                <div class="chip" data-value="academic">Academic / Tutoring</div>
+                <div class="chip" data-value="food">Food & Beverage</div>
+                <div class="chip" data-value="tech">Tech / IT</div>
+                <div class="chip" data-value="laundry">Laundry / Cleaning</div>
+                <div class="chip" data-value="event">Event Support</div>
               </div>
-              <small class="muted">Tags help buyers find your products more easily.</small>
+              <small class="muted">These tags help us recommend your service to interested students.</small>
             </div>
 
             <div class="form-group">
               <label for="description">Description</label>
-              <textarea id="description" rows="4" placeholder="Describe your product condition, features, etc..." required></textarea>
+              <textarea id="description" rows="4" placeholder="Describe your service in detail..." required></textarea>
             </div>
 
             <div class="form-group">
@@ -144,12 +138,12 @@
 
             <div class="form-group" style="display: flex; align-items: flex-start; gap: 10px;">
               <input type="checkbox" id="terms" style="width: auto; margin-top: 4px;" required>
-              <label for="terms" style="font-weight: 400; font-size: 0.9rem;">I agree to the <a href="#" style="color: #007bff;">Terms and Conditions</a> and ensure that this listing complies with campus trade policies.</label>
+              <label for="terms" style="font-weight: 400; font-size: 0.9rem;">I agree to the <a href="#" style="color: #007bff;">Terms and Conditions</a> and ensure that the service provided follows campus guidelines.</label>
             </div>
 
             <div style="height:20px;"></div>
 
-            <button type="submit" class="btn btn-primary" style="width:100%; padding:14px; font-size:1.1rem;">Post Now</button>
+            <button type="submit" class="btn btn-primary" style="width:100%; padding:14px; font-size:1.1rem;">Post Service Now</button>
           </form>
         </div>
       </div>
@@ -157,6 +151,6 @@
 
   </div>
 
-  <script type="module" src="../../js/pages/student/product-manage.js"></script>
+  <script type="module" src="../../js/pages/student/service-manage.js"></script>
 </body>
 </html>

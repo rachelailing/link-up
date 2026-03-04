@@ -110,7 +110,7 @@ class Marketplace {
 
     if (seeMoreMine) {
       seeMoreMine.addEventListener("click", () => {
-        window.location.href = "marketplace-my-listings.html";
+        window.location.href = "marketplace-listings.html";
       });
     }
   }

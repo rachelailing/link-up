@@ -1,13 +1,13 @@
-// js/pages/student/product-manage.js
+// js/pages/student/service-manage.js
 import { $, $$ } from "../../utils/dom.js";
 import { setActiveNav } from "../../components/navbar.js";
 
-class ProductManage {
+class ServiceManage {
   constructor() {
-    this.form = $("#listingForm");
+    this.form = $("#serviceForm");
     this.imageUpload = $("#imageUpload");
     this.fileInput = $("#fileInput");
-    this.tagsContainer = $("#productTags");
+    this.tagsContainer = $("#serviceTags");
     this.selectedImageData = null;
     this.selectedTags = new Set();
   }
@@ -24,12 +24,9 @@ class ProductManage {
   }
 
   wireEvents() {
-    // Image upload trigger
-    this.imageUpload.addEventListener("click", () => {
-      this.fileInput.click();
-    });
+    // Image Upload
+    this.imageUpload.addEventListener("click", () => this.fileInput.click());
 
-    // Handle file selection
     this.fileInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (file) {
@@ -69,7 +66,6 @@ class ProductManage {
   handlePost() {
     const title = $("#title").value;
     const priceValue = $("#price").value;
-    const quantity = $("#quantity").value;
     const location = $("#location").value;
     const description = $("#description").value;
     const date = $("#date").value;
@@ -79,30 +75,28 @@ class ProductManage {
       return;
     }
 
-    const newListing = {
+    const newService = {
       id: Date.now(),
       title,
       price: `RM ${priceValue}`,
-      quantity,
       location,
       description,
       date,
       tags: Array.from(this.selectedTags),
       image: this.selectedImageData,
-      type: "Product"
+      type: "Service"
     };
 
-    // Save to localStorage
     const existingListings = JSON.parse(localStorage.getItem("linkup_my_market_listings") || "[]");
-    existingListings.unshift(newListing);
+    existingListings.unshift(newService);
     localStorage.setItem("linkup_my_market_listings", JSON.stringify(existingListings));
 
-    alert("Success! Your item has been posted to the marketplace.");
+    alert("Success! Your service has been posted.");
     window.location.href = "marketplace-listings.html";
   }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const page = new ProductManage();
+  const page = new ServiceManage();
   page.init();
 });
