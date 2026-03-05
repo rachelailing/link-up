@@ -141,7 +141,7 @@ export function initEmployerLogin() {
     };
     localStorage.setItem(STORAGE.SESSION, JSON.stringify(session));
 
-    // Redirect to employer dashboard
-    window.location.href = "../employer/dashboard.html";
+    // Redirect to employer homepage
+    window.location.href = "../employer/employer_homepage.html";
   });
 }
