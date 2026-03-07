@@ -66,7 +66,7 @@ link-up/
 │   └── utils/          # DOM helpers and formatters
 ├── pages/              
 │   ├── auth/           # Login, Register, and Onboarding flows
-│   ├── employer/       # Employer-specific dashboards and tools
+│   ├── employer/       # Employer-specific home page and tools
 │   └── student/        # Student-specific dashboards and tools
 └── index.html          # Main landing page
 ```
