@@ -1,5 +1,6 @@
 // js/pages/auth/employer-register.js
 import { isEmail, minLength, digitsCount } from "../../utils/validators.js";
+import { authService } from "../../services/auth.service.js";
 
 export function initEmployerRegister() {
   const form = document.getElementById("employerRegisterForm");
@@ -150,26 +151,36 @@ export function initEmployerRegister() {
     return ok;
   }
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
-    // Frontend demo: store in localStorage (temporary)
-    const payload = {
-      role: "employer",
-      businessName: fields.businessName.value.trim(),
-      businessType: fields.businessType.value,
-      businessEmail: fields.businessEmail.value.trim(),
-      businessPhone: fields.businessPhone.value.trim(),
-      businessAddress: document.getElementById("businessAddress")?.value.trim() || "",
-      picName: fields.picName.value.trim(),
-      picRole: fields.picRole.value.trim(),
-      createdAt: new Date().toISOString(),
-    };
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Creating account...";
 
-    localStorage.setItem("linkup_employer_register", JSON.stringify(payload));
+    try {
+      const payload = {
+        email: fields.businessEmail.value.trim(),
+        password: fields.password.value,
+        businessName: fields.businessName.value.trim(),
+        businessType: fields.businessType.value,
+        businessPhone: fields.businessPhone.value.trim(),
+        businessAddress: document.getElementById("businessAddress")?.value.trim() || "",
+        picName: fields.picName.value.trim(),
+        picRole: fields.picRole.value.trim(),
+      };
 
-    // Redirect to employer login (nice flow)
-    window.location.href = "./employer-login.html";
+      await authService.register(payload, "employer");
+
+      // Redirect to email verification page
+      window.location.href = "./verify-email.html";
+
+    } catch (err) {
+      showAlert("Registration failed: " + (err.message || "Please try again."));
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Create Account";
+    }
   });
 }

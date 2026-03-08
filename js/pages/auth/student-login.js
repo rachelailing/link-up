@@ -35,12 +35,18 @@ class StudentLogin {
     if (!this.validate(email, pass)) return;
 
     try {
-      const user = await authService.login(email, pass, "student");
+      const user = await authService.login(email, pass);
       
+      // Verify role
+      if (user.user_metadata?.role !== "student") {
+        await authService.logout();
+        throw new Error("This account is not registered as a student.");
+      }
+
       authService.setRememberMe(email, this.rememberMe.checked);
 
       // Redirect based on onboarding
-      const onboardingDone = !!user.onboardingDone;
+      const onboardingDone = !!user.user_metadata?.onboardingDone;
       window.location.href = onboardingDone
         ? "../student/job-section.html"
         : "./onboarding.html";

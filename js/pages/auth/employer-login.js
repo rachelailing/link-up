@@ -1,21 +1,14 @@
 // js/pages/auth/employer-login.js
 import { isEmail, minLength } from "../../utils/validators.js";
-
-const STORAGE = {
-  // where we saved employer registration mock
-  EMPLOYER_REGISTER: "linkup_employer_register",
-  // logged in session
-  SESSION: "linkup_session",
-  REMEMBER_EMAIL: "linkup_employer_remember_email",
-};
+import { authService } from "../../services/auth.service.js";
 
 export function initEmployerLogin() {
   const form = document.getElementById("employerLoginForm");
   if (!form) return;
 
   const banner = document.getElementById("errorBanner");
-  const email = document.getElementById("email");
-  const password = document.getElementById("password");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
   const remember = document.getElementById("remember");
 
   // --- Password toggle (Show/Hide) ---
@@ -31,10 +24,10 @@ export function initEmployerLogin() {
     });
   });
 
-  // --- Remember email (optional) ---
-  const savedEmail = localStorage.getItem(STORAGE.REMEMBER_EMAIL);
+  // --- Remember email ---
+  const savedEmail = authService.getRememberedEmail();
   if (savedEmail) {
-    email.value = savedEmail;
+    emailInput.value = savedEmail;
     remember.checked = true;
   }
 
@@ -66,26 +59,25 @@ export function initEmployerLogin() {
   }
 
   // Live validation cleanup
-  email.addEventListener("input", () => { hideBanner(); clearFieldError("email"); });
-  password.addEventListener("input", () => { hideBanner(); clearFieldError("password"); });
+  emailInput.addEventListener("input", () => { hideBanner(); clearFieldError("email"); });
+  passwordInput.addEventListener("input", () => { hideBanner(); clearFieldError("password"); });
 
   function validate() {
     hideBanner();
     let ok = true;
 
-    if (!email.value.trim()) {
+    if (!emailInput.value.trim()) {
       setFieldError("email", "Email is required.");
       ok = false;
-    } else if (!isEmail(email.value)) {
+    } else if (!isEmail(emailInput.value)) {
       setFieldError("email", "Please enter a valid email.");
       ok = false;
     }
 
-    if (!password.value) {
+    if (!passwordInput.value) {
       setFieldError("password", "Password is required.");
       ok = false;
-    } else if (!minLength(password.value, 8)) {
-      // you can remove this if you don't want length check on login
+    } else if (!minLength(passwordInput.value, 8)) {
       setFieldError("password", "Password must be at least 8 characters.");
       ok = false;
     }
@@ -94,54 +86,39 @@ export function initEmployerLogin() {
     return ok;
   }
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
-    // --- Mock authentication ---
-    // For now, compare with the stored registration record.
-    const regRaw = localStorage.getItem(STORAGE.EMPLOYER_REGISTER);
-    if (!regRaw) {
-      showBanner("No employer account found. Please register first.");
-      return;
-    }
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Logging in...";
 
-    const reg = JSON.parse(regRaw);
+    try {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      
+      const user = await authService.login(email, password);
 
-    // NOTE: In a real app, password is never stored in localStorage.
-    // For now, we just simulate:
-    const storedEmail = (reg.businessEmail || "").toLowerCase();
-    const inputEmail = email.value.trim().toLowerCase();
+      // Verify role
+      if (user.user_metadata?.role !== "employer") {
+        await authService.logout();
+        throw new Error("This account is not registered as an employer.");
+      }
 
-    // If you didn't store password at register, we can accept any password for demo.
-    // If you DID store it later, you can enable password check:
-    const storedPassword = reg.password; // may be undefined
-    const passwordMatches = storedPassword ? (password.value === storedPassword) : true;
+      // Remember email if checked
+      authService.setRememberMe(email, remember.checked);
 
-    if (inputEmail !== storedEmail || !passwordMatches) {
-      showBanner("Invalid email or password.");
+      // Redirect to employer homepage
+      window.location.href = "../employer/employer_homepage.html";
+
+    } catch (err) {
+      showBanner(err.message || "Invalid email or password.");
       setFieldError("email", "");
       setFieldError("password", "");
-      return;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Login";
     }
-
-    // Remember email if checked
-    if (remember.checked) {
-      localStorage.setItem(STORAGE.REMEMBER_EMAIL, email.value.trim());
-    } else {
-      localStorage.removeItem(STORAGE.REMEMBER_EMAIL);
-    }
-
-    // Create a session object
-    const session = {
-      role: "employer",
-      businessName: reg.businessName || "",
-      businessEmail: reg.businessEmail || "",
-      createdAt: new Date().toISOString(),
-    };
-    localStorage.setItem(STORAGE.SESSION, JSON.stringify(session));
-
-    // Redirect to employer homepage
-    window.location.href = "../employer/employer_homepage.html";
   });
 }

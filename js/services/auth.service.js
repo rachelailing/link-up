@@ -1,75 +1,92 @@
 // js/services/auth.service.js
+import { supabase } from "../config/supabase.js";
 import { storage } from "../utils/storage.js";
 
 /**
  * Authentication Service
- * Responsibility: Handle all login, registration, and session management.
+ * Responsibility: Handle all login, registration, and session management using Supabase.
  */
 export class AuthService {
   constructor() {
     this.STORAGE_KEYS = {
-      STUDENT_PROFILE: "linkup_student_profile",
-      EMPLOYER_PROFILE: "linkup_employer_profile",
-      CURRENT_USER: "linkup_currentUser",
       REMEMBER_EMAIL: "linkup_remember_email"
     };
   }
 
   /**
-   * Mock login for students/employers
+   * Login for students/employers using Supabase Auth
    * @param {string} email 
    * @param {string} password 
-   * @param {string} role - 'student' or 'employer'
    * @returns {Promise<Object>} User data on success
    * @throws {Error} On failure
    */
-  async login(email, password, role) {
-    // In a real app, this would be a fetch() call
-    const storedProfile = this._getProfileByRole(role);
-    
-    if (!storedProfile || storedProfile.email.toLowerCase() !== email.toLowerCase()) {
-      throw new Error("No account found for this email. Please register first.");
-    }
+  async login(email, password) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-    // Mock session creation
-    const userSession = {
-      ...storedProfile,
-      role,
-      loggedInAt: new Date().toISOString()
-    };
+    if (error) throw error;
 
-    storage.set(this.STORAGE_KEYS.CURRENT_USER, userSession);
-    return userSession;
+    // Return the user and their session
+    return data.user;
   }
 
   /**
-   * Registers a new user
-   * @param {Object} userData 
+   * Registers a new user with role and profile metadata
+   * @param {Object} userData - { email, password, fullName, university, etc. }
    * @param {string} role - 'student' or 'employer'
    * @returns {Promise<Object>} The registered user
    */
   async register(userData, role) {
-    const key = role === "student" 
-      ? this.STORAGE_KEYS.STUDENT_PROFILE 
-      : this.STORAGE_KEYS.EMPLOYER_PROFILE;
-    
-    storage.set(key, { ...userData, role });
-    return userData;
+    const { email, password, ...metadata } = userData;
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          role,
+          ...metadata,
+          onboardingDone: false
+        }
+      }
+    });
+
+    if (error) throw error;
+
+    return data.user;
   }
 
-  logout() {
-    storage.remove(this.STORAGE_KEYS.CURRENT_USER);
+  /**
+   * Signs out the current user
+   */
+  async logout() {
+    const { error } = await supabase.auth.signOut();
+    if (error) console.error("Error logging out:", error.message);
     window.location.href = "/index.html";
   }
 
-  getCurrentUser() {
-    return storage.get(this.STORAGE_KEYS.CURRENT_USER);
+  /**
+   * Gets the currently logged-in user session
+   */
+  async getCurrentUser() {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error) return null;
+    return user;
   }
 
-  isLoggedIn() {
-    return !!this.getCurrentUser();
+  /**
+   * Check if a user is currently logged in
+   */
+  async isLoggedIn() {
+    const user = await this.getCurrentUser();
+    return !!user;
   }
 
+  /**
+   * Helper to set "Remember Me" email in local storage
+   */
   setRememberMe(email, enabled) {
     if (enabled) {
       storage.set(this.STORAGE_KEYS.REMEMBER_EMAIL, email);
@@ -78,15 +95,11 @@ export class AuthService {
     }
   }
 
+  /**
+   * Helper to get remembered email
+   */
   getRememberedEmail() {
     return storage.get(this.STORAGE_KEYS.REMEMBER_EMAIL) || "";
-  }
-
-  _getProfileByRole(role) {
-    const key = role === "student" 
-      ? this.STORAGE_KEYS.STUDENT_PROFILE 
-      : this.STORAGE_KEYS.EMPLOYER_PROFILE;
-    return storage.get(key);
   }
 }
 

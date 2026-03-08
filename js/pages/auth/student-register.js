@@ -1,4 +1,6 @@
+// js/pages/auth/student-register.js
 import { $, $$ } from "../../utils/dom.js";
+import { authService } from "../../services/auth.service.js";
 
 function setError(id, message){
   const el = document.querySelector(`[data-error-for="${id}"]`);
@@ -37,31 +39,40 @@ function validate(){
   return ok;
 }
 
-function saveStudent(){
-  const student = {
-    role: "student",
-    fullName: $("#fullName").value.trim(),
+async function registerStudent(){
+  const userData = {
     email: $("#studentEmail").value.trim(),
+    password: $("#password").value,
+    fullName: $("#fullName").value.trim(),
     university: $("#university").value,
     phone: $("#phone").value.trim(),
-    createdAt: new Date().toISOString(),
   };
 
-  // MVP storage (temporary)
-  localStorage.setItem("linkup_currentUser", JSON.stringify(student));
-  localStorage.setItem("linkup_student_profile", JSON.stringify(student));
+  try {
+    await authService.register(userData, "student");
+    // Next step: tell user to verify email
+    window.location.href = "./verify-email.html";
+  } catch (err) {
+    alert("Registration failed: " + err.message);
+  }
 }
 
 function init(){
   const form = $("#studentRegisterForm");
-  form.addEventListener("submit", (e) => {
+  if (!form) return;
+
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
-    saveStudent();
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Creating Account...";
 
-    // Next step in your flow: onboarding
-    window.location.href = "./onboarding.html";
+    await registerStudent();
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Create Account";
   });
 }
 
