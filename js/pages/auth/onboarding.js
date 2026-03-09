@@ -1,4 +1,7 @@
+// js/pages/auth/onboarding.js
 import { $, $$ } from "../../utils/dom.js";
+import { authService } from "../../services/auth.service.js";
+import { supabase } from "../../config/supabase.js";
 
 const SKILLS = [
   { key:"design", name:"Graphic Design", desc:"Poster, slides, banners" },
@@ -24,6 +27,7 @@ const INTERESTS = [
 let step = 1;
 const selectedSkills = new Set();
 const selectedInterests = new Set();
+let currentUser = null;
 
 function renderChips(list, mountEl, setRef){
   mountEl.innerHTML = list.map(item => `
@@ -43,7 +47,6 @@ function renderChips(list, mountEl, setRef){
         setRef.add(key);
         chip.classList.add("active");
       }
-      updateProgress(); // optional feel-good update
     });
   });
 }
@@ -57,38 +60,34 @@ function showStep(n){
 function updateProgress(){
   const bar = $("#progressBar");
   const pct = step === 1 ? 33 : step === 2 ? 66 : 100;
-  bar.style.width = pct + "%";
+  if (bar) bar.style.width = pct + "%";
 }
 
 function validateStep(){
-  $("#skillsError").textContent = "";
-  $("#interestsError").textContent = "";
+  const skillsError = $("#skillsError");
+  const interestsError = $("#interestsError");
+  if (skillsError) skillsError.textContent = "";
+  if (interestsError) interestsError.textContent = "";
 
   if (step === 1) {
     if (selectedSkills.size < 2) {
-      $("#skillsError").textContent = "Please select at least 2 skills.";
+      if (skillsError) skillsError.textContent = "Please select at least 2 skills.";
       return false;
     }
   }
   if (step === 2) {
     if (selectedInterests.size < 1) {
-      $("#interestsError").textContent = "Please select at least 1 interest.";
+      if (interestsError) interestsError.textContent = "Please select at least 1 interest.";
       return false;
     }
   }
   return true;
 }
 
-function getStudentProfile(){
-  const raw = localStorage.getItem("linkup_student_profile");
-  if (!raw) return null;
-  try { return JSON.parse(raw); } catch { return null; }
-}
+async function saveOnboarding(){
+  if (!currentUser) return;
 
-function saveOnboarding(){
-  const student = getStudentProfile() || {};
-  const updated = {
-    ...student,
+  const metadata = {
     onboardingDone: true,
     skills: [...selectedSkills],
     interests: [...selectedInterests],
@@ -99,8 +98,18 @@ function saveOnboarding(){
     updatedAt: new Date().toISOString()
   };
 
-  localStorage.setItem("linkup_student_profile", JSON.stringify(updated));
-  localStorage.setItem("linkup_currentUser", JSON.stringify({ ...updated, role:"student" }));
+  // Update Supabase Auth metadata
+  const { data, error } = await supabase.auth.updateUser({
+    data: metadata
+  });
+
+  if (error) {
+    alert("Failed to save onboarding: " + error.message);
+    return;
+  }
+
+  // Success
+  window.location.href = "../student/job-section.html";
 }
 
 function wireNavButtons(){
@@ -116,11 +125,17 @@ function wireNavButtons(){
   });
 }
 
-function init(){
-  // guard: if no registered user, go to register
-  const student = getStudentProfile();
-  if (!student) {
+async function init(){
+  currentUser = await authService.getCurrentUser();
+  
+  if (!currentUser) {
     window.location.href = "./student-register.html";
+    return;
+  }
+
+  // Pre-fill if some metadata exists
+  if (currentUser.user_metadata?.onboardingDone) {
+    window.location.href = "../student/job-section.html";
     return;
   }
 
@@ -130,13 +145,22 @@ function init(){
   wireNavButtons();
   showStep(1);
 
-  $("#onboardingForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    if (!validateStep()) return;
-
-    saveOnboarding();
-    window.location.href = "../student/job-section.html";
-  });
+  const form = $("#onboardingForm");
+  if (form) {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!validateStep()) return;
+      
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Saving...";
+      
+      await saveOnboarding();
+      
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Complete Onboarding";
+    });
+  }
 }
 
 document.addEventListener("DOMContentLoaded", init);

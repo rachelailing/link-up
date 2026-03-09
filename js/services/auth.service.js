@@ -41,20 +41,31 @@ export class AuthService {
   async register(userData, role) {
     const { email, password, ...metadata } = userData;
 
+    // Remove any potentially undefined or null values from metadata
+    const cleanMetadata = Object.fromEntries(
+      Object.entries(metadata).filter(([_, v]) => v != null)
+    );
+
+    console.log(`[AuthService] Registering ${role}:`, { email, cleanMetadata });
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           role,
-          ...metadata,
+          ...cleanMetadata,
           onboardingDone: false
         }
       }
     });
 
-    if (error) throw error;
+    if (error) {
+      console.error(`[AuthService] Supabase signUp error:`, error);
+      throw error;
+    }
 
+    console.log(`[AuthService] Registration successful for:`, data.user?.email);
     return data.user;
   }
 

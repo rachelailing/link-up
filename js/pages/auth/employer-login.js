@@ -2,101 +2,67 @@
 import { isEmail, minLength } from "../../utils/validators.js";
 import { authService } from "../../services/auth.service.js";
 
-export function initEmployerLogin() {
-  const form = document.getElementById("employerLoginForm");
-  if (!form) return;
+/**
+ * Employer Login Controller
+ */
+class EmployerLogin {
+  constructor() {
+    this.form = document.getElementById("employerLoginForm");
+    if (!this.form) return;
 
-  const banner = document.getElementById("errorBanner");
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
-  const remember = document.getElementById("remember");
+    this.banner = document.getElementById("errorBanner");
+    this.emailInput = document.getElementById("email");
+    this.passwordInput = document.getElementById("password");
+    this.remember = document.getElementById("remember");
+  }
 
-  // --- Password toggle (Show/Hide) ---
-  document.querySelectorAll("[data-toggle-password]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const selector = btn.getAttribute("data-toggle-password");
-      const input = document.querySelector(selector);
-      if (!input) return;
+  init() {
+    if (!this.form) return;
 
-      const hidden = input.type === "password";
-      input.type = hidden ? "text" : "password";
-      btn.textContent = hidden ? "Hide" : "Show";
+    this.prefillEmail();
+    this.wirePasswordToggles();
+    this.wireLiveCleanup();
+    this.form.addEventListener("submit", (e) => this.handleSubmit(e));
+  }
+
+  prefillEmail() {
+    const savedEmail = authService.getRememberedEmail();
+    if (savedEmail) {
+      this.emailInput.value = savedEmail;
+      this.remember.checked = true;
+    }
+  }
+
+  wirePasswordToggles() {
+    document.querySelectorAll("[data-toggle-password]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const selector = btn.getAttribute("data-toggle-password");
+        const input = document.querySelector(selector);
+        if (!input) return;
+
+        const hidden = input.type === "password";
+        input.type = hidden ? "text" : "password";
+        btn.textContent = hidden ? "Hide" : "Show";
+      });
     });
-  });
-
-  // --- Remember email ---
-  const savedEmail = authService.getRememberedEmail();
-  if (savedEmail) {
-    emailInput.value = savedEmail;
-    remember.checked = true;
   }
 
-  // Helpers
-  function showBanner(msg) {
-    if (!banner) return;
-    banner.textContent = msg;
-    banner.classList.add("show");
+  wireLiveCleanup() {
+    this.emailInput.addEventListener("input", () => { this.hideBanner(); this.clearFieldError("email"); });
+    this.passwordInput.addEventListener("input", () => { this.hideBanner(); this.clearFieldError("password"); });
   }
 
-  function hideBanner() {
-    if (!banner) return;
-    banner.textContent = "";
-    banner.classList.remove("show");
-  }
-
-  function setFieldError(name, msg) {
-    const field = form.querySelector(`#${name}`)?.closest(".field");
-    const err = form.querySelector(`[data-error-for="${name}"]`);
-    if (field) field.classList.add("is-invalid");
-    if (err) err.textContent = msg || "";
-  }
-
-  function clearFieldError(name) {
-    const field = form.querySelector(`#${name}`)?.closest(".field");
-    const err = form.querySelector(`[data-error-for="${name}"]`);
-    if (field) field.classList.remove("is-invalid");
-    if (err) err.textContent = "";
-  }
-
-  // Live validation cleanup
-  emailInput.addEventListener("input", () => { hideBanner(); clearFieldError("email"); });
-  passwordInput.addEventListener("input", () => { hideBanner(); clearFieldError("password"); });
-
-  function validate() {
-    hideBanner();
-    let ok = true;
-
-    if (!emailInput.value.trim()) {
-      setFieldError("email", "Email is required.");
-      ok = false;
-    } else if (!isEmail(emailInput.value)) {
-      setFieldError("email", "Please enter a valid email.");
-      ok = false;
-    }
-
-    if (!passwordInput.value) {
-      setFieldError("password", "Password is required.");
-      ok = false;
-    } else if (!minLength(passwordInput.value, 8)) {
-      setFieldError("password", "Password must be at least 8 characters.");
-      ok = false;
-    }
-
-    if (!ok) showBanner("Please fix the highlighted fields and try again.");
-    return ok;
-  }
-
-  form.addEventListener("submit", async (e) => {
+  async handleSubmit(e) {
     e.preventDefault();
-    if (!validate()) return;
+    if (!this.validate()) return;
 
-    const submitBtn = form.querySelector('button[type="submit"]');
+    const submitBtn = this.form.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.textContent = "Logging in...";
 
     try {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
+      const email = this.emailInput.value.trim();
+      const password = this.passwordInput.value;
       
       const user = await authService.login(email, password);
 
@@ -107,18 +73,70 @@ export function initEmployerLogin() {
       }
 
       // Remember email if checked
-      authService.setRememberMe(email, remember.checked);
+      authService.setRememberMe(email, this.remember.checked);
 
       // Redirect to employer homepage
       window.location.href = "../employer/employer_homepage.html";
 
     } catch (err) {
-      showBanner(err.message || "Invalid email or password.");
-      setFieldError("email", "");
-      setFieldError("password", "");
+      this.showBanner(err.message || "Invalid email or password.");
+      this.setFieldError("email", "");
+      this.setFieldError("password", "");
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = "Login";
     }
-  });
+  }
+
+  validate() {
+    this.hideBanner();
+    let ok = true;
+
+    if (!this.emailInput.value.trim()) {
+      this.setFieldError("email", "Email is required.");
+      ok = false;
+    } else if (!isEmail(this.emailInput.value)) {
+      this.setFieldError("email", "Please enter a valid email.");
+      ok = false;
+    }
+
+    if (!this.passwordInput.value) {
+      this.setFieldError("password", "Password is required.");
+      ok = false;
+    } else if (!minLength(this.passwordInput.value, 8)) {
+      this.setFieldError("password", "Password must be at least 8 characters.");
+      ok = false;
+    }
+
+    if (!ok) this.showBanner("Please fix the highlighted fields and try again.");
+    return ok;
+  }
+
+  showBanner(msg) {
+    if (!this.banner) return;
+    this.banner.textContent = msg;
+    this.banner.classList.add("show");
+  }
+
+  hideBanner() {
+    if (!this.banner) return;
+    this.banner.textContent = "";
+    this.banner.classList.remove("show");
+  }
+
+  setFieldError(name, msg) {
+    const errorEl = this.form.querySelector(`[data-error-for="${name}"]`);
+    if (errorEl) errorEl.textContent = msg || "";
+  }
+
+  clearFieldError(name) {
+    const errorEl = this.form.querySelector(`[data-error-for="${name}"]`);
+    if (errorEl) errorEl.textContent = "";
+  }
 }
+
+// Bootstrap
+document.addEventListener("DOMContentLoaded", () => {
+  const page = new EmployerLogin();
+  page.init();
+});

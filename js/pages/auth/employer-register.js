@@ -2,185 +2,187 @@
 import { isEmail, minLength, digitsCount } from "../../utils/validators.js";
 import { authService } from "../../services/auth.service.js";
 
-export function initEmployerRegister() {
-  const form = document.getElementById("employerRegisterForm");
-  if (!form) return;
+/**
+ * Employer Registration Controller
+ */
+class EmployerRegister {
+  constructor() {
+    this.form = document.getElementById("employerRegisterForm");
+    if (!this.form) return;
 
-  const alertBox = document.getElementById("formAlert");
+    this.alertBox = document.getElementById("formAlert");
+    this.fields = {
+      businessName: document.getElementById("businessName"),
+      businessType: document.getElementById("businessType"),
+      businessEmail: document.getElementById("businessEmail"),
+      businessPhone: document.getElementById("businessPhone"),
+      picName: document.getElementById("picName"),
+      picRole: document.getElementById("picRole"),
+      password: document.getElementById("password"),
+      confirmPassword: document.getElementById("confirmPassword"),
+      terms: document.getElementById("terms"),
+    };
+  }
 
-  const fields = {
-    businessName: document.getElementById("businessName"),
-    businessType: document.getElementById("businessType"),
-    businessEmail: document.getElementById("businessEmail"),
-    businessPhone: document.getElementById("businessPhone"),
-    picName: document.getElementById("picName"),
-    picRole: document.getElementById("picRole"),
-    password: document.getElementById("password"),
-    confirmPassword: document.getElementById("confirmPassword"),
-    terms: document.getElementById("terms"),
-  };
+  init() {
+    if (!this.form) return;
 
-  // Toggle password buttons
-  document.querySelectorAll("[data-toggle-password]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const selector = btn.getAttribute("data-toggle-password");
-      const input = document.querySelector(selector);
-      if (!input) return;
+    this.wirePasswordToggles();
+    this.wireLiveCleanup();
+    this.form.addEventListener("submit", (e) => this.handleSubmit(e));
+  }
 
-      const isHidden = input.type === "password";
-      input.type = isHidden ? "text" : "password";
-      btn.textContent = isHidden ? "Hide" : "Show";
+  wirePasswordToggles() {
+    document.querySelectorAll("[data-toggle-password]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const selector = btn.getAttribute("data-toggle-password");
+        const input = document.querySelector(selector);
+        if (!input) return;
+
+        const isHidden = input.type === "password";
+        input.type = isHidden ? "text" : "password";
+        btn.textContent = isHidden ? "Hide" : "Show";
+      });
     });
-  });
-
-  function setFieldError(name, message) {
-    const input = fields[name];
-    const errorEl = form.querySelector(`[data-error-for="${name}"]`);
-    if (input) input.closest(".form-field")?.classList.add("is-invalid");
-    if (errorEl) errorEl.textContent = message || "";
   }
 
-  function clearFieldError(name) {
-    const input = fields[name];
-    const errorEl = form.querySelector(`[data-error-for="${name}"]`);
-    if (input) input.closest(".form-field")?.classList.remove("is-invalid");
-    if (errorEl) errorEl.textContent = "";
-  }
+  wireLiveCleanup() {
+    Object.keys(this.fields).forEach((name) => {
+      const el = this.fields[name];
+      if (!el) return;
 
-  function showAlert(message) {
-    if (!alertBox) return;
-    alertBox.hidden = false;
-    alertBox.textContent = message;
-  }
+      const evt = el.type === "checkbox" || el.tagName === "SELECT" ? "change" : "input";
+      el.addEventListener(evt, () => {
+        this.hideAlert();
+        this.clearFieldError(name);
 
-  function hideAlert() {
-    if (!alertBox) return;
-    alertBox.hidden = true;
-    alertBox.textContent = "";
-  }
-
-  function normalizePhone(value) {
-    return String(value || "").replace(/[^\d+\-()\s]/g, "");
-  }
-
-  // Live cleanup
-  Object.keys(fields).forEach((name) => {
-    const el = fields[name];
-    if (!el) return;
-
-    const evt = el.type === "checkbox" || el.tagName === "SELECT" ? "change" : "input";
-    el.addEventListener(evt, () => {
-      hideAlert();
-      clearFieldError(name);
-
-      if (name === "businessPhone") {
-        el.value = normalizePhone(el.value);
-      }
-
-      // Password match live
-      if (name === "password" || name === "confirmPassword") {
-        if (fields.confirmPassword.value && fields.password.value !== fields.confirmPassword.value) {
-          setFieldError("confirmPassword", "Passwords do not match.");
-        } else {
-          clearFieldError("confirmPassword");
+        if (name === "businessPhone") {
+          el.value = el.value.replace(/[^\d+\-()\s]/g, "");
         }
-      }
+
+        if (name === "password" || name === "confirmPassword") {
+          if (this.fields.confirmPassword.value && this.fields.password.value !== this.fields.confirmPassword.value) {
+            this.setFieldError("confirmPassword", "Passwords do not match.");
+          } else {
+            this.clearFieldError("confirmPassword");
+          }
+        }
+      });
     });
-  });
-
-  function validate() {
-    hideAlert();
-    let ok = true;
-
-    // Required text fields
-    const requiredText = ["businessName", "picName", "picRole"];
-    requiredText.forEach((name) => {
-      if (!fields[name].value.trim()) {
-        setFieldError(name, "This field is required.");
-        ok = false;
-      }
-    });
-
-    // Business type
-    if (!fields.businessType.value) {
-      setFieldError("businessType", "Please select a business type.");
-      ok = false;
-    }
-
-    // Email
-    if (!fields.businessEmail.value.trim()) {
-      setFieldError("businessEmail", "Business email is required.");
-      ok = false;
-    } else if (!isEmail(fields.businessEmail.value)) {
-      setFieldError("businessEmail", "Please enter a valid email.");
-      ok = false;
-    }
-
-    // Phone
-    const phoneVal = fields.businessPhone.value.trim();
-    if (!phoneVal) {
-      setFieldError("businessPhone", "Business phone is required.");
-      ok = false;
-    } else if (digitsCount(phoneVal) < 9) {
-      setFieldError("businessPhone", "Please enter a valid phone number.");
-      ok = false;
-    }
-
-    // Password
-    if (!minLength(fields.password.value, 8)) {
-      setFieldError("password", "Password must be at least 8 characters.");
-      ok = false;
-    }
-
-    // Confirm password
-    if (!fields.confirmPassword.value) {
-      setFieldError("confirmPassword", "Please confirm your password.");
-      ok = false;
-    } else if (fields.password.value !== fields.confirmPassword.value) {
-      setFieldError("confirmPassword", "Passwords do not match.");
-      ok = false;
-    }
-
-    // Terms
-    if (!fields.terms.checked) {
-      setFieldError("terms", "You must agree before creating an account.");
-      ok = false;
-    }
-
-    if (!ok) showAlert("Please fix the highlighted fields and try again.");
-    return ok;
   }
 
-  form.addEventListener("submit", async (e) => {
+  async handleSubmit(e) {
     e.preventDefault();
-    if (!validate()) return;
+    alert("Form submit triggered!");
+    console.log("[EmployerRegister] Form submitted");
 
-    const submitBtn = form.querySelector('button[type="submit"]');
+    if (!this.validate()) {
+      console.warn("[EmployerRegister] Validation failed");
+      return;
+    }
+
+    const submitBtn = this.form.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.textContent = "Creating account...";
 
     try {
       const payload = {
-        email: fields.businessEmail.value.trim(),
-        password: fields.password.value,
-        businessName: fields.businessName.value.trim(),
-        businessType: fields.businessType.value,
-        businessPhone: fields.businessPhone.value.trim(),
+        email: this.fields.businessEmail.value.trim(),
+        password: this.fields.password.value,
+        businessName: this.fields.businessName.value.trim(),
+        businessType: this.fields.businessType.value,
+        businessPhone: this.fields.businessPhone.value.trim(),
         businessAddress: document.getElementById("businessAddress")?.value.trim() || "",
-        picName: fields.picName.value.trim(),
-        picRole: fields.picRole.value.trim(),
+        picName: this.fields.picName.value.trim(),
+        picRole: this.fields.picRole.value.trim(),
       };
 
-      await authService.register(payload, "employer");
-
-      // Redirect to email verification page
+      console.log("[EmployerRegister] Calling authService.register with payload:", payload);
+      const user = await authService.register(payload, "employer");
+      
+      console.log("[EmployerRegister] Success! Redirecting to verify-email.html. User:", user);
       window.location.href = "./verify-email.html";
 
     } catch (err) {
-      showAlert("Registration failed: " + (err.message || "Please try again."));
+      console.error("[EmployerRegister] Catch block error:", err);
+      this.showAlert("Registration failed: " + (err.message || "Please try again."));
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = "Create Account";
     }
-  });
+  }
+
+  validate() {
+    this.hideAlert();
+    let ok = true;
+
+    const requiredText = ["businessName", "picName", "picRole"];
+    requiredText.forEach((name) => {
+      if (!this.fields[name].value.trim()) {
+        this.setFieldError(name, "This field is required.");
+        ok = false;
+      }
+    });
+
+    if (!this.fields.businessType.value) {
+      this.setFieldError("businessType", "Please select a business type.");
+      ok = false;
+    }
+
+    if (!isEmail(this.fields.businessEmail.value)) {
+      this.setFieldError("businessEmail", "Please enter a valid email.");
+      ok = false;
+    }
+
+    if (digitsCount(this.fields.businessPhone.value) < 9) {
+      this.setFieldError("businessPhone", "Please enter a valid phone number.");
+      ok = false;
+    }
+
+    if (!minLength(this.fields.password.value, 8)) {
+      this.setFieldError("password", "Password must be at least 8 characters.");
+      ok = false;
+    }
+
+    if (this.fields.password.value !== this.fields.confirmPassword.value) {
+      this.setFieldError("confirmPassword", "Passwords do not match.");
+      ok = false;
+    }
+
+    if (!this.fields.terms.checked) {
+      this.setFieldError("terms", "You must agree before creating an account.");
+      ok = false;
+    }
+
+    if (!ok) this.showAlert("Please fix the highlighted fields and try again.");
+    return ok;
+  }
+
+  setFieldError(name, message) {
+    const errorEl = this.form.querySelector(`[data-error-for="${name}"]`);
+    if (errorEl) errorEl.textContent = message || "";
+  }
+
+  clearFieldError(name) {
+    const errorEl = this.form.querySelector(`[data-error-for="${name}"]`);
+    if (errorEl) errorEl.textContent = "";
+  }
+
+  showAlert(message) {
+    if (!this.alertBox) return;
+    this.alertBox.textContent = message;
+    this.alertBox.classList.add("show");
+  }
+
+  hideAlert() {
+    if (!this.alertBox) return;
+    this.alertBox.textContent = "";
+    this.alertBox.classList.remove("show");
+  }
 }
+
+// Bootstrap
+document.addEventListener("DOMContentLoaded", () => {
+  const page = new EmployerRegister();
+  page.init();
+});

@@ -9,26 +9,22 @@
 </head>
 
 <body class="auth-body">
-  <!-- Top bar (same structure as your student pages) -->
   <header class="auth-top">
     <a class="auth-brand" href="../../index.html" aria-label="Go to landing page">
-      <img src="../../assets/images/logo.png" alt="Link Up logo" class="auth-logo" />
+      <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up logo" class="auth-logo" />
       <span class="auth-brand__text">Link <b>Up</b></span>
     </a>
   </header>
 
   <main class="auth-wrap">
-    <!-- Left: Form card -->
     <section class="auth-card card">
       <div class="auth-card__inner">
         <h1>Create Employer Account</h1>
         <p class="auth-subtitle">Post jobs, hire students, and manage applications in one place.</p>
 
-        <!-- Form-level error banner (same UI pattern as login) -->
-        <div class="error-banner" id="errorBanner"></div>
+        <div class="error-banner" id="formAlert"></div>
 
         <form class="form" id="employerRegisterForm" novalidate>
-          <!-- Business Information -->
           <h3 class="section-title">Business Information</h3>
 
           <div class="form-grid">
@@ -71,7 +67,6 @@
             <small class="error" data-error-for="businessAddress"></small>
           </div>
 
-          <!-- Person in Charge -->
           <h3 class="section-title" style="margin-top:18px;">Person In Charge</h3>
 
           <div class="form-grid">
@@ -88,29 +83,24 @@
             </div>
           </div>
 
-          <!-- Account Security -->
           <h3 class="section-title" style="margin-top:18px;">Account Security</h3>
 
           <div class="form-grid">
             <div class="field">
               <label for="password">Password</label>
-
               <div class="input-with-action">
                 <input id="password" name="password" type="password" placeholder="Minimum 8 characters" required />
                 <button class="input-action" type="button" data-toggle-password="#password">Show</button>
               </div>
-
               <small class="error" data-error-for="password"></small>
             </div>
 
             <div class="field">
               <label for="confirmPassword">Confirm Password</label>
-
               <div class="input-with-action">
                 <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Re-enter password" required />
                 <button class="input-action" type="button" data-toggle-password="#confirmPassword">Show</button>
               </div>
-
               <small class="error" data-error-for="confirmPassword"></small>
             </div>
           </div>
@@ -123,7 +113,7 @@
             <small class="error" data-error-for="terms"></small>
           </div>
 
-          <button class="btn btn--primary btn-full" type="submit">Create Employer Account</button>
+          <button class="btn btn-primary btn-full" type="submit">Create Employer Account</button>
 
           <div class="auth-bottom">
             <span>Already have an employer account?</span>
@@ -133,11 +123,9 @@
       </div>
     </section>
 
-    <!-- Right: Side info (same “side card” idea as your auth.css) -->
     <aside class="auth-side">
       <div class="card auth-card__inner">
         <h2 style="margin:0;">Employer tools inside Link Up</h2>
-
         <div class="auth-steps">
           <div class="step">
             <span class="step-dot"></span>
@@ -146,7 +134,6 @@
               <p>Post short campus tasks or longer gigs for students.</p>
             </div>
           </div>
-
           <div class="step">
             <span class="step-dot"></span>
             <div>
@@ -154,7 +141,6 @@
               <p>Accept/reject applicants and track job status.</p>
             </div>
           </div>
-
           <div class="step">
             <span class="step-dot"></span>
             <div>
@@ -162,7 +148,6 @@
               <p>Pay only after work is confirmed completed.</p>
             </div>
           </div>
-
           <div class="step">
             <span class="step-dot"></span>
             <div>
@@ -171,13 +156,11 @@
             </div>
           </div>
         </div>
-
         <p class="hint">Tip: Use a business email so your applicants can recognize you.</p>
       </div>
     </aside>
   </main>
 
-  <!-- IMPORTANT: use module only if main.js uses imports -->
-  <script type="module" src="../../js/main.js"></script>
+  <script type="module" src="../../js/pages/auth/employer-register.js"></script>
 </body>
 </html>
