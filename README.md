@@ -88,7 +88,23 @@ link-up/
    ```bash
    cd link-up
    ```
-3. Open `index.html` in your browser. If using VS Code, we recommend the **Live Server** extension.
+
+### Local Development (Recommended)
+
+Since this project uses ES modules and custom rewrites defined in `vercel.json`, it is recommended to use the **Vercel CLI** to mirror the production environment locally.
+
+1. **Install Vercel CLI:**
+   ```bash
+   npm i -g vercel
+   ```
+
+2. **Run the Development Server:**
+   ```bash
+   vercel dev
+   ```
+   This will start a local server (usually at `http://localhost:3000`) and correctly handle the custom routes like `/pages/employer/dashboard`.
+
+Alternatively, if using VS Code, you can use the **Live Server** extension, but note that custom rewrites in `vercel.json` may not be active.
 
 ---
 
