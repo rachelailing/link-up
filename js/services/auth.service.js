@@ -70,6 +70,18 @@ export class AuthService {
   }
 
   /**
+   * Update the current user's metadata
+   * @param {Object} metadata 
+   */
+  async updateUserMetadata(metadata) {
+    const { data, error } = await supabase.auth.updateUser({
+      data: metadata
+    });
+    if (error) throw error;
+    return data.user;
+  }
+
+  /**
    * Signs out the current user
    */
   async logout() {

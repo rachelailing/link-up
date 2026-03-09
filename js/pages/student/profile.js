@@ -1,91 +1,114 @@
-import { storage } from "../../utils/storage.js";
+// js/pages/student/profile.js
 import { $ } from "../../utils/dom.js";
 import { setActiveNav } from "../../components/navbar.js";
+import { authService } from "../../services/auth.service.js";
 
-const STORAGE_KEY = "linkup_student_profile";
-
-function loadProfile() {
-  const profile = storage.get(STORAGE_KEY);
-  if (!profile) return;
-
-  // Header display
-  $("#displayName").textContent = profile.fullName || "Student Name";
-  $("#displayEmail").textContent = profile.email || "student@email.com";
-  
-  // Basic Info
-  $("#fullName").value = profile.fullName || "";
-  $("#campus").value = profile.campus || "";
-  $("#email").value = profile.email || "";
-  $("#phone").value = profile.phone || "";
-
-  // Professional Profile
-  $("#bio").value = profile.bio || "";
-  $("#portfolio").value = profile.portfolio || "";
-  $("#availability").value = profile.availability || "flexible";
-
-  // Stats (Mock for now)
-  const jobs = storage.get("linkup_student_jobs") || [];
-  const completedCount = jobs.filter(j => j.status === "Completed").length;
-  $("#statsCompleted").textContent = completedCount;
-
-  // Skills & Interests
-  renderTags(profile.skills || [], $("#skillsList"));
-  renderTags(profile.interests || [], $("#interestsList"));
-}
-
-function renderTags(tags, container) {
-  if (!tags.length) {
-    container.innerHTML = '<span class="muted small">None selected</span>';
-    return;
+/**
+ * Student Profile Controller
+ */
+class StudentProfile {
+  constructor() {
+    this.form = $("#studentProfileForm");
+    this.saveBtn = $("#saveProfileBtn");
+    this.currentUser = null;
   }
-  container.innerHTML = tags.map(tag => `
-    <span class="chip-item">${capitalize(tag)}</span>
-  `).join("");
-}
 
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+  async init() {
+    setActiveNav();
+    
+    // Load user from Supabase
+    this.currentUser = await authService.getCurrentUser();
+    
+    if (!this.currentUser) {
+      window.location.href = "../auth/student-login.html";
+      return;
+    }
 
-function saveProfile() {
-  const currentProfile = storage.get(STORAGE_KEY) || {};
-  
-  const updatedProfile = {
-    ...currentProfile,
-    fullName: $("#fullName").value.trim(),
-    campus: $("#campus").value.trim(),
-    phone: $("#phone").value.trim(),
-    bio: $("#bio").value.trim(),
-    portfolio: $("#portfolio").value.trim(),
-    availability: $("#availability").value,
-    updatedAt: new Date().toISOString()
-  };
+    this.fillForm();
+    this.wireEvents();
+  }
 
-  storage.set(STORAGE_KEY, updatedProfile);
-  
-  // Also update session/current user
-  const currentUser = storage.get("linkup_currentUser");
-  if (currentUser) {
-    storage.set("linkup_currentUser", {
-      ...currentUser,
-      ...updatedProfile
+  fillForm() {
+    const meta = this.currentUser.user_metadata || {};
+
+    // Header Display
+    $("#displayName").textContent = meta.fullName || "Student Name";
+    $("#displayEmail").textContent = this.currentUser.email || "student@email.com";
+
+    // Personal Info
+    $("#fullName").value = meta.fullName || "";
+    $("#campus").value = meta.campus || meta.university || ""; // Handle university from registration too
+    $("#email").value = this.currentUser.email || "";
+    $("#phone").value = meta.phone || "";
+
+    // Professional Profile
+    $("#bio").value = meta.bio || "";
+    $("#portfolio").value = meta.portfolio || "";
+    $("#availability").value = meta.availability || "flexible";
+
+    // Stats (Mock for now, eventually from a jobs table)
+    $("#statsCompleted").textContent = meta.completedJobsCount || "0";
+
+    // Skills & Interests
+    this.renderTags(meta.skills || [], $("#skillsList"));
+    this.renderTags(meta.interests || [], $("#interestsList"));
+  }
+
+  renderTags(tags, container) {
+    if (!container) return;
+    if (!tags || tags.length === 0) {
+      container.innerHTML = '<span class="muted small">None selected</span>';
+      return;
+    }
+    container.innerHTML = tags.map(tag => `
+      <span class="chip-item">${this.capitalize(tag)}</span>
+    `).join("");
+  }
+
+  capitalize(str) {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  async saveProfile() {
+    this.saveBtn.disabled = true;
+    this.saveBtn.textContent = "Saving...";
+
+    const updatedMetadata = {
+      fullName: $("#fullName").value.trim(),
+      campus: $("#campus").value.trim(),
+      phone: $("#phone").value.trim(),
+      bio: $("#bio").value.trim(),
+      portfolio: $("#portfolio").value.trim(),
+      availability: $("#availability").value,
+      updatedAt: new Date().toISOString()
+    };
+
+    try {
+      await authService.updateUserMetadata(updatedMetadata);
+      
+      // Update header display
+      $("#displayName").textContent = updatedMetadata.fullName;
+      
+      alert("Profile updated successfully! ✅");
+    } catch (err) {
+      alert("Error updating profile: " + err.message);
+    } finally {
+      this.saveBtn.disabled = false;
+      this.saveBtn.textContent = "Save Changes";
+    }
+  }
+
+  wireEvents() {
+    this.saveBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      this.saveProfile();
     });
   }
-
-  // Update header display
-  $("#displayName").textContent = updatedProfile.fullName;
-
-  alert("Profile updated successfully! ✅");
 }
 
-function init() {
-  setActiveNav();
-  loadProfile();
-
-  $("#saveProfileBtn").addEventListener("click", (e) => {
-    e.preventDefault();
-    saveProfile();
-  });
-}
-
-document.addEventListener("DOMContentLoaded", init);
+// Bootstrap
+document.addEventListener("DOMContentLoaded", () => {
+  const page = new StudentProfile();
+  page.init();
+});

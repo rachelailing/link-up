@@ -1,64 +1,80 @@
-import { storage } from "../../utils/storage.js";
+// js/pages/employer/business-profile.js
 import { $ } from "../../utils/dom.js";
 import { setActiveNav } from "../../components/navbar.js";
+import { authService } from "../../services/auth.service.js";
 
-const STORAGE_KEYS = {
-  EMPLOYER_PROFILE: "linkup_employer_register",
-  SESSION: "linkup_session"
-};
-
-function loadProfile() {
-  const profile = storage.get(STORAGE_KEYS.EMPLOYER_PROFILE);
-  const session = storage.get(STORAGE_KEYS.SESSION);
-
-  if (!profile) return;
-
-  // Fill form
-  $("#businessName").value = profile.businessName || "";
-  $("#businessType").value = profile.businessType || "SME";
-  $("#businessEmail").value = profile.businessEmail || "";
-  $("#businessPhone").value = profile.businessPhone || "";
-  $("#businessAddress").value = profile.businessAddress || "";
-  $("#picName").value = profile.picName || "";
-  $("#picRole").value = profile.picRole || "";
-}
-
-function saveProfile() {
-  const profile = storage.get(STORAGE_KEYS.EMPLOYER_PROFILE) || {};
-  
-  const updatedProfile = {
-    ...profile,
-    businessName: $("#businessName").value,
-    businessType: $("#businessType").value,
-    businessPhone: $("#businessPhone").value,
-    businessAddress: $("#businessAddress").value,
-    picName: $("#picName").value,
-    picRole: $("#picRole").value,
-    updatedAt: new Date().toISOString()
-  };
-
-  storage.set(STORAGE_KEYS.EMPLOYER_PROFILE, updatedProfile);
-
-  // Also update session if relevant
-  const session = storage.get(STORAGE_KEYS.SESSION);
-  if (session) {
-    storage.set(STORAGE_KEYS.SESSION, {
-      ...session,
-      businessName: updatedProfile.businessName
-    });
+/**
+ * Business Profile Controller
+ */
+class BusinessProfile {
+  constructor() {
+    this.form = $("#profileForm");
+    this.saveBtn = $("#saveProfileBtn");
+    this.currentUser = null;
   }
 
-  alert("Profile updated successfully! ✅");
+  async init() {
+    setActiveNav();
+    
+    // Load current user from Supabase
+    this.currentUser = await authService.getCurrentUser();
+    
+    if (!this.currentUser) {
+      window.location.href = "../auth/employer-login.html";
+      return;
+    }
+
+    this.fillForm();
+    this.wireEvents();
+  }
+
+  fillForm() {
+    const meta = this.currentUser.user_metadata || {};
+
+    $("#businessName").value = meta.businessName || "";
+    $("#businessType").value = meta.businessType || "SME";
+    $("#businessEmail").value = this.currentUser.email || "";
+    $("#businessPhone").value = meta.businessPhone || "";
+    $("#businessAddress").value = meta.businessAddress || "";
+    $("#picName").value = meta.picName || "";
+    $("#picRole").value = meta.picRole || "";
+  }
+
+  async saveProfile() {
+    this.saveBtn.disabled = true;
+    this.saveBtn.textContent = "Saving...";
+
+    const updatedMetadata = {
+      businessName: $("#businessName").value.trim(),
+      businessType: $("#businessType").value,
+      businessPhone: $("#businessPhone").value.trim(),
+      businessAddress: $("#businessAddress").value.trim(),
+      picName: $("#picName").value.trim(),
+      picRole: $("#picRole").value.trim(),
+      updatedAt: new Date().toISOString()
+    };
+
+    try {
+      await authService.updateUserMetadata(updatedMetadata);
+      alert("Profile updated successfully! ✅");
+    } catch (err) {
+      alert("Error updating profile: " + err.message);
+    } finally {
+      this.saveBtn.disabled = false;
+      this.saveBtn.textContent = "Save Changes";
+    }
+  }
+
+  wireEvents() {
+    this.saveBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      this.saveProfile();
+    });
+  }
 }
 
-function init() {
-  setActiveNav();
-  loadProfile();
-
-  $("#saveProfileBtn").addEventListener("click", (e) => {
-    e.preventDefault();
-    saveProfile();
-  });
-}
-
-document.addEventListener("DOMContentLoaded", init);
+// Bootstrap
+document.addEventListener("DOMContentLoaded", () => {
+  const page = new BusinessProfile();
+  page.init();
+});
