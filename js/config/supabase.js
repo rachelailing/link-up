@@ -8,7 +8,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
  */
 
 const SUPABASE_URL = window.env?.SUPABASE_URL || 'https://idarkfieeoxysqejrugs.supabase.co';
-const SUPABASE_ANON_KEY = window.env?.SUPABASE_ANON_KEY || 'sb_publishable_z244cu5ANHBpdVOw2LIUBw_KgnpoGpS';
+const SUPABASE_ANON_KEY = window.env?.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkYXJrZmllZW94eXNxZWpydWdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NDI3MTEsImV4cCI6MjA4NzUxODcxMX0.K5x9mp5MiJvr0_wjSbHp-9n9FUHzIJAdIZgHopfjeCE';
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.error("Supabase credentials missing! Ensure environment variables are set.");
