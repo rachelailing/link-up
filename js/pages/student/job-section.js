@@ -1,9 +1,10 @@
 // js/pages/student/dashboard.js
-import { setActiveNav } from "../../components/navbar.js";
+import { setActiveNav, wireLogout } from "../../components/navbar.js";
 import { openModal, wireModalClose } from "../../components/modal.js";
 import { $ } from "../../utils/dom.js";
 import { jobsService } from "../../services/jobs.service.js";
 import { renderJobCard, wireJobCardEvents } from "../../components/job-card.js";
+import { authService } from "../../services/auth.service.js";
 
 /**
  * Dashboard Controller
@@ -14,7 +15,11 @@ class StudentDashboard {
   }
 
   async init() {
+    const user = await authService.requireAuth("student");
+    if (!user) return; // Stop if not authorized
+
     setActiveNav();
+    wireLogout();
     wireModalClose();
     
     await this.renderJobs();

@@ -1,6 +1,7 @@
 import { $, $$ } from "../../utils/dom.js";
 import { statusToBadgeClass } from "../../components/status-badge.js";
-import { setActiveNav } from "../../components/navbar.js";
+import { setActiveNav, wireLogout } from "../../components/navbar.js";
+import { authService } from "../../services/auth.service.js";
 
 const JOBS = [
   {
@@ -83,11 +84,12 @@ function renderJobs(list){
 
   // Apply button
   $$("[data-apply]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const id = btn.dataset.apply;
-    window.location.href = `apply-job.html?id=${id}`;
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.apply;
+      window.location.href = `apply-job.html?id=${id}`;
+    });
   });
-});
+}
 
 function filterJobs(){
   const search = $("#searchInput").value.toLowerCase();
@@ -110,8 +112,12 @@ function filterJobs(){
   renderJobs(filtered);
 }
 
-function init(){
+async function init(){
+  const user = await authService.requireAuth("student");
+  if (!user) return;
+
   setActiveNav();
+  wireLogout();
   renderJobs(JOBS);
 
   $("#searchInput").addEventListener("input", filterJobs);
@@ -119,4 +125,4 @@ function init(){
   $("#payFilter").addEventListener("change", filterJobs);
 }
 
-document.addEventListener("DOMContentLoaded", init);}
+document.addEventListener("DOMContentLoaded", init);

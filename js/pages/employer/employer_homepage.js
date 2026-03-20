@@ -1,6 +1,7 @@
 import { $, $$ } from "../../utils/dom.js";
-import { setActiveNav } from "../../components/navbar.js";
+import { setActiveNav, wireLogout } from "../../components/navbar.js";
 import { statusToBadgeClass } from "../../components/status-badge.js";
+import { authService } from "../../services/auth.service.js";
 
 const JOBS = [
   { id: 101, title: "Booth Helper (Career Fair)", status: "Open", pay: 80, applicants: 6, location: "UTP Main Hall" },
@@ -102,8 +103,12 @@ function setStats(){
   $("#statPendingPay").textContent = `RM ${pendingPay}`;
 }
 
-function init(){
+async function init(){
+  const user = await authService.requireAuth("employer");
+  if (!user) return;
+
   setActiveNav();
+  wireLogout();
   setStats();
   renderRecentJobs();
   renderRecentApplications();

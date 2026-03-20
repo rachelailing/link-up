@@ -1,6 +1,6 @@
 // js/pages/student/profile.js
 import { $ } from "../../utils/dom.js";
-import { setActiveNav } from "../../components/navbar.js";
+import { setActiveNav, wireLogout } from "../../components/navbar.js";
 import { authService } from "../../services/auth.service.js";
 
 /**
@@ -15,6 +15,7 @@ class StudentProfile {
 
   async init() {
     setActiveNav();
+    wireLogout();
     
     // Load user from Supabase
     this.currentUser = await authService.getCurrentUser();

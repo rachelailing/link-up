@@ -100,6 +100,35 @@ export class AuthService {
   }
 
   /**
+   * Guard for protected pages: redirect if not logged in
+   * @param {string} requiredRole - 'student' or 'employer'
+   * @returns {Promise<Object>} The authenticated user
+   */
+  async requireAuth(requiredRole = null) {
+    const user = await this.getCurrentUser();
+    
+    if (!user) {
+      console.warn("[AuthService] No session found, redirecting to login.");
+      const loginPage = requiredRole === "employer" 
+        ? "/pages/auth/employer-login.html" 
+        : "/pages/auth/student-login.html";
+      window.location.href = loginPage;
+      return null;
+    }
+
+    if (requiredRole && user.user_metadata?.role !== requiredRole) {
+      console.warn(`[AuthService] Role mismatch: required ${requiredRole}, got ${user.user_metadata?.role}`);
+      const homePage = user.user_metadata?.role === "employer"
+        ? "/pages/employer/employer_homepage.html"
+        : "/pages/student/job-section.html";
+      window.location.href = homePage;
+      return null;
+    }
+
+    return user;
+  }
+
+  /**
    * Check if a user is currently logged in
    */
   async isLoggedIn() {

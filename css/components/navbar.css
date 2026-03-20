@@ -12,6 +12,7 @@
   display:flex;
   flex-direction:column;
   gap: 6px;
+  height: calc(100vh - 120px); /* Adjust based on logo and padding */
 }
 .nav a{
   display:flex;
@@ -30,6 +31,20 @@
   background: rgba(46,84,143,.12);
   color: var(--linkup-blue);
   border: 1px solid rgba(46,84,143,.18);
+}
+
+.nav-logout {
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  padding-top: var(--s-4);
+}
+
+.nav-logout a {
+  color: var(--error) !important;
+}
+
+.nav-logout a:hover {
+  background: rgba(239, 68, 68, 0.08) !important;
 }
 
 /* Topbar Navigation */
