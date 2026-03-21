@@ -22,6 +22,9 @@
         <a data-nav href="marketplace.html">🏠 Home Page</a>
         <a data-nav href="earnings.html">💰 Earning History</a>
         <a data-nav href="purchase.html" class="active">🛍️ Purchase History</a>
+        <div class="nav-logout">
+          <a href="#" id="logoutBtn">🚪 Logout</a>
+        </div>
       </nav>
     </aside>
 
@@ -70,9 +73,12 @@
 
   </div>
 
-  <!-- Placeholder script -->
   <script type="module">
-    console.log("Purchase History page loaded");
+    import { setActiveNav, wireLogout } from "../../js/components/navbar.js";
+    document.addEventListener("DOMContentLoaded", () => {
+      setActiveNav();
+      wireLogout();
+    });
   </script>
 </body>
 </html>

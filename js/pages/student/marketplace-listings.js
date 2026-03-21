@@ -1,52 +1,8 @@
 // js/pages/student/marketplace-listings.js
 import { $ } from "../../utils/dom.js";
-import { setActiveNav } from "../../components/navbar.js";
-
-const MOCK_PRODUCTS = [
-  {
-    id: 101,
-    title: "Used Calculus Textbook",
-    price: "RM 30",
-    location: "V2, Block A",
-    date: "2 Mar 2026",
-    type: "Product"
-  },
-  {
-    id: 102,
-    title: "Custom Crochet Keychain",
-    price: "RM 12",
-    location: "All Villages",
-    date: "1 Mar 2026",
-    type: "Product"
-  },
-  {
-    id: 103,
-    title: "Second-hand Scientific Calculator",
-    price: "RM 45",
-    location: "V3, Block B",
-    date: "25 Feb 2026",
-    type: "Product"
-  }
-];
-
-const MOCK_SERVICES = [
-  {
-    id: 301,
-    title: "Pro Video Editing Service",
-    price: "RM 50/video",
-    location: "Online / UTP",
-    date: "3 Mar 2026",
-    type: "Service"
-  },
-  {
-    id: 302,
-    title: "Python Tutoring (Basic)",
-    price: "RM 20/hour",
-    location: "Main Library",
-    date: "2 Mar 2026",
-    type: "Service"
-  }
-];
+import { setActiveNav, wireLogout } from "../../components/navbar.js";
+import { authService } from "../../services/auth.service.js";
+import { marketplaceService } from "../../services/marketplace.service.js";
 
 class MyMarketplaceListings {
   constructor() {
@@ -54,35 +10,41 @@ class MyMarketplaceListings {
     this.servicesGrid = $("#myServicesGrid");
   }
 
-  init() {
+  async init() {
+    const user = await authService.requireAuth("student");
+    if (!user) return;
+
     setActiveNav();
-    this.renderAll();
+    wireLogout();
+
+    await this.renderAll();
   }
 
-  renderAll() {
-    const myListings = JSON.parse(localStorage.getItem("linkup_my_market_listings") || "[]");
-    
-    // Combine mock and local
-    const allProducts = [...myListings.filter(i => i.type === "Product"), ...MOCK_PRODUCTS];
-    const allServices = [...myListings.filter(i => i.type === "Service"), ...MOCK_SERVICES];
+  async renderAll() {
+    const items = await marketplaceService.getMyListings();
 
-    this.renderItems(allProducts, this.productsGrid);
-    this.renderItems(allServices, this.servicesGrid);
+    const products = items.filter(i => i.type === "Product");
+    const services = items.filter(i => i.type === "Service");
+
+    this.renderItems(products, this.productsGrid);
+    this.renderItems(services, this.servicesGrid);
   }
 
   createCard(item) {
     const placeholderImg = `https://via.placeholder.com/300x160/f0f0f0/999?text=${encodeURIComponent(item.title)}`;
-    const managePage = item.type === "Service" ? "service-manage.html" : "product-manage.html";
+    const managePage = item.type === "Service" ? "service-manage" : "product-manage";
+    const displayPrice = typeof item.price === 'number' ? `RM ${item.price.toFixed(2)}` : item.price;
+
     return `
-      <div class="market-card" onclick="window.location.href='${managePage}?id=${item.id}'">
+      <a href="${managePage}?id=${item.id}" class="market-card" style="text-decoration: none; color: inherit;">
         <img src="${item.image || placeholderImg}" alt="${item.title}" class="market-card-image">
         <div class="market-card-content">
           <h3>${item.title}</h3>
-          <div class="price">${item.price}</div>
+          <div class="price">${displayPrice}</div>
           <div class="meta">📍 ${item.location}</div>
           <div class="meta">📅 Posted: ${item.date}</div>
         </div>
-      </div>
+      </a>
     `;
   }
 

@@ -1,19 +1,8 @@
 // js/pages/student/marketplace-details.js
 import { $, $$ } from "../../utils/dom.js";
-import { setActiveNav } from "../../components/navbar.js";
-
-/**
- * Combined mock data from recommended and my listings
- * In a real app, this would come from an API/Service.
- */
-const ALL_MOCK_ITEMS = [
-  { id: 1, title: "Pro Video Editing Service", price: 50, location: "Online / UTP", date: "3 Mar 2026", rating: 5.0, reviews: 20, type: "Service", description: "Professional video editing for your assignments, vlogs, or club events. Quick turnaround and high-quality results.", tags: ["creative", "video"] },
-  { id: 2, title: "Organic Nasi Lemak", price: 5, location: "V4, Block B", date: "4 Mar 2026", rating: 4.9, reviews: 45, type: "Product", description: "Delicious home-cooked Nasi Lemak with organic ingredients. Served hot with spicy sambal and crispy anchovies.", tags: ["food"] },
-  { id: 3, title: "Python Tutoring (Basic)", price: 20, location: "Main Library", date: "2 Mar 2026", rating: 4.9, reviews: 32, type: "Service", description: "Struggling with Python? I can help you understand the basics of programming, loops, and data structures.", tags: ["academic", "tech"] },
-  { id: 4, title: "Laundry Service (Wash & Fold)", price: 8, location: "V5, Ground Floor", date: "1 Mar 2026", rating: 4.6, reviews: 54, type: "Service", description: "Fast and clean laundry service. Wash and fold included. RM 8 per 5kg load.", tags: ["laundry"] },
-  { id: 201, title: "Used Calculus Textbook", price: 30, location: "V2, Block A", date: "2 Mar 2026", rating: 4.8, reviews: 12, type: "Product", description: "Thomas' Calculus (14th Edition). Condition: 9/10. No highlights, very clean.", tags: ["textbooks", "academic"] },
-  { id: 203, title: "Custom Crochet Keychain", price: 12, location: "All Villages", date: "1 Mar 2026", rating: 4.7, reviews: 8, type: "Product", description: "Handmade crochet keychains. Customizable colors and designs. Perfect for gifts!", tags: ["creative", "others"] }
-];
+import { setActiveNav, wireLogout } from "../../components/navbar.js";
+import { authService } from "../../services/auth.service.js";
+import { marketplaceService } from "../../services/marketplace.service.js";
 
 class MarketplaceDetails {
   constructor() {
@@ -21,24 +10,92 @@ class MarketplaceDetails {
     this.currentItem = null;
   }
 
-  init() {
+  async init() {
+    const user = await authService.requireAuth("student");
+    if (!user) return;
+
     setActiveNav();
-    this.loadItem();
+    wireLogout();
+
+    await this.loadItem();
     this.wireEvents();
   }
 
-  loadItem() {
-    const params = new URLSearchParams(window.location.search);
-    const id = parseInt(params.get("id"));
+  async loadItem() {
+    // Robust ID extraction
+    const url = new URL(window.location.href);
+    let id = url.searchParams.get("id");
 
-    // Combine mock data with localStorage listings
-    const myListings = JSON.parse(localStorage.getItem("linkup_my_market_listings") || "[]");
-    const allItems = [...ALL_MOCK_ITEMS, ...myListings];
+    // Fallback 1: manual search params check
+    if (!id) {
+      const manualParams = new URLSearchParams(window.location.search);
+      id = manualParams.get("id");
+    }
 
-    const item = allItems.find(i => i.id === id);
+    // Fallback 2: check if id is in the hash
+    if (!id && window.location.hash) {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      id = hashParams.get("id");
+    }
+
+    // Fallback 3: check if it's in the path (e.g. /marketplace-details/1)
+    if (!id) {
+      const parts = window.location.pathname.split("/");
+      const lastPart = parts[parts.length - 1];
+      if (lastPart && !isNaN(lastPart) && lastPart !== "marketplace-details") {
+        id = lastPart;
+      }
+    }
+
+    console.log("[MarketplaceDetails] Debug Info:", {
+      href: window.location.href,
+      search: window.location.search,
+      pathname: window.location.pathname,
+      id: id
+    });
+
+    if (!id || id === "undefined" || id === "null") {
+      $("#loadingState").innerHTML = `
+        <div class="card pad" style="border: 2px solid var(--error); max-width: 500px; margin: 0 auto;">
+          <h2 style="color: var(--error);">No item ID provided.</h2>
+          <p class="muted">We couldn't find the item ID in the URL. This can happen if the browser strips parameters.</p>
+          
+          <div style="margin: 20px 0; padding: 15px; background: #f0f0f0; border-radius: 8px;">
+            <label style="display:block; margin-bottom: 8px; font-weight: bold;">Manually Enter ID (Emergency Fallback):</label>
+            <div style="display:flex; gap: 10px;">
+              <input type="text" id="manualIdInput" placeholder="e.g. 1, 2, 101" style="flex:1; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+              <button id="manualIdBtn" class="btn btn-blue">Load</button>
+            </div>
+          </div>
+
+          <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin: 15px 0; text-align: left; font-family: monospace; font-size: 0.8rem; overflow-x: auto;">
+            <strong>Debug Path:</strong> ${window.location.pathname}<br>
+            <strong>Debug Query:</strong> ${window.location.search || "(empty)"}<br>
+          </div>
+          <div style="margin-top: 20px;">
+            <a href="/pages/student/marketplace.html" class="btn btn-primary">Back to Marketplace</a>
+          </div>
+        </div>
+      `;
+
+      $("#manualIdBtn").addEventListener("click", () => {
+        const manualId = $("#manualIdInput").value.trim();
+        if (manualId) {
+          window.location.href = `marketplace-details?id=${manualId}`;
+        }
+      });
+      return;
+    }
+
+    const item = await marketplaceService.getItemById(id);
 
     if (!item) {
-      $("#loadingState").innerHTML = "<h2>Item not found.</h2><a href='marketplace.html'>Back to Marketplace</a>";
+      $("#loadingState").innerHTML = `
+        <h2>Item not found (ID: ${id}).</h2>
+        <div style="margin-top: 20px;">
+          <a href="/pages/student/marketplace.html" class="btn btn-primary">Back to Marketplace</a>
+        </div>
+      `;
       return;
     }
 
@@ -51,7 +108,10 @@ class MarketplaceDetails {
     
     $("#itemImage").src = item.image || placeholderImg;
     $("#itemTitle").textContent = item.title;
-    $("#itemPrice").textContent = typeof item.price === 'number' ? `RM ${item.price.toFixed(2)}` : item.price;
+    
+    const displayPrice = typeof item.price === 'number' ? `RM ${item.price.toFixed(2)}` : item.price;
+    $("#itemPrice").textContent = displayPrice;
+    
     $("#itemRating").textContent = `⭐ ${item.rating || 'N/A'}`;
     $("#itemReviews").textContent = item.reviews ? `(${item.reviews} reviews)` : '(No reviews yet)';
     $("#itemType").textContent = item.type || "Product";

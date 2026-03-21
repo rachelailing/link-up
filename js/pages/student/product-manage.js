@@ -1,6 +1,6 @@
 // js/pages/student/product-manage.js
 import { $, $$ } from "../../utils/dom.js";
-import { setActiveNav } from "../../components/navbar.js";
+import { setActiveNav, wireLogout } from "../../components/navbar.js";
 
 class ProductManage {
   constructor() {
@@ -18,6 +18,7 @@ class ProductManage {
 
   init() {
     setActiveNav();
+    wireLogout();
     this.checkEditMode();
     this.wireEvents();
     if (!this.editId) {
