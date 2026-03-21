@@ -101,6 +101,7 @@ class ProductManage {
         title: $("#title").value,
         price: parseFloat($("#price").value),
         quantity: parseInt($("#quantity").value),
+        status: $("#status").value,
         location: $("#location").value,
         description: $("#description").value,
         date: $("#date").value,

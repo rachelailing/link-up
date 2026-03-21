@@ -67,6 +67,7 @@ class ServiceManage {
     if (item) {
       $("#title").value = item.title;
       $("#price").value = (item.price || "").replace("RM ", "");
+      $("#status").value = item.status || "Ongoing";
       $("#location").value = item.location;
       $("#description").value = item.description || "";
       $("#date").value = item.date;
@@ -143,6 +144,7 @@ class ServiceManage {
   handlePost() {
     const title = $("#title").value;
     const priceValue = $("#price").value;
+    const status = $("#status").value;
     const location = $("#location").value;
     const description = $("#description").value;
     const date = $("#date").value;
@@ -156,6 +158,7 @@ class ServiceManage {
       id: this.editId || Date.now(),
       title,
       price: `RM ${priceValue}`,
+      status,
       location,
       description,
       date,

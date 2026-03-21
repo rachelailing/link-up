@@ -107,7 +107,7 @@
               <input type="text" id="title" placeholder="e.g. Calculus Textbook" required>
             </div>
 
-            <div class="grid cols-2 gap-16">
+            <div class="grid cols-3 gap-16">
               <div class="form-group">
                 <label for="price">Price (RM)</label>
                 <input type="text" id="price" placeholder="e.g. 30" required>
@@ -115,6 +115,14 @@
               <div class="form-group">
                 <label for="quantity">Quantity</label>
                 <input type="number" id="quantity" value="1" min="1" required>
+              </div>
+              <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" required>
+                  <option value="Ongoing">Ongoing</option>
+                  <option value="Preorder">Preorder</option>
+                  <option value="NA">NA</option>
+                </select>
               </div>
             </div>
 
