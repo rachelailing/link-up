@@ -185,7 +185,6 @@ if (badgeEl) {
   badgeEl.className = "badge " + (filtered.length ? "pending" : "accepted");
 }
 
-const el = $("#feeList");
 if (!filtered.length){
     el.innerHTML = `
       <div class="card pad">

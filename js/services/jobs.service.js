@@ -1,92 +1,46 @@
 // js/services/jobs.service.js
+import { supabase } from "../config/supabase.js";
 
+/**
+ * Job Service
+ * Responsibility: Handle fetching, searching, and applying for jobs via Supabase.
+ */
 export class JobService {
-  constructor() {
-    // Initial mock data with more metadata for recommendation
-    this._jobs = [
-      { 
-        id: 1, 
-        title: "Freelance Video Editor", 
-        employer: "Campus Media Club", 
-        location: "UTP, Block A", 
-        pay: 150, 
-        status: "Open",
-        category: "Creative",
-        tags: ["video", "editing", "media", "creative"],
-        description: "Looking for someone to edit 3-5 minute event videos. Familiarity with Premiere Pro or Final Cut is a plus."
-      },
-      { 
-        id: 2, 
-        title: "Booth Helper (Weekend)", 
-        employer: "Student Biz Society", 
-        location: "UTP, Main Hall", 
-        pay: 80, 
-        status: "Open",
-        category: "Event",
-        tags: ["event", "helper", "booth", "customer service"],
-        description: "Assist with setup and managing the registration booth for the upcoming Entrepreneurship Day."
-      },
-      { 
-        id: 3, 
-        title: "Poster Design", 
-        employer: "Event Committee", 
-        location: "Remote", 
-        pay: 60, 
-        status: "Open", // Changed to Open for demo
-        category: "Design",
-        tags: ["design", "poster", "graphics", "creative"],
-        description: "Need a minimalist poster for a tech talk event. Deadline: 3 days."
-      },
-      { 
-        id: 4, 
-        title: "Python Tutor", 
-        employer: "IT Department", 
-        location: "Online", 
-        pay: 40, 
-        status: "Open",
-        category: "Education",
-        tags: ["python", "coding", "tutoring", "tech"],
-        description: "Help first-year students with basic Python syntax and logic."
-      },
-      { 
-        id: 5, 
-        title: "Social Media Manager", 
-        employer: "Startup Hub", 
-        location: "Remote", 
-        pay: 200, 
-        status: "Open",
-        category: "Marketing",
-        tags: ["social media", "marketing", "content creation", "writing"],
-        description: "Manage Instagram and LinkedIn accounts for our student-led startup hub."
-      }
-    ];
-  }
-
   /**
-   * Fetches all available jobs. 
-   * (In the future, this will use fetch() to an API)
+   * Fetches all available jobs from the 'jobs' table.
    * @returns {Promise<Array>}
    */
   async getJobs() {
-    return [...this._jobs];
+    const { data, error } = await supabase
+      .from('jobs')
+      .select('*')
+      .eq('status', 'Open')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error("[JobService] Error fetching jobs:", error.message);
+      return [];
+    }
+    return data;
   }
 
   /**
    * Fetches recommended jobs for a student using a scoring algorithm.
+   * Fetches open jobs from DB and then scores them in JS.
    * @param {Object} profile - Student profile metadata { skills, interests, campus, etc. }
    * @returns {Promise<Array>}
    */
   async getRecommendedJobs(profile = {}) {
     const jobs = await this.getJobs();
     
-    // Algorithm: Score each job based on profile matches
+    // Scoring Algorithm (Matches profile skills/interests against job tags/titles)
     const scoredJobs = jobs.map(job => {
       let score = 0;
       
       const studentSkills = (profile.skills || []).map(s => s.toLowerCase());
       const studentInterests = (profile.interests || []).map(i => i.toLowerCase());
       const jobTags = (job.tags || []).map(t => t.toLowerCase());
-      const jobTitle = job.title.toLowerCase();
+      const jobTitle = (job.title || "").toLowerCase();
       const jobDesc = (job.description || "").toLowerCase();
 
       // 1. Skill Match (High weight)
@@ -104,22 +58,15 @@ export class JobService {
       });
 
       // 3. Location/Campus Match (Bonus)
-      if (profile.campus && job.location.includes(profile.campus)) {
+      if (profile.campus && job.location?.includes(profile.campus)) {
         score += 5;
-      }
-
-      // 4. Remote Preference (Small bonus if no campus set)
-      if (!profile.campus && job.location.toLowerCase().includes("remote")) {
-        score += 2;
       }
 
       return { ...job, matchScore: score };
     });
 
-    // Sort by score (descending) and return top matches
-    // Only return jobs with a score > 0 if there are any, otherwise return default top 3
+    // Sort by score (descending) and return top 3
     const recommendations = scoredJobs
-      .filter(j => j.status === "Open")
       .sort((a, b) => b.matchScore - a.matchScore);
 
     console.log("[JobService] Recommended Jobs Scores:", recommendations.map(j => ({ title: j.title, score: j.matchScore })));
@@ -128,28 +75,87 @@ export class JobService {
   }
 
   /**
-   * Gets a job by its unique ID.
-   * @param {number} id 
+   * Gets a single job by its ID.
+   * @param {string|number} id 
    * @returns {Promise<Object|null>}
    */
   async getJobById(id) {
-    return this._jobs.find(j => j.id === id) || null;
+    const { data, error } = await supabase
+      .from('jobs')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error("[JobService] Error fetching job by ID:", error.message);
+      return null;
+    }
+    return data;
   }
 
   /**
-   * Mock implementation of applying for a job.
+   * Inserts a new application for a job.
    * @param {number} jobId 
-   * @returns {Promise<boolean>}
+   * @param {string} studentId 
+   * @param {string} message 
+   * @returns {Promise<Object>} The application result
    */
-  async applyForJob(jobId) {
-    const job = await this.getJobById(jobId);
-    if (job) {
-      job.status = "Pending";
-      return true;
+  async applyForJob(jobId, studentId, message = "") {
+    const { data, error } = await supabase
+      .from('applications')
+      .insert([
+        { 
+          job_id: jobId, 
+          student_id: studentId,
+          message: message,
+          status: 'pending'
+        }
+      ])
+      .select();
+
+    if (error) {
+      console.error("[JobService] Application error:", error.message);
+      throw error;
     }
-    return false;
+
+    console.log("[JobService] Application submitted successfully!");
+    return data[0];
+  }
+
+  /**
+   * Fetches all jobs created by a specific employer.
+   * @param {string} employerId 
+   */
+  async getJobsByEmployer(employerId) {
+    const { data, error } = await supabase
+      .from('jobs')
+      .select('*')
+      .eq('employer_id', employerId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error("[JobService] Error fetching employer jobs:", error.message);
+      return [];
+    }
+    return data;
+  }
+
+  /**
+   * Creates a new job listing.
+   * @param {Object} jobData 
+   */
+  async createJob(jobData) {
+    const { data, error } = await supabase
+      .from('jobs')
+      .insert([jobData])
+      .select();
+
+    if (error) {
+      console.error("[JobService] Error creating job:", error.message);
+      throw error;
+    }
+    return data[0];
   }
 }
 
-// Singleton instance for global use
 export const jobsService = new JobService();

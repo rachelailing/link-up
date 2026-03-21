@@ -21,14 +21,19 @@ export class AuthService {
    * @throws {Error} On failure
    */
   async login(email, password) {
+    console.log(`[AuthService] Attempting login for: ${email}`);
+    
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    if (error) throw error;
+    if (error) {
+      console.error(`[AuthService] Login failed for ${email}:`, error.message);
+      throw error;
+    }
 
-    // Return the user and their session
+    console.log(`[AuthService] Login successful! User ID: ${data.user?.id}`);
     return data.user;
   }
 

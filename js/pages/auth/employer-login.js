@@ -60,6 +60,8 @@ class EmployerLogin {
     submitBtn.disabled = true;
     submitBtn.textContent = "Logging in...";
 
+    console.log("[EmployerLogin] Form submitted, calling AuthService...");
+
     try {
       const email = this.emailInput.value.trim();
       const password = this.passwordInput.value;
@@ -68,10 +70,12 @@ class EmployerLogin {
 
       // Verify role
       if (user.user_metadata?.role !== "employer") {
+        console.warn("[EmployerLogin] Role mismatch: user is not an employer.", user.user_metadata);
         await authService.logout();
         throw new Error("This account is not registered as an employer.");
       }
 
+      console.log("[EmployerLogin] Login successful, redirecting to dashboard...");
       // Remember email if checked
       authService.setRememberMe(email, this.remember.checked);
 
@@ -79,6 +83,7 @@ class EmployerLogin {
       window.location.href = "../employer/employer_homepage.html";
 
     } catch (err) {
+      console.error("[EmployerLogin] Login error:", err);
       this.showBanner(err.message || "Invalid email or password.");
       this.setFieldError("email", "");
       this.setFieldError("password", "");
