@@ -147,6 +147,21 @@
               <span id="itemDate">📅 Posted: Date</span>
             </div>
 
+            <div style="display: flex; gap: 30px; margin-bottom: 32px; padding: 20px; background: #f8f9fa; border-radius: 12px; border: 1px solid #eee;">
+              <div style="flex: 1;">
+                <label style="font-weight: 600; font-size: 0.85rem; color: #666; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Current Status</label>
+                <span id="itemStatus" class="badge" style="background: #e7f3ff; color: #007bff; padding: 8px 16px; border-radius: 24px; font-weight: 700; font-size: 0.95rem; border: 1px solid #cce5ff;">Ongoing</span>
+              </div>
+              <div style="flex: 1;">
+                <label style="font-weight: 600; font-size: 0.85rem; color: #666; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Order Quantity</label>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <button id="decreaseQty" class="btn btn-outline" style="padding: 4px 12px; height: 36px; min-width: 36px; border-radius: 8px; font-weight: 800;">−</button>
+                  <span id="itemQuantity" style="font-weight: 800; font-size: 1.2rem; min-width: 30px; text-align: center;">1</span>
+                  <button id="increaseQty" class="btn btn-outline" style="padding: 4px 12px; height: 36px; min-width: 36px; border-radius: 8px; font-weight: 800;">+</button>
+                </div>
+              </div>
+            </div>
+
             <h3>Description</h3>
             <div id="itemDescription" class="description-box">
               Detailed description goes here...

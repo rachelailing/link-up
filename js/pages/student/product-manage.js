@@ -1,6 +1,8 @@
 // js/pages/student/product-manage.js
 import { $, $$ } from "../../utils/dom.js";
 import { setActiveNav, wireLogout } from "../../components/navbar.js";
+import { supabase } from "../../config/supabase.js"; // Import Supabase client
+import { authService } from "../../services/auth.service.js";
 
 class ProductManage {
   constructor() {
@@ -10,106 +12,35 @@ class ProductManage {
     this.tagsContainer = $("#productTags");
     this.toggleEditBtn = $("#toggleEditBtn");
     this.submitBtn = $("button[type='submit']");
-    this.selectedImageData = null;
+    this.selectedFile = null; // Store the actual file object
+    this.selectedImageData = null; // For preview only
     this.selectedTags = new Set();
     this.editId = null;
     this.isEditMode = false;
   }
 
-  init() {
+  async init() {
     setActiveNav();
     wireLogout();
     this.checkEditMode();
     this.wireEvents();
     if (!this.editId) {
       this.setDefaultDate();
-      this.isEditMode = true; // New listing is always in edit mode
+      this.isEditMode = true;
     }
   }
 
-  checkEditMode() {
-    const params = new URLSearchParams(window.location.search);
-    const id = parseInt(params.get("id"));
-    if (id) {
-      this.editId = id;
-      this.isEditMode = false; // Start in View mode
-      $("#pageTitle").textContent = "Product Details";
-      this.toggleEditBtn.style.display = "block";
-      this.submitBtn.style.display = "none";
-      
-      this.loadExistingData(id);
-      this.setFormDisabled(true);
-    }
-  }
-
-  setFormDisabled(disabled) {
-    const inputs = this.form.querySelectorAll("input, textarea, select");
-    inputs.forEach(input => {
-      if (input.id !== "toggleEditBtn") input.disabled = disabled;
-    });
-    
-    // Disable chips
-    const chips = this.tagsContainer.querySelectorAll(".chip");
-    chips.forEach(chip => {
-      chip.style.pointerEvents = disabled ? "none" : "auto";
-      chip.style.opacity = disabled ? "0.7" : "1";
-    });
-
-    // Disable image upload
-    this.imageUpload.style.pointerEvents = disabled ? "none" : "auto";
-    this.imageUpload.style.opacity = disabled ? "0.8" : "1";
-  }
-
-  loadExistingData(id) {
-    const myListings = JSON.parse(localStorage.getItem("linkup_my_market_listings") || "[]");
-    const item = myListings.find(i => i.id === id);
-    
-    if (item) {
-      $("#title").value = item.title;
-      $("#price").value = (item.price || "").replace("RM ", "");
-      $("#quantity").value = item.quantity || 1;
-      $("#location").value = item.location;
-      $("#description").value = item.description || "";
-      $("#date").value = item.date;
-      
-      if (item.image) {
-        this.selectedImageData = item.image;
-        this.imageUpload.innerHTML = `<img src="${item.image}" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">`;
-      }
-
-      if (item.tags) {
-        item.tags.forEach(tag => {
-          this.selectedTags.add(tag);
-          const chip = this.tagsContainer.querySelector(`[data-value="${tag}"]`);
-          if (chip) chip.classList.add("active");
-        });
-      }
-      
-      $("#terms").checked = true;
-    }
-  }
-
-  setDefaultDate() {
-    const today = new Date().toISOString().split('T')[0];
-    $("#date").value = today;
-  }
+  // ... (keep checkEditMode, setFormDisabled, loadExistingData, setDefaultDate as they are) ...
 
   wireEvents() {
-    // Toggle Edit Mode
-    this.toggleEditBtn.addEventListener("click", () => {
-      this.isEditMode = true;
-      this.setFormDisabled(false);
-      this.toggleEditBtn.style.display = "none";
-      this.submitBtn.style.display = "block";
-      this.submitBtn.textContent = "Update Product";
-      $("#pageTitle").textContent = "Edit Product";
-    });
+    // ... (keep toggleEditBtn logic) ...
 
     this.imageUpload.addEventListener("click", () => this.fileInput.click());
 
     this.fileInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (file) {
+        this.selectedFile = file; // Save the file object for Supabase upload
         const reader = new FileReader();
         reader.onload = (event) => {
           this.selectedImageData = event.target.result;
@@ -119,69 +50,84 @@ class ProductManage {
       }
     });
 
-    if (this.tagsContainer) {
-      this.tagsContainer.addEventListener("click", (e) => {
-        if (!this.isEditMode) return;
-        const chip = e.target.closest(".chip");
-        if (!chip) return;
-        const val = chip.dataset.value;
-        if (this.selectedTags.has(val)) {
-          this.selectedTags.delete(val);
-          chip.classList.remove("active");
-        } else {
-          this.selectedTags.add(val);
-          chip.classList.add("active");
-        }
-      });
-    }
+    // ... (keep tags logic) ...
 
-    this.form.addEventListener("submit", (e) => {
+    this.form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      this.handlePost();
+      await this.handlePost();
     });
   }
 
-  handlePost() {
-    const title = $("#title").value;
-    const priceValue = $("#price").value;
-    const quantity = $("#quantity").value;
-    const location = $("#location").value;
-    const description = $("#description").value;
-    const date = $("#date").value;
+  async uploadImage(file) {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    const filePath = `listings/${fileName}`;
 
-    if (this.selectedTags.size === 0) {
-      alert("Please select at least one category tag.");
+    // Upload to 'marketplace-images' bucket
+    const { data, error } = await supabase.storage
+      .from('marketplace-images')
+      .upload(filePath, file);
+
+    if (error) throw error;
+
+    // Get the Public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from('marketplace-images')
+      .getPublicUrl(filePath);
+
+    return publicUrl;
+  }
+
+  async handlePost() {
+    const user = await authService.getCurrentUser();
+    if (!user) {
+      alert("Please log in to post items.");
       return;
     }
 
-    const listingData = {
-      id: this.editId || Date.now(),
-      title,
-      price: `RM ${priceValue}`,
-      quantity,
-      location,
-      description,
-      date,
-      tags: Array.from(this.selectedTags),
-      image: this.selectedImageData,
-      type: "Product"
-    };
+    this.submitBtn.disabled = true;
+    this.submitBtn.textContent = "Uploading...";
 
-    let existingListings = JSON.parse(localStorage.getItem("linkup_my_market_listings") || "[]");
-    
-    if (this.editId) {
-      existingListings = existingListings.map(i => i.id === this.editId ? listingData : i);
-    } else {
-      existingListings.unshift(listingData);
+    try {
+      let imageUrl = this.selectedImageData;
+
+      // 1. If a NEW file was picked, upload it to Supabase
+      if (this.selectedFile) {
+        imageUrl = await this.uploadImage(this.selectedFile);
+      }
+
+      // 2. Prepare the data for the database
+      const listingData = {
+        title: $("#title").value,
+        price: parseFloat($("#price").value),
+        quantity: parseInt($("#quantity").value),
+        location: $("#location").value,
+        description: $("#description").value,
+        date: $("#date").value,
+        tags: Array.from(this.selectedTags),
+        image: imageUrl,
+        type: "Product",
+        user_id: user.id // Tie it to the logged-in student
+      };
+
+      // 3. Save to Supabase Database (or fallback to localStorage for now)
+      // This is where you would call: await supabase.from('marketplace_items').insert([listingData])
+      
+      console.log("[ProductManage] Ready to save:", listingData);
+      
+      // Temporary: keep saving to localStorage so the app still works for testing
+      let existingListings = JSON.parse(localStorage.getItem("linkup_my_market_listings") || "[]");
+      existingListings.unshift({ ...listingData, id: Date.now() });
+      localStorage.setItem("linkup_my_market_listings", JSON.stringify(existingListings));
+
+      alert("Success! Your item has been uploaded.");
+      window.location.href = "marketplace-listings.html";
+
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      this.submitBtn.disabled = false;
+      this.submitBtn.textContent = "Post Item";
     }
-
-    localStorage.setItem("linkup_my_market_listings", JSON.stringify(existingListings));
-    alert(this.editId ? "Product updated successfully!" : "Success! Your item has been posted to the marketplace.");
-    window.location.href = "marketplace-listings.html";
   }
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-  const page = new ProductManage();
-  page.init();
-});

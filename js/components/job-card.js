@@ -10,14 +10,21 @@ import { statusToBadgeClass } from "./status-badge.js";
 export function renderJobCard(job, { onView, onApply }) {
   const badgeClass = statusToBadgeClass(job.status);
   
-  // Using a template literal but we could use DOM nodes for better event binding if needed.
-  // For simplicity and speed in this Vanilla JS context, we return a string and wire events later.
+  // High Match Badge logic
+  const isHighMatch = job.matchScore && job.matchScore >= 15;
+  const matchBadge = isHighMatch 
+    ? `<span class="badge" style="background: #e1f5fe; color: #0288d1; border: 1px solid #b3e5fc; margin-right: 8px;">✨ Best Match</span>` 
+    : "";
+
   return `
     <div class="card job" data-job-id="${job.id}">
       <div class="job-left">
         <div style="display:flex; justify-content:space-between; gap:12px;">
           <div>
-            <h3 style="margin:0;">${job.title}</h3>
+            <div style="display:flex; align-items:center;">
+              ${matchBadge}
+              <h3 style="margin:0;">${job.title}</h3>
+            </div>
             <p style="margin:6px 0 0;">${job.employer}</p>
           </div>
           <span class="badge ${badgeClass}">${job.status}</span>
@@ -26,6 +33,7 @@ export function renderJobCard(job, { onView, onApply }) {
         <div class="job-meta">
           <span class="kv">📍 ${job.location}</span>
           <span class="kv">💰 RM ${job.pay}</span>
+          ${job.category ? `<span class="kv">🏷️ ${job.category}</span>` : ""}
         </div>
       </div>
 

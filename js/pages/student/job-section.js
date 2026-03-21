@@ -28,7 +28,9 @@ class StudentDashboard {
   }
 
   async renderJobs() {
-    const jobs = await jobsService.getRecommendedJobs();
+    const user = await authService.getCurrentUser();
+    const profile = user?.user_metadata || {};
+    const jobs = await jobsService.getRecommendedJobs(profile);
     
     if (jobs.length === 0) {
       this.listEl.innerHTML = `<p class="muted">No recommended jobs found at the moment.</p>`;

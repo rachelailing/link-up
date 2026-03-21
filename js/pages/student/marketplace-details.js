@@ -8,6 +8,7 @@ class MarketplaceDetails {
   constructor() {
     this.selectedBank = null;
     this.currentItem = null;
+    this.quantity = 1;
   }
 
   async init() {
@@ -119,6 +120,24 @@ class MarketplaceDetails {
     $("#itemDate").textContent = `📅 Posted: ${item.date}`;
     $("#itemDescription").textContent = item.description || "No description provided.";
 
+    // New Fields: Status
+    const statusEl = $("#itemStatus");
+    const status = item.status || "Ongoing";
+    statusEl.textContent = status;
+    if (status.toLowerCase() === "preorder") {
+      statusEl.style.background = "#fff3cd";
+      statusEl.style.color = "#856404";
+      statusEl.style.borderColor = "#ffeeba";
+    } else {
+      statusEl.style.background = "#e7f3ff";
+      statusEl.style.color = "#007bff";
+      statusEl.style.borderColor = "#cce5ff";
+    }
+
+    // Reset Quantity
+    this.quantity = 1;
+    $("#itemQuantity").textContent = this.quantity;
+
     // Render Tags
     if (item.tags && item.tags.length > 0) {
       $("#itemTags").innerHTML = item.tags.map(t => `<span class="badge outline">${t}</span>`).join("");
@@ -126,17 +145,26 @@ class MarketplaceDetails {
       $("#itemTags").innerHTML = "<span class='muted'>No tags</span>";
     }
 
-    // Update Payment Summary
-    const priceNum = typeof item.price === 'number' ? item.price : parseFloat(item.price.replace("RM ", "")) || 0;
-    const fee = priceNum * 0.02;
-    const total = priceNum + fee;
-
-    $("#subtotal").textContent = `RM ${priceNum.toFixed(2)}`;
-    $("#serviceFee").textContent = `RM ${fee.toFixed(2)}`;
-    $("#totalAmount").textContent = `RM ${total.toFixed(2)}`;
+    this.updatePaymentSummary();
 
     $("#loadingState").style.display = "none";
     $("#detailsContent").style.display = "grid";
+  }
+
+  updatePaymentSummary() {
+    if (!this.currentItem) return;
+
+    const priceNum = typeof this.currentItem.price === 'number' 
+      ? this.currentItem.price 
+      : parseFloat(this.currentItem.price.replace("RM ", "")) || 0;
+    
+    const subtotal = priceNum * this.quantity;
+    const fee = subtotal * 0.02;
+    const total = subtotal + fee;
+
+    $("#subtotal").textContent = `RM ${subtotal.toFixed(2)}`;
+    $("#serviceFee").textContent = `RM ${fee.toFixed(2)}`;
+    $("#totalAmount").textContent = `RM ${total.toFixed(2)}`;
   }
 
   wireEvents() {
@@ -148,6 +176,21 @@ class MarketplaceDetails {
         bank.classList.add("selected");
         this.selectedBank = bank.dataset.bank;
       });
+    });
+
+    // Quantity events
+    $("#increaseQty").addEventListener("click", () => {
+      this.quantity++;
+      $("#itemQuantity").textContent = this.quantity;
+      this.updatePaymentSummary();
+    });
+
+    $("#decreaseQty").addEventListener("click", () => {
+      if (this.quantity > 1) {
+        this.quantity--;
+        $("#itemQuantity").textContent = this.quantity;
+        this.updatePaymentSummary();
+      }
     });
 
     // Pay button
