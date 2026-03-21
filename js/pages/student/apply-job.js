@@ -1,18 +1,7 @@
 import { $, $$ } from "../../utils/dom.js";
 import { setActiveNav } from "../../components/navbar.js";
-
-function getJobs(){
-  return JSON.parse(localStorage.getItem("linkup_employer_jobs") || "[]");
-}
-function saveJobs(jobs){
-  localStorage.setItem("linkup_employer_jobs", JSON.stringify(jobs));
-}
-
-function getCurrentUser(){
-  const raw = localStorage.getItem("linkup_currentUser");
-  if (!raw) return null;
-  try { return JSON.parse(raw); } catch { return null; }
-}
+import { jobsService } from "../../services/jobs.service.js";
+import { authService } from "../../services/auth.service.js";
 
 function setError(id, msg){
   const el = document.querySelector(`[data-error-for="${id}"]`);
@@ -23,14 +12,21 @@ function clearErrors(){
   $$("[data-error-for]").forEach(e => e.textContent = "");
 }
 
-function init(){
+async function init(){
   setActiveNav();
 
-  const params = new URLSearchParams(window.location.search);
-  const jobId = Number(params.get("id"));
+  const user = await authService.requireAuth("student");
+  if (!user) return;
 
-  const jobs = getJobs();
-  const job = jobs.find(j => j.id === jobId);
+  const params = new URLSearchParams(window.location.search);
+  const jobId = params.get("id");
+
+  if (!jobId) {
+    window.location.href = "./jobs.html";
+    return;
+  }
+
+  const job = await jobsService.getJobById(jobId);
 
   if (!job){
     document.querySelector(".container").innerHTML = `
@@ -44,22 +40,18 @@ function init(){
 
   // Fill job preview
   $("#jobTitle").textContent = job.title;
-  $("#jobEmployer").textContent = job.employer || "Employer";
+  $("#jobEmployer").textContent = job.employer_name || "Employer";
   $("#jobLocation").textContent = `📍 ${job.location}`;
   $("#jobSalary").textContent = `💰 RM ${job.salary}`;
   $("#jobDeposit").textContent = `💳 Fee RM ${job.deposit}`;
   $("#jobDeadline").textContent = `📅 ${job.deadline || "-"}`;
   $("#jobDescription").textContent = job.description || "";
 
-  const user = getCurrentUser();
-  const studentName = user?.fullName || "Student";
-
-  $("#applyForm").addEventListener("submit", (e) => {
+  $("#applyForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     clearErrors();
 
     const message = $("#message").value.trim();
-    const cvLink = $("#cvLink").value.trim();
     const availability = $("#availability").value;
 
     let ok = true;
@@ -73,35 +65,24 @@ function init(){
     }
     if (!ok) return;
 
-    // Ensure applications array exists
-    job.applications = job.applications || [];
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting...";
 
-    // Prevent duplicate application (same student)
-    const already = job.applications.some(a =>
-      (a.studentName || "").toLowerCase() === studentName.toLowerCase()
-    );
-    if (already){
-      alert("You already applied for this job.");
-      window.location.href = "./applications.html";
-      return;
+    try {
+      await jobsService.applyForJob(jobId, user.id, message);
+      alert("Application submitted successfully to Supabase! ✅");
+      window.location.href = "./job-section.html"; // Redirect to student job section
+    } catch (err) {
+      if (err.code === "23505") {
+        alert("You have already applied for this job.");
+      } else {
+        alert("Error submitting application: " + err.message);
+      }
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Application";
     }
-
-    // Add application
-    job.applications.push({
-      id: Date.now(),
-      studentName,
-      rating: 4.5,              // MVP placeholder
-      status: "Pending",
-      message,
-      cvLink,
-      availability,
-      appliedAt: new Date().toISOString()
-    });
-
-    saveJobs(jobs);
-
-    alert("Application submitted ✅ Status: Pending");
-    window.location.href = "./applications.html";
   });
 }
 

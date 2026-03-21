@@ -1,17 +1,14 @@
 import { $, $$ } from "../../utils/dom.js";
 import { setActiveNav } from "../../components/navbar.js";
 import { statusToBadgeClass } from "../../components/status-badge.js";
+import { jobsService } from "../../services/jobs.service.js";
+import { authService } from "../../services/auth.service.js";
 
-function getJobs(){
-  return JSON.parse(localStorage.getItem("linkup_employer_jobs") || "[]");
-}
+async function renderJobs(){
+  const user = await authService.getCurrentUser();
+  if (!user) return;
 
-function saveJobs(jobs){
-  localStorage.setItem("linkup_employer_jobs", JSON.stringify(jobs));
-}
-
-function renderJobs(){
-  const jobs = getJobs();
+  const jobs = await jobsService.getJobsByEmployer(user.id);
   const container = $("#jobManageList");
 
   if (!jobs.length){
@@ -39,18 +36,11 @@ function renderJobs(){
             <span class="kv">📍 ${job.location}</span>
             <span class="kv">💰 RM ${job.salary}</span>
             <span class="kv">💳 Deposit RM ${job.deposit}</span>
-            <span class="kv">👥 ${job.slots} slot(s)</span>
-            <span class="kv">📅 ${job.deadline}</span>
+            <span class="kv">📅 ${job.deadline || "No deadline"}</span>
           </div>
         </div>
 
         <div class="manage-actions">
-          ${job.status === "Draft" ? `
-            <button class="btn btn-outline" data-edit="${job.id}">Edit</button>
-            <button class="btn btn-primary" data-publish="${job.id}">Publish</button>
-            <button class="btn btn-outline" data-delete="${job.id}">Delete</button>
-          ` : ""}
-
           ${job.status === "Open" ? `
             <button class="btn btn-outline" data-apps="${job.id}">View Applications</button>
             <button class="btn btn-outline" data-close="${job.id}">Close</button>
@@ -72,51 +62,25 @@ function renderJobs(){
 }
 
 function attachActions(){
-  const jobs = getJobs();
-
-  // Publish Draft
-  $$("[data-publish]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = Number(btn.dataset.publish);
-      const job = jobs.find(j => j.id === id);
-      job.status = "Open";
-      saveJobs(jobs);
-      renderJobs();
-    });
-  });
-
-  // Delete Draft
-  $$("[data-delete]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = Number(btn.dataset.delete);
-      const updated = jobs.filter(j => j.id !== id);
-      saveJobs(updated);
-      renderJobs();
-    });
-  });
-
-  // Close Open
-  $$("[data-close]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = Number(btn.dataset.close);
-      const job = jobs.find(j => j.id === id);
-      job.status = "Completed";
-      saveJobs(jobs);
-      renderJobs();
-    });
-  });
-
   // View Applications
   $$("[data-apps]").forEach(btn => {
     btn.addEventListener("click", () => {
       window.location.href = `applications.html?job=${btn.dataset.apps}`;
     });
   });
+
+  // Placeholder for close logic (can be implemented in jobsService later)
+  $$("[data-close]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      alert("Close logic will be implemented with Supabase soon.");
+    });
+  });
 }
 
-function init(){
+async function init(){
   setActiveNav();
-  renderJobs();
+  await authService.requireAuth("employer");
+  await renderJobs();
 }
 
 document.addEventListener("DOMContentLoaded", init);

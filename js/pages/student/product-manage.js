@@ -91,40 +91,34 @@ class ProductManage {
     try {
       let imageUrl = this.selectedImageData;
 
-      // 1. If a NEW file was picked, upload it to Supabase
+      // 1. Upload image to Supabase Storage if a new file was selected
       if (this.selectedFile) {
         imageUrl = await this.uploadImage(this.selectedFile);
       }
 
-      // 2. Prepare the data for the database
+      // 2. Prepare the data for Supabase
       const listingData = {
-        title: $("#title").value,
+        owner_id: user.id,
+        title: $("#title").value.trim(),
         price: parseFloat($("#price").value),
-        quantity: parseInt($("#quantity").value),
-        status: $("#status").value,
-        location: $("#location").value,
-        description: $("#description").value,
-        date: $("#date").value,
+        type: $("#listingType")?.value || "Product", // Assume you have a type selector
+        category: $("#category")?.value || "General",
+        location: $("#location").value.trim(),
+        description: $("#description").value.trim(),
+        status: $("#status").value || "Ongoing",
         tags: Array.from(this.selectedTags),
-        image: imageUrl,
-        type: "Product",
-        user_id: user.id // Tie it to the logged-in student
+        image_url: imageUrl
       };
 
-      // 3. Save to Supabase Database (or fallback to localStorage for now)
-      // This is where you would call: await supabase.from('marketplace_items').insert([listingData])
-      
-      console.log("[ProductManage] Ready to save:", listingData);
-      
-      // Temporary: keep saving to localStorage so the app still works for testing
-      let existingListings = JSON.parse(localStorage.getItem("linkup_my_market_listings") || "[]");
-      existingListings.unshift({ ...listingData, id: Date.now() });
-      localStorage.setItem("linkup_my_market_listings", JSON.stringify(existingListings));
+      // 3. Save to Supabase Database
+      console.log("[ProductManage] Saving to Supabase:", listingData);
+      await marketplaceService.createItem(listingData);
 
-      alert("Success! Your item has been uploaded.");
+      alert("Success! Your item has been listed on the marketplace.");
       window.location.href = "marketplace-listings.html";
 
     } catch (err) {
+      console.error("[ProductManage] Post failed:", err);
       alert("Error: " + err.message);
     } finally {
       this.submitBtn.disabled = false;

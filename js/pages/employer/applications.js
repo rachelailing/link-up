@@ -1,51 +1,33 @@
 import { $, $$ } from "../../utils/dom.js";
 import { setActiveNav } from "../../components/navbar.js";
 import { statusToBadgeClass } from "../../components/status-badge.js";
+import { supabase } from "../../config/supabase.js";
+import { authService } from "../../services/auth.service.js";
+import { jobsService } from "../../services/jobs.service.js";
 
-/*
-MVP Data Structure:
+async function fetchApplications(jobId) {
+  const { data, error } = await supabase
+    .from('applications')
+    .select(`
+      *,
+      student:student_id (
+        full_name
+      )
+    `)
+    .eq('job_id', jobId);
 
-linkup_employer_jobs
-[
-  {
-    id,
-    title,
-    status,
-    ...
-    applications: [
-        {
-          id,
-          studentName,
-          rating,
-          status: "Pending" | "Accepted" | "Rejected" | "Awaiting Commitment Fee"
-        }
-    ]
+  if (error) {
+    console.error("Error fetching applications:", error);
+    return [];
   }
-]
-*/
-
-function getJobs(){
-  return JSON.parse(localStorage.getItem("linkup_employer_jobs") || "[]");
+  return data;
 }
 
-function saveJobs(jobs){
-  localStorage.setItem("linkup_employer_jobs", JSON.stringify(jobs));
-}
-
-function seedApplicationsIfMissing(job){
-  if (!job.applications){
-    job.applications = [
-      { id: Date.now()+1, studentName:"Aiman Z.", rating:4.6, status:"Pending" },
-      { id: Date.now()+2, studentName:"Siti N.", rating:4.9, status:"Pending" },
-      { id: Date.now()+3, studentName:"Ken L.", rating:4.2, status:"Pending" }
-    ];
-  }
-}
-
-function renderApplications(job){
+async function renderApplications(jobId) {
   const container = $("#applicationsList");
+  const apps = await fetchApplications(jobId);
 
-  if (!job.applications || job.applications.length === 0){
+  if (!apps || apps.length === 0) {
     container.innerHTML = `
       <div class="card pad">
         <p>No applications yet.</p>
@@ -54,38 +36,39 @@ function renderApplications(job){
     return;
   }
 
-  container.innerHTML = job.applications.map(app => {
+  container.innerHTML = apps.map(app => {
     const badgeClass = statusToBadgeClass(app.status);
+    const studentName = app.student?.full_name || "Unknown Student";
 
     return `
       <div class="card application-card">
         <div class="app-left">
           <div style="display:flex; gap:10px; align-items:center;">
-            <h3 style="margin:0;">${app.studentName}</h3>
+            <h3 style="margin:0;">${studentName}</h3>
             <span class="badge ${badgeClass}">${app.status}</span>
           </div>
 
           <div class="app-meta">
-            <span class="kv">⭐ Rating ${app.rating}</span>
-            <span class="kv">📅 Applied recently</span>
+            <span class="kv">📅 Applied ${new Date(app.created_at).toLocaleDateString()}</span>
+            <p class="muted" style="margin-top:8px;">${app.message || "No message provided."}</p>
           </div>
         </div>
 
         <div class="app-actions">
-          ${app.status === "Pending" ? `
+          ${app.status === 'pending' ? `
             <button class="btn btn-primary" data-accept="${app.id}">Accept</button>
             <button class="btn btn-outline" data-reject="${app.id}">Reject</button>
           ` : ""}
 
-          ${app.status === "Awaiting Commitment Fee" ? `
+          ${app.status === 'accepted' ? `
             <span class="badge pending">Waiting for student payment</span>
           ` : ""}
 
-          ${app.status === "Accepted" ? `
+          ${app.status === 'confirmed' ? `
             <span class="badge accepted">Confirmed</span>
           ` : ""}
 
-          ${app.status === "Rejected" ? `
+          ${app.status === 'rejected' ? `
             <span class="badge rejected">Rejected</span>
           ` : ""}
         </div>
@@ -93,41 +76,51 @@ function renderApplications(job){
     `;
   }).join("");
 
-  attachActions(job);
+  attachActions(jobId);
 }
 
-function attachActions(job){
-  const jobs = getJobs();
-
+function attachActions(jobId) {
   // Accept
   $$("[data-accept]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = Number(btn.dataset.accept);
-      const app = job.applications.find(a => a.id === id);
+    btn.addEventListener("click", async () => {
+      const appId = btn.dataset.accept;
+      
+      const { error } = await supabase
+        .from('applications')
+        .update({ status: 'accepted' })
+        .eq('id', appId);
 
-      app.status = "Awaiting Commitment Fee";
-      job.status = "Awaiting Commitment Fee";
-
-      saveJobs(jobs);
-      renderApplications(job);
-      updateHeader(job);
+      if (error) {
+        alert("Error accepting application: " + error.message);
+      } else {
+        renderApplications(jobId);
+      }
     });
   });
 
   // Reject
   $$("[data-reject]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = Number(btn.dataset.reject);
-      const app = job.applications.find(a => a.id === id);
+    btn.addEventListener("click", async () => {
+      const appId = btn.dataset.reject;
+      
+      const { error } = await supabase
+        .from('applications')
+        .update({ status: 'rejected' })
+        .eq('id', appId);
 
-      app.status = "Rejected";
-      saveJobs(jobs);
-      renderApplications(job);
+      if (error) {
+        alert("Error rejecting application: " + error.message);
+      } else {
+        renderApplications(jobId);
+      }
     });
   });
 }
 
-function updateHeader(job){
+async function updateHeader(jobId) {
+  const job = await jobsService.getJobById(jobId);
+  if (!job) return;
+
   $("#jobTitleDisplay").textContent = job.title + " — Applications";
 
   const badge = $("#jobStatusBadge");
@@ -135,29 +128,20 @@ function updateHeader(job){
   badge.className = "badge " + statusToBadgeClass(job.status);
 }
 
-function init(){
+async function init() {
   setActiveNav();
+  await authService.requireAuth("employer");
 
   const urlParams = new URLSearchParams(window.location.search);
-  const jobId = Number(urlParams.get("job"));
+  const jobId = urlParams.get("job");
 
-  const jobs = getJobs();
-  const job = jobs.find(j => j.id === jobId);
-
-  if (!job){
-    $("#applicationsList").innerHTML = `
-      <div class="card pad">
-        <p>Job not found.</p>
-      </div>
-    `;
+  if (!jobId) {
+    window.location.href = "./job-manage.html";
     return;
   }
 
-  seedApplicationsIfMissing(job);
-  saveJobs(jobs);
-
-  updateHeader(job);
-  renderApplications(job);
+  await updateHeader(jobId);
+  await renderApplications(jobId);
 }
 
 document.addEventListener("DOMContentLoaded", init);

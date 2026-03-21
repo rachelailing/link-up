@@ -203,29 +203,55 @@ class MarketplaceDetails {
     });
   }
 
-  handlePayment() {
+  async handlePayment() {
+    const user = await authService.getCurrentUser();
+    if (!user) {
+      alert("Please log in to make a purchase.");
+      return;
+    }
+
     const btn = $("#payButton");
     btn.disabled = true;
     btn.textContent = "Processing...";
 
-    // Simulate payment process
-    setTimeout(() => {
-      alert(`Payment Successful via ${this.selectedBank.toUpperCase()}! Your purchase of "${this.currentItem.title}" is confirmed.`);
-      
-      // Save to purchase history (simplified)
-      const purchase = {
-        id: Date.now(),
-        itemTitle: this.currentItem.title,
-        amount: $("#totalAmount").textContent,
-        date: new Date().toLocaleDateString(),
-        status: "Completed"
-      };
-      const history = JSON.parse(localStorage.getItem("linkup_purchases") || "[]");
-      history.unshift(purchase);
-      localStorage.setItem("linkup_purchases", JSON.stringify(history));
+    try {
+      // 1. Simulate PayPal / Bank Gateway Delay
+      console.log(`[Marketplace] Simulating payment for: ${this.currentItem.title}`);
+      await new Promise(res => setTimeout(res, 2000));
 
+      // 2. Prepare Order Data
+      const totalAmount = parseFloat($("#totalAmount").textContent.replace("RM ", ""));
+      
+      const orderData = {
+        item_id: this.currentItem.id,
+        buyer_id: user.id,
+        seller_id: this.currentItem.owner_id,
+        quantity: this.quantity,
+        total_amount: totalAmount,
+        bank_name: this.selectedBank,
+        status: 'Completed'
+      };
+
+      // 3. Save to Supabase
+      const { data, error } = await supabase
+        .from('marketplace_orders')
+        .insert([orderData])
+        .select();
+
+      if (error) throw error;
+
+      console.log("[Marketplace] Order placed successfully:", data[0]);
+      alert(`Payment Successful! Your purchase of "${this.currentItem.title}" is confirmed.`);
+      
       window.location.href = "purchase.html";
-    }, 2000);
+
+    } catch (err) {
+      console.error("[Marketplace] Purchase failed:", err);
+      alert("Error: " + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Pay Now";
+    }
   }
 }
 
