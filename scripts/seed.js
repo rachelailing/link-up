@@ -8,31 +8,47 @@ import { createClient } from '@supabase/supabase-js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Explicitly load .env from the project root
+// Load .env if it exists
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
 const SERVICE_KEY =
-  process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_SERVICE_KEY;
+  process.env.VITE_SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.VITE_SUPABASE_SERVICE_KEY ||
+  process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!SUPABASE_URL || !SERVICE_KEY) {
-  console.error('Error: VITE_SUPABASE_URL or VITE_SUPABASE_SERVICE_KEY is missing from .env');
+  console.error('Error: SUPABASE_URL or SERVICE_KEY is missing');
   process.exit(1);
 }
 
 const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
 
 async function seed() {
-  console.log('--- STARTING AUTOMATED SEED ---');
+  console.log('--- STARTING AUTOMATED SEED CHECK ---');
 
   try {
-    // 1. Get the first user
+    // 1. Check if we already have jobs or marketplace items
+    const { count: jobCount, error: jobCountErr } = await supabase
+      .from('jobs')
+      .select('*', { count: 'exact', head: true });
+
+    if (jobCountErr) throw jobCountErr;
+
+    if (jobCount > 0) {
+      console.log(
+        `Database already contains ${jobCount} jobs. Skipping seed to prevent duplicates.`
+      );
+      return;
+    }
+
+    // 2. Get the first user to assign seeded data to
     const { data: users, error: userError } = await supabase.auth.admin.listUsers();
     if (userError) throw userError;
 
     if (!users.users || users.users.length === 0) {
-      console.error(
-        'Error: No users found in Supabase Auth. Please register an account on your website first!'
+      console.log(
+        'No users found in Supabase Auth. Skipping seed as there is no owner to assign data to.'
       );
       return;
     }
@@ -41,31 +57,17 @@ async function seed() {
     const myUserId = user.id;
     console.log(`Targeting User: ${user.email} (${myUserId})`);
 
-    // 2. SELF-HEALING: Ensure the user exists in the public.profiles table
-    // This handles users created BEFORE the migration was pushed.
+    // 3. Ensure profile exists
     console.log('Syncing user to public.profiles...');
-    const { error: profileErr } = await supabase.from('profiles').upsert(
+    await supabase.from('profiles').upsert(
       {
         id: myUserId,
         email: user.email,
         full_name: user.user_metadata?.fullName || 'Seed User',
         role: user.user_metadata?.role || 'employer',
-        university: user.user_metadata?.university || 'UTP',
-        business_name: user.user_metadata?.businessName || 'Campus Gigs',
-        onboarding_done: !!user.user_metadata?.onboardingDone,
       },
       { onConflict: 'id' }
     );
-
-    if (profileErr) {
-      console.error('Error syncing profile:', profileErr.message);
-      throw profileErr;
-    }
-
-    // 3. Clear existing data to prevent duplicates
-    console.log('Cleaning up old database records...');
-    await supabase.from('jobs').delete().neq('id', 0);
-    await supabase.from('marketplace_items').delete().neq('id', 0);
 
     // 4. Seed Jobs
     console.log('Seeding Jobs...');
@@ -76,8 +78,6 @@ async function seed() {
         category: 'Creative',
         location: 'UTP, Block A',
         salary: 150,
-        deposit: 15,
-        tags: ['video', 'editing', 'media'],
         status: 'Open',
       },
       {
@@ -86,38 +86,6 @@ async function seed() {
         category: 'Event',
         location: 'UTP, Main Hall',
         salary: 80,
-        deposit: 5,
-        tags: ['event', 'helper', 'booth'],
-        status: 'Open',
-      },
-      {
-        employer_id: myUserId,
-        title: 'Poster Design',
-        category: 'Design',
-        location: 'Remote',
-        salary: 60,
-        deposit: 5,
-        tags: ['design', 'poster', 'graphics'],
-        status: 'Open',
-      },
-      {
-        employer_id: myUserId,
-        title: 'Python Tutor',
-        category: 'Education',
-        location: 'Online',
-        salary: 40,
-        deposit: 0,
-        tags: ['python', 'coding', 'tutoring'],
-        status: 'Open',
-      },
-      {
-        employer_id: myUserId,
-        title: 'Social Media Manager',
-        category: 'Marketing',
-        location: 'Remote',
-        salary: 200,
-        deposit: 20,
-        tags: ['social media', 'marketing'],
         status: 'Open',
       },
     ]);
@@ -134,52 +102,15 @@ async function seed() {
         type: 'Service',
         category: 'Creative',
         location: 'Online / UTP',
-        tags: ['creative', 'video'],
-        rating: 5.0,
-        reviews_count: 20,
-      },
-      {
-        owner_id: myUserId,
-        title: 'Organic Nasi Lemak',
-        price: 5,
-        type: 'Product',
-        category: 'Food',
-        location: 'V4, Block B',
-        tags: ['food', 'homemade'],
-        rating: 4.9,
-        reviews_count: 45,
-      },
-      {
-        owner_id: myUserId,
-        title: 'Python Tutoring (Basic)',
-        price: 20,
-        type: 'Service',
-        category: 'Academic',
-        location: 'Main Library',
-        tags: ['academic', 'coding'],
-        rating: 4.9,
-        reviews_count: 32,
-      },
-      {
-        owner_id: myUserId,
-        title: 'Used Calculus Textbook',
-        price: 30,
-        type: 'Product',
-        category: 'Academic',
-        location: 'V2, Block A',
-        tags: ['textbooks', 'academic'],
-        rating: 4.8,
-        reviews_count: 12,
       },
     ]);
 
     if (marketErr) throw marketErr;
 
     console.log('--- SEED FINISHED SUCCESSFULLY ---');
-    console.log('Your database is now fully populated and linked to your user account.');
   } catch (err) {
-    console.error('Fatal Error during seeding:', err.message);
-    process.exit(1);
+    console.error('Error during seeding:', err.message);
+    // Don't exit with error to prevent blocking deploy if seeding fails but migrations succeeded
   }
 }
 
