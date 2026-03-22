@@ -12,7 +12,7 @@ class ProductManage {
     this.fileInput = $('#fileInput');
     this.tagsContainer = $('#productTags');
     this.toggleEditBtn = $('#toggleEditBtn');
-    this.submitBtn = $("button[type='submit']");
+    this.submitBtn = $('button[type="submit"]');
     this.selectedFile = null; // Store the actual file object
     this.selectedImageData = null; // For preview only
     this.selectedTags = new Set();

@@ -52,7 +52,7 @@ class MyMarketplaceListings {
   renderItems(items, container) {
     if (!container) return;
     if (items.length === 0) {
-      container.innerHTML = "<p class='muted'>No listings found.</p>";
+      container.innerHTML = '<p class="muted">No listings found.</p>';
       return;
     }
     container.innerHTML = items.map((item) => this.createCard(item)).join('');

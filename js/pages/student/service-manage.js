@@ -9,7 +9,7 @@ class ServiceManage {
     this.fileInput = $('#fileInput');
     this.tagsContainer = $('#serviceTags');
     this.toggleEditBtn = $('#toggleEditBtn');
-    this.submitBtn = $("button[type='submit']");
+    this.submitBtn = $('button[type="submit"]');
     this.selectedImageData = null;
     this.selectedTags = new Set();
     this.editId = null;
