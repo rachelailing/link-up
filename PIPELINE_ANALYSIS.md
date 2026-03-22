@@ -140,3 +140,4 @@ jobs:
 - **Targeted Installation:** Use `--filter <package>...` during CI to speed up installation and avoid unnecessary package downloads.
 - **Migration Check:** For database-heavy apps, always validate migrations before deployment to prevent production drift.
 - **CLI-based Deployment:** The workflows favor CLI-based deployments (Railway/Vercel) over generic Docker actions for tighter integration with hosting providers.
+  \n- Fixed supabase db push command to use supabase link first.
