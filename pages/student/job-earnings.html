@@ -69,6 +69,24 @@
           <h2>Transaction History</h2>
         </div>
 
+        <!-- Filters -->
+        <div class="card pad filter-bar" style="display: flex; gap: 10px; margin-bottom: 20px;">
+          <select id="typeFilter" class="btn btn-outline" style="text-align: left; flex: 1;">
+            <option value="all">All Types</option>
+            <option value="commitment">Commitment Fee</option>
+            <option value="salary">Salary</option>
+            <option value="both">Commitment + Salary</option>
+          </select>
+
+          <select id="statusFilter" class="btn btn-outline" style="text-align: left; flex: 1;">
+            <option value="all">All Status</option>
+            <option value="unpaid">Unpaid</option>
+            <option value="refund">Refund</option>
+            <option value="pending">Pending</option>
+            <option value="cancel">Cancel</option>
+          </select>
+        </div>
+
         <div class="list" id="earningsList">
           <!-- Mock Job Earnings -->
           <div class="card pad" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
