@@ -16,7 +16,15 @@ if (!stripeSecretKey) {
 }
 const stripe = stripeSecretKey ? new Stripe(stripeSecretKey) : null;
 
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_SERVICE_KEY);
+const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+const supabaseServiceKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_SERVICE_KEY;
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.warn('⚠️  Supabase URL or Service Key missing. Backend features may fail.');
+}
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 app.use(cors());
 
@@ -37,6 +45,10 @@ app.post('/api/create-checkout-session', async (req, res) => {
 
     console.log(`[API] Creating Checkout Session for: ${itemTitle} (RM ${amount})`);
 
+    const protocol = req.headers['x-forwarded-proto'] || 'http';
+    const host = req.headers['host'];
+    const baseUrl = process.env.VITE_APP_URL || `${protocol}://${host}`;
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card', 'fpx'],
       line_items: [
@@ -52,9 +64,8 @@ app.post('/api/create-checkout-session', async (req, res) => {
         },
       ],
       mode: 'payment',
-      // Pointing to your local frontend pages as requested, now including session_id
-      success_url: `${process.env.VITE_APP_URL || 'http://127.0.0.1:5173'}/pages/student/purchase.html?payment=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.VITE_APP_URL || 'http://127.0.0.1:5173'}/pages/student/marketplace-details.html?id=${itemId}&payment=cancel`,
+      success_url: `${baseUrl}/pages/student/purchase.html?payment=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/pages/student/marketplace-details.html?id=${itemId}&payment=cancel`,
       metadata: {
         itemId: itemId.toString(),
         buyerId,
