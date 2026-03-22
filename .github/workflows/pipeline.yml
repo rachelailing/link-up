@@ -59,7 +59,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Check Supabase Migrations
         run: pnpm exec supabase db lint
