@@ -4,6 +4,13 @@
   "buildCommand": "pnpm build",
   "outputDirectory": "dist",
   "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/$1.html",
+      "continue": true
+    }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",
