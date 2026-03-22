@@ -123,19 +123,28 @@ app.get('/api/verify-session', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
-const server = app.listen(PORT, '127.0.0.1', () => {
-  console.log('--------------------------------------------------');
-  console.log(`🚀 Stripe Backend Server running on http://127.0.0.1:${PORT}`);
-  console.log('--------------------------------------------------');
-});
+// ... (rest of the file remains the same until the end)
 
-server.on('error', (err) => {
-  console.error('❌ SERVER ERROR:', err.message);
-  if (err.code === 'EADDRINUSE') {
-    console.error(`Port ${PORT} is already in use.`);
-  }
-});
+const PORT = process.env.PORT || 3000;
+
+// Export for Vercel
+export default app;
+
+// Only start the server if this file is run directly (local development)
+if (process.env.NODE_ENV !== 'production') {
+  const server = app.listen(PORT, '127.0.0.1', () => {
+    console.log('--------------------------------------------------');
+    console.log(`🚀 Stripe Backend Server running on http://127.0.0.1:${PORT}`);
+    console.log('--------------------------------------------------');
+  });
+
+  server.on('error', (err) => {
+    console.error('❌ SERVER ERROR:', err.message);
+    if (err.code === 'EADDRINUSE') {
+      console.error(`Port ${PORT} is already in use.`);
+    }
+  });
+}
 
 process.on('uncaughtException', (err) => {
   console.error('❌ UNCAUGHT EXCEPTION:', err.message);
