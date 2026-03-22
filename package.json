@@ -15,7 +15,7 @@
     "lint:code": "eslint .",
     "format": "prettier --write \"**/*.{js,css,html,md,json}\"",
     "test": "turbo run test",
-    "prepare": "husky"
+    "prepare": "if [ \"$CI\" = \"true\" ]; then exit 0; else husky; fi"
   },
   "lint-staged": {
     "*.js": [
