@@ -121,7 +121,7 @@ function renderRecentApplications() {
 
   $$('[data-app-accept]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      alert("MVP: Accepting will move application to 'Awaiting Commitment Fee'.");
+      alert('MVP: Accepting will move application to Awaiting Commitment Fee.');
     });
   });
 }
