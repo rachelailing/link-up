@@ -1,6 +1,8 @@
 // js/pages/student/service-manage.js
 import { $, $$ } from "../../utils/dom.js";
 import { setActiveNav, wireLogout } from "../../components/navbar.js";
+import { marketplaceService } from "../../services/marketplace.service.js";
+import { authService } from "../../services/auth.service.js";
 
 class ServiceManage {
   constructor() {
@@ -10,34 +12,35 @@ class ServiceManage {
     this.tagsContainer = $("#serviceTags");
     this.toggleEditBtn = $("#toggleEditBtn");
     this.submitBtn = $("button[type='submit']");
+    this.selectedFile = null;
     this.selectedImageData = null;
     this.selectedTags = new Set();
     this.editId = null;
     this.isEditMode = false;
   }
 
-  init() {
+  async init() {
     setActiveNav();
     wireLogout();
-    this.checkEditMode();
+    await this.checkEditMode();
     this.wireEvents();
     if (!this.editId) {
       this.setDefaultDate();
-      this.isEditMode = true; // New listing is always in edit mode
+      this.isEditMode = true;
     }
   }
 
-  checkEditMode() {
+  async checkEditMode() {
     const params = new URLSearchParams(window.location.search);
-    const id = parseInt(params.get("id"));
+    const id = params.get("id");
     if (id) {
       this.editId = id;
-      this.isEditMode = false; // Start in View mode
+      this.isEditMode = false;
       $("#pageTitle").textContent = "Service Details";
       this.toggleEditBtn.style.display = "block";
       this.submitBtn.style.display = "none";
       
-      this.loadExistingData(id);
+      await this.loadExistingData(id);
       this.setFormDisabled(true);
     }
   }
@@ -48,44 +51,44 @@ class ServiceManage {
       if (input.id !== "toggleEditBtn") input.disabled = disabled;
     });
     
-    // Disable chips
     const chips = this.tagsContainer.querySelectorAll(".chip");
     chips.forEach(chip => {
       chip.style.pointerEvents = disabled ? "none" : "auto";
       chip.style.opacity = disabled ? "0.7" : "1";
     });
 
-    // Disable image upload
     this.imageUpload.style.pointerEvents = disabled ? "none" : "auto";
     this.imageUpload.style.opacity = disabled ? "0.8" : "1";
   }
 
-  loadExistingData(id) {
-    const myListings = JSON.parse(localStorage.getItem("linkup_my_market_listings") || "[]");
-    const item = myListings.find(i => i.id === id);
-    
-    if (item) {
-      $("#title").value = item.title;
-      $("#price").value = (item.price || "").replace("RM ", "");
-      $("#status").value = item.status || "Ongoing";
-      $("#location").value = item.location;
-      $("#description").value = item.description || "";
-      $("#date").value = item.date;
-      
-      if (item.image) {
-        this.selectedImageData = item.image;
-        this.imageUpload.innerHTML = `<img src="${item.image}" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">`;
-      }
+  async loadExistingData(id) {
+    try {
+      const item = await marketplaceService.getItemById(id);
+      if (item) {
+        $("#title").value = item.title;
+        $("#price").value = item.price;
+        $("#status").value = item.status;
+        $("#location").value = item.location;
+        $("#description").value = item.description || "";
+        $("#date").value = item.date;
+        
+        if (item.image) {
+          this.selectedImageData = item.image;
+          this.imageUpload.innerHTML = `<img src="${item.image}" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">`;
+        }
 
-      if (item.tags) {
-        item.tags.forEach(tag => {
-          this.selectedTags.add(tag);
-          const chip = this.tagsContainer.querySelector(`[data-value="${tag}"]`);
-          if (chip) chip.classList.add("active");
-        });
+        if (item.tags) {
+          item.tags.forEach(tag => {
+            this.selectedTags.add(tag);
+            const chip = this.tagsContainer.querySelector(`[data-value="${tag}"]`);
+            if (chip) chip.classList.add("active");
+          });
+        }
+        
+        $("#terms").checked = true;
       }
-      
-      $("#terms").checked = true;
+    } catch (err) {
+      console.error("Error loading data:", err);
     }
   }
 
@@ -95,7 +98,6 @@ class ServiceManage {
   }
 
   wireEvents() {
-    // Toggle Edit Mode
     this.toggleEditBtn.addEventListener("click", () => {
       this.isEditMode = true;
       this.setFormDisabled(false);
@@ -110,6 +112,7 @@ class ServiceManage {
     this.fileInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (file) {
+        this.selectedFile = file;
         const reader = new FileReader();
         reader.onload = (event) => {
           this.selectedImageData = event.target.result;
@@ -135,49 +138,63 @@ class ServiceManage {
       });
     }
 
-    this.form.addEventListener("submit", (e) => {
+    this.form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      this.handlePost();
+      await this.handlePost();
     });
   }
 
-  handlePost() {
-    const title = $("#title").value;
-    const priceValue = $("#price").value;
-    const status = $("#status").value;
-    const location = $("#location").value;
-    const description = $("#description").value;
-    const date = $("#date").value;
+  async handlePost() {
+    const user = await authService.getCurrentUser();
+    if (!user) {
+      alert("Please log in to post items.");
+      return;
+    }
 
     if (this.selectedTags.size === 0) {
       alert("Please select at least one category tag.");
       return;
     }
 
-    const listingData = {
-      id: this.editId || Date.now(),
-      title,
-      price: `RM ${priceValue}`,
-      status,
-      location,
-      description,
-      date,
-      tags: Array.from(this.selectedTags),
-      image: this.selectedImageData,
-      type: "Service"
-    };
+    this.submitBtn.disabled = true;
+    this.submitBtn.textContent = "Processing...";
 
-    let existingListings = JSON.parse(localStorage.getItem("linkup_my_market_listings") || "[]");
-    
-    if (this.editId) {
-      existingListings = existingListings.map(i => i.id === this.editId ? listingData : i);
-    } else {
-      existingListings.unshift(listingData);
+    try {
+      let imageUrl = this.selectedImageData;
+
+      if (this.selectedFile) {
+        imageUrl = await marketplaceService.uploadImage(this.selectedFile);
+      }
+
+      const listingData = {
+        title: $("#title").value,
+        price: parseFloat($("#price").value),
+        status: $("#status").value,
+        location: $("#location").value,
+        description: $("#description").value,
+        date: $("#date").value,
+        tags: Array.from(this.selectedTags),
+        image: imageUrl,
+        type: "Service",
+        user_id: user.id
+      };
+
+      if (this.editId) {
+        await marketplaceService.updateItem(this.editId, listingData);
+        alert("Service updated successfully!");
+      } else {
+        await marketplaceService.createItem(listingData);
+        alert("Success! Your service has been posted.");
+      }
+
+      window.location.href = "marketplace-listings.html";
+
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      this.submitBtn.disabled = false;
+      this.submitBtn.textContent = this.editId ? "Update Service" : "Post Service";
     }
-
-    localStorage.setItem("linkup_my_market_listings", JSON.stringify(existingListings));
-    alert(this.editId ? "Service updated successfully!" : "Success! Your service has been posted.");
-    window.location.href = "marketplace-listings.html";
   }
 }
 

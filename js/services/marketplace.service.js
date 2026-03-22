@@ -1,4 +1,5 @@
 // js/services/marketplace.service.js
+import { supabase } from "../config/supabase.js";
 
 const MOCK_DATA = [
   { id: 1, title: "Pro Video Editing Service", price: 50, location: "Online / UTP", date: "3 Mar 2026", rating: 5.0, reviews: 20, type: "Service", status: "Ongoing", description: "Professional video editing for your assignments, vlogs, or club events. Quick turnaround and high-quality results.", tags: ["creative", "video", "media"] },
@@ -13,38 +14,46 @@ const MOCK_DATA = [
 ];
 
 class MarketplaceService {
+  /**
+   * Fetch all items from Supabase marketplace_items table.
+   * Merges with MOCK_DATA for fallback if the table is empty.
+   */
   async getAllItems() {
-    return MOCK_DATA;
+    const { data, error } = await supabase
+      .from('marketplace_items')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error("[MarketplaceService] Error fetching items:", error);
+      return MOCK_DATA;
+    }
+
+    // Merge mock data with real data for demo richness
+    return [...data, ...MOCK_DATA];
   }
 
   /**
    * Smart recommendation algorithm for marketplace items.
-   * @param {Object} profile - Student profile metadata
-   * @returns {Promise<Array>}
    */
   async getRecommended(profile = {}) {
     const items = await this.getAllItems();
     
-    // Algorithm: Score each item based on interests and campus
     const scoredItems = items.map(item => {
       let score = 0;
-      
       const studentInterests = (profile.interests || []).map(i => i.toLowerCase());
       const itemTags = (item.tags || []).map(t => t.toLowerCase());
       const itemTitle = item.title.toLowerCase();
 
-      // 1. Interest Match (High weight)
       studentInterests.forEach(interest => {
         if (itemTags.includes(interest)) score += 10;
         if (itemTitle.includes(interest)) score += 5;
       });
 
-      // 2. Location Match
-      if (profile.campus && item.location.includes(profile.campus)) {
+      if (profile.campus && item.location && item.location.includes(profile.campus)) {
         score += 5;
       }
 
-      // 3. Quality Bonus (Rating)
       if (item.rating >= 4.5) {
         score += 2;
       }
@@ -52,44 +61,120 @@ class MarketplaceService {
       return { ...item, matchScore: score };
     });
 
-    // Sort by score and rating
     const recommendations = scoredItems
       .sort((a, b) => {
         if (b.matchScore !== a.matchScore) return b.matchScore - a.matchScore;
-        return b.rating - a.rating;
+        return (b.rating || 0) - (a.rating || 0);
       });
 
-    console.log("[MarketplaceService] Recommendations:", recommendations.map(i => ({ title: i.title, score: i.matchScore })));
-    
     return recommendations.slice(0, 4);
   }
 
   async getProducts() {
-    return MOCK_DATA.filter(i => i.type === "Product");
+    const items = await this.getAllItems();
+    return items.filter(i => i.type === "Product");
   }
 
   async getServices() {
-    return MOCK_DATA.filter(i => i.type === "Service");
+    const items = await this.getAllItems();
+    return items.filter(i => i.type === "Service");
   }
 
   async getItemById(id) {
-    const numericId = parseInt(id);
-    const item = MOCK_DATA.find(i => i.id === numericId);
-    
-    if (item) return item;
+    // Check Supabase first
+    const { data, error } = await supabase
+      .from('marketplace_items')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-    // Check local storage for user's own listings
-    const myListings = JSON.parse(localStorage.getItem("linkup_my_market_listings") || "[]");
-    return myListings.find(i => i.id === numericId);
+    if (data) return data;
+
+    // Fallback to MOCK_DATA
+    const numericId = parseInt(id);
+    return MOCK_DATA.find(i => i.id === numericId);
   }
 
+  /**
+   * Fetch items posted by the current user.
+   */
   async getMyListings() {
-    const myListings = JSON.parse(localStorage.getItem("linkup_my_market_listings") || "[]");
-    // Merge with some mock data for demo if empty
-    if (myListings.length === 0) {
-      return MOCK_DATA.filter(i => [101, 102].includes(i.id));
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+
+    const { data, error } = await supabase
+      .from('marketplace_items')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error("[MarketplaceService] Error fetching my listings:", error);
+      return [];
     }
-    return myListings;
+
+    return data;
+  }
+
+  /**
+   * Create a new marketplace item in Supabase.
+   */
+  async createItem(itemData) {
+    const { data, error } = await supabase
+      .from('marketplace_items')
+      .insert([itemData])
+      .select();
+
+    if (error) throw error;
+    return data[0];
+  }
+
+  /**
+   * Update an existing marketplace item.
+   */
+  async updateItem(id, itemData) {
+    const { data, error } = await supabase
+      .from('marketplace_items')
+      .update(itemData)
+      .eq('id', id)
+      .select();
+
+    if (error) throw error;
+    return data[0];
+  }
+
+  /**
+   * Delete an item.
+   */
+  async deleteItem(id) {
+    const { error } = await supabase
+      .from('marketplace_items')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    return true;
+  }
+
+  /**
+   * Upload an image to Supabase storage.
+   */
+  async uploadImage(file) {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `marketplace/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('marketplace_images')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('marketplace_images')
+      .getPublicUrl(filePath);
+
+    return publicUrl;
   }
 }
 
