@@ -61,8 +61,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
       - name: Check Supabase Migrations
-        run: pnpm exec supabase db lint
+        run: supabase db lint
 
       - name: Pull Vercel environment information
         run: pnpm exec vercel pull --yes --environment=production --token=$VERCEL_TOKEN
