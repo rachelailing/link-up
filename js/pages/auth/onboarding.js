@@ -103,7 +103,7 @@ async function saveOnboarding() {
   };
 
   // Update Supabase Auth metadata
-  const { data, error } = await supabase.auth.updateUser({
+  const { error } = await supabase.auth.updateUser({
     data: metadata,
   });
 

@@ -1,5 +1,5 @@
 // js/pages/student/purchase.js
-import { $, $$ } from '../../utils/dom.js';
+import { $ } from '../../utils/dom.js';
 import { setActiveNav, wireLogout } from '../../components/navbar.js';
 import { authService } from '../../services/auth.service.js';
 import { supabase } from '../../config/supabase.js';

@@ -1,4 +1,4 @@
-import { $, $$ } from '../../utils/dom.js';
+import { $ } from '../../utils/dom.js';
 import { setActiveNav } from '../../components/navbar.js';
 import { statusToBadgeClass } from '../../components/status-badge.js';
 import { supabase } from '../../config/supabase.js';
@@ -18,11 +18,11 @@ async function fetchMyApplication(jobId, studentId) {
   return data;
 }
 
-function renderDetail(job, app, feeRecord) {
+function renderDetail(job, _app, feeRecord) {
   const detail = $('#feeDetail');
   detail.style.display = 'block';
 
-  const status = feeRecord ? feeRecord.status : app.status === 'accepted' ? 'Unpaid' : 'Pending';
+  const status = feeRecord ? feeRecord.status : _app.status === 'accepted' ? 'Unpaid' : 'Pending';
   const badge = statusToBadgeClass(status);
 
   const statusText =
@@ -57,7 +57,7 @@ function renderDetail(job, app, feeRecord) {
 
       <div style="text-align:right;">
         <div class="muted">Application status</div>
-        <div style="font-weight:800;">${app.status}</div>
+        <div style="font-weight:800;">${_app.status}</div>
       </div>
     </div>
 
@@ -70,11 +70,11 @@ function renderDetail(job, app, feeRecord) {
   `;
 
   if (showPayBtn) {
-    $('#payNowBtn').addEventListener('click', () => payFee(job, app));
+    $('#payNowBtn').addEventListener('click', () => payFee(job, _app));
   }
 }
 
-async function payFee(job, app) {
+async function payFee(job, _app) {
   const user = await authService.getCurrentUser();
 
   const payBtn = $('#payNowBtn');

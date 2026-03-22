@@ -65,7 +65,7 @@ class ProductManage {
     const filePath = `listings/${fileName}`;
 
     // Upload to 'marketplace-images' bucket
-    const { data, error } = await supabase.storage
+    const { data: _data, error } = await supabase.storage
       .from('marketplace-images')
       .upload(filePath, file);
 
@@ -126,3 +126,9 @@ class ProductManage {
     }
   }
 }
+
+// Bootstrap the page
+document.addEventListener('DOMContentLoaded', () => {
+  const manager = new ProductManage();
+  manager.init();
+});

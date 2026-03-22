@@ -7,7 +7,7 @@ import { statusToBadgeClass } from './status-badge.js';
  * @param {Object} options - Rendering options/actions
  * @returns {string}
  */
-export function renderJobCard(job, { onView, onApply }) {
+export function renderJobCard(job) {
   const badgeClass = statusToBadgeClass(job.status);
 
   // High Match Badge logic

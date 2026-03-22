@@ -1,4 +1,4 @@
-import { $, $$ } from '../../utils/dom.js';
+import { $ } from '../../utils/dom.js';
 import { setActiveNav } from '../../components/navbar.js';
 import { jobsService } from '../../services/jobs.service.js';
 import { authService } from '../../services/auth.service.js';

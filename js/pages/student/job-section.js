@@ -4,7 +4,6 @@ import { $ } from '../../utils/dom.js';
 import { jobsService } from '../../services/jobs.service.js';
 import { renderJobCard, wireJobCardEvents } from '../../components/job-card.js';
 import { authService } from '../../services/auth.service.js';
-import { supabase } from '../../config/supabase.js';
 
 /**
  * Dashboard Controller

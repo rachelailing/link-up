@@ -6,7 +6,6 @@ import { jobsService } from '../../services/jobs.service.js';
 
 let currentPage = 0;
 const PAGE_SIZE = 5;
-let hasMore = true;
 
 function renderJobs(list, append = false) {
   const listEl = $('#jobsList');
@@ -83,10 +82,8 @@ async function fetchAndRender(append = false) {
   });
 
   if (jobs.length < PAGE_SIZE) {
-    hasMore = false;
     if ($('#loadMoreBtn')) $('#loadMoreBtn').style.display = 'none';
   } else {
-    hasMore = true;
     if ($('#loadMoreBtn')) $('#loadMoreBtn').style.display = 'block';
   }
 

@@ -1,5 +1,5 @@
 // js/pages/student/service-manage.js
-import { $, $$ } from '../../utils/dom.js';
+import { $ } from '../../utils/dom.js';
 import { setActiveNav, wireLogout } from '../../components/navbar.js';
 
 class ServiceManage {
