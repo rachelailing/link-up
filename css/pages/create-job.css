@@ -36,6 +36,31 @@
   margin-top: 10px;
 }
 
+.tags-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  background: rgba(0,0,0,0.02);
+  padding: 15px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+}
+
+.tag-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.tag-option input {
+  width: 16px !important;
+  height: 16px !important;
+  cursor: pointer;
+}
+
 @media (max-width: 960px){
   .create-job-grid{
     grid-template-columns: 1fr;
