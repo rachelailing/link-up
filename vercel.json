@@ -7,8 +7,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/$1.html",
-      "continue": true
+      "destination": "/$1.html"
     }
   ],
   "headers": [
