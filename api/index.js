@@ -1,4 +1,4 @@
-// server.js
+// api/index.js
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -8,6 +8,7 @@ import { createClient } from '@supabase/supabase-js';
 dotenv.config();
 
 const app = express();
+const router = express.Router();
 
 // Initialize Stripe only if the key is provided to prevent startup crashes
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -27,22 +28,18 @@ if (!supabaseUrl || !supabaseServiceKey) {
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 app.use(cors());
-
-// JSON parser for all routes (since we've removed the raw webhook route)
 app.use(express.json());
 
 /**
  * Create Checkout Session
- * Called by frontend when a user clicks "Pay Now"
  */
-app.post('/api/create-checkout-session', async (req, res) => {
+router.post('/create-checkout-session', async (req, res) => {
   try {
     if (!stripe) {
       throw new Error('Stripe is not configured. Please add STRIPE_SECRET_KEY to your .env file.');
     }
 
     const { itemId, itemTitle, amount, quantity, buyerId, sellerId } = req.body;
-
     console.log(`[API] Creating Checkout Session for: ${itemTitle} (RM ${amount})`);
 
     const protocol = req.headers['x-forwarded-proto'] || 'http';
@@ -55,10 +52,8 @@ app.post('/api/create-checkout-session', async (req, res) => {
         {
           price_data: {
             currency: 'myr',
-            product_data: {
-              name: itemTitle,
-            },
-            unit_amount: Math.round(amount * 100), // convert to cents
+            product_data: { name: itemTitle },
+            unit_amount: Math.round(amount * 100),
           },
           quantity: quantity,
         },
@@ -83,20 +78,16 @@ app.post('/api/create-checkout-session', async (req, res) => {
 
 /**
  * Verify Stripe Session
- * Called by frontend (purchase.html) after a successful redirect
  */
-app.get('/api/verify-session', async (req, res) => {
+router.get('/verify-session', async (req, res) => {
   const { session_id } = req.query;
-
   try {
     if (!stripe) throw new Error('Stripe not configured.');
-
     const session = await stripe.checkout.sessions.retrieve(session_id);
 
     if (session.payment_status === 'paid') {
       const { itemId, buyerId, sellerId, quantity } = session.metadata;
 
-      // Check if order already exists in Supabase to avoid duplicates
       const { data: existingOrder } = await supabase
         .from('marketplace_orders')
         .select('id')
@@ -104,7 +95,7 @@ app.get('/api/verify-session', async (req, res) => {
         .eq('buyer_id', buyerId)
         .eq('seller_id', sellerId)
         .eq('status', 'Completed')
-        .gte('created_at', new Date(Date.now() - 3600000).toISOString()) // Within last hour
+        .gte('created_at', new Date(Date.now() - 3600000).toISOString())
         .single();
 
       if (!existingOrder) {
@@ -120,10 +111,8 @@ app.get('/api/verify-session', async (req, res) => {
             status: 'Completed',
           },
         ]);
-
         if (error) throw error;
       }
-
       res.json({ success: true, order: session.metadata });
     } else {
       res.status(400).json({ success: false, error: 'Payment not completed' });
@@ -134,33 +123,15 @@ app.get('/api/verify-session', async (req, res) => {
   }
 });
 
-// ... (rest of the file remains the same until the end)
+// Handle both root and /api paths to be safe on Vercel
+app.use('/api', router);
+app.use('/', router);
 
-const PORT = process.env.PORT || 3000;
-
-// Export for Vercel
 export default app;
 
-// Only start the server if this file is run directly (local development)
+const PORT = process.env.PORT || 3000;
 if (process.env.NODE_ENV !== 'production') {
-  const server = app.listen(PORT, '127.0.0.1', () => {
-    console.log('--------------------------------------------------');
+  app.listen(PORT, '127.0.0.1', () => {
     console.log(`🚀 Stripe Backend Server running on http://127.0.0.1:${PORT}`);
-    console.log('--------------------------------------------------');
-  });
-
-  server.on('error', (err) => {
-    console.error('❌ SERVER ERROR:', err.message);
-    if (err.code === 'EADDRINUSE') {
-      console.error(`Port ${PORT} is already in use.`);
-    }
   });
 }
-
-process.on('uncaughtException', (err) => {
-  console.error('❌ UNCAUGHT EXCEPTION:', err.message);
-});
-
-process.on('unhandledRejection', (reason) => {
-  console.error('❌ UNHANDLED REJECTION:', reason);
-});
