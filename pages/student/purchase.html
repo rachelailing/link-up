@@ -48,23 +48,9 @@
           <h2>Purchase History</h2>
         </div>
 
-        <div class="card pad">
-          <p class="muted">You haven't made any purchases yet.</p>
-        </div>
-
-        <div style="height:20px;"></div>
-
-        <!-- Example of how a purchase might look -->
-        <div class="list">
-          <div class="card pad" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <div>
-              <h3 style="margin:0;">UI Design Component Pack</h3>
-              <p class="muted" style="margin:4px 0 0 0;">Purchased on: 2026-03-04</p>
-            </div>
-            <div style="text-align: right;">
-              <div style="font-weight: bold; color: var(--blue);">RM 45.00</div>
-              <span class="badge inprogress">Completed</span>
-            </div>
+        <div id="purchaseList" class="list">
+          <div class="card pad">
+            <p class="muted">Loading your purchase history...</p>
           </div>
         </div>
 
@@ -73,12 +59,6 @@
 
   </div>
 
-  <script type="module">
-    import { setActiveNav, wireLogout } from "../../js/components/navbar.js";
-    document.addEventListener("DOMContentLoaded", () => {
-      setActiveNav();
-      wireLogout();
-    });
-  </script>
+  <script type="module" src="/js/pages/student/purchase.js"></script>
 </body>
 </html>

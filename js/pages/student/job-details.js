@@ -1,27 +1,8 @@
 import { $, $$ } from "../../utils/dom.js";
-import { setActiveNav } from "../../components/navbar.js";
+import { setActiveNav, wireLogout } from "../../components/navbar.js";
 import { statusToBadgeClass } from "../../components/status-badge.js";
-
-function getJobs(){
-  return JSON.parse(localStorage.getItem("linkup_employer_jobs") || "[]");
-}
-
-function saveJobs(jobs){
-  localStorage.setItem("linkup_employer_jobs", JSON.stringify(jobs));
-}
-
-function getCurrentUser(){
-  const raw = localStorage.getItem("linkup_currentUser");
-  if (!raw) return null;
-  try { return JSON.parse(raw); } catch { return null; }
-}
-
-function getMyApplication(job, studentName){
-  if (!job.applications) return null;
-  return job.applications.find(a => 
-    (a.studentName || "").toLowerCase() === studentName.toLowerCase()
-  );
-}
+import { authService } from "../../services/auth.service.js";
+import { supabase } from "../../config/supabase.js";
 
 function normalizeStatus(s){
   return (s || "").toLowerCase().replace(/\s+/g, "");
@@ -41,25 +22,32 @@ function computeCountdown(deadlineStr){
   return `${hours}h ${mins}m left`;
 }
 
-function isActive(job){
-  const s = normalizeStatus(job.status);
-  return ["inprogress","submitted","awaitingapproval","awaitingpayment","confirmed"].includes(s);
-}
-
-function renderJobs(){
-  const user = getCurrentUser();
+async function renderJobs(){
+  const user = await authService.getCurrentUser();
   if (!user) return;
-  const studentName = user.fullName || "Student";
 
-  const allJobs = getJobs();
-  const myJobsWithApp = allJobs.filter(job => getMyApplication(job, studentName));
+  // Fetch applications with job details
+  const { data: apps, error } = await supabase
+    .from('applications')
+    .select(`
+      *,
+      jobs (*)
+    `)
+    .eq('student_id', user.id);
+
+  if (error) {
+    console.error("Error fetching my jobs:", error);
+    return;
+  }
 
   const searchQuery = $("#searchInput").value.toLowerCase().trim();
   const statusFilter = $("#statusFilter").value;
   const dateSort = $("#dateFilter").value;
 
-  let filtered = myJobsWithApp.filter(job => {
-    const app = getMyApplication(job, studentName);
+  let filtered = apps.filter(app => {
+    const job = app.jobs;
+    if (!job) return false;
+    
     const jobTitle = job.title.toLowerCase();
     
     // Search filter
@@ -68,16 +56,15 @@ function renderJobs(){
     // Status filter
     if (statusFilter !== "all") {
       const appStatus = normalizeStatus(app.status);
-      const jobStatus = normalizeStatus(job.status);
 
       if (statusFilter === "applied") {
-        if (!["pending", "awaitingcommitmentfee"].includes(appStatus)) return false;
+        if (!["pending", "accepted"].includes(appStatus)) return false;
       } else if (statusFilter === "current") {
-        if (!["inprogress", "submitted", "confirmed", "awaitingpayment"].includes(jobStatus)) return false;
+        if (!["confirmed", "inprogress", "submitted"].includes(appStatus)) return false;
       } else if (statusFilter === "done") {
-        if (jobStatus !== "completed") return false;
+        if (appStatus !== "completed") return false;
       } else if (statusFilter === "cancelled") {
-        if (!["rejected", "cancelled"].includes(appStatus) && jobStatus !== "cancelled") return false;
+        if (!["rejected", "cancelled"].includes(appStatus)) return false;
       }
     }
     return true;
@@ -85,42 +72,25 @@ function renderJobs(){
 
   // Date Sort
   filtered.sort((a, b) => {
-    const da = new Date(a.createdAt || 0);
-    const db = new Date(b.createdAt || 0);
+    const da = new Date(a.created_at);
+    const db = new Date(b.created_at);
     return dateSort === "newest" ? db - da : da - db;
   });
 
-  // Update counter
-  const activeCount = filtered.filter(isActive).length;
-  const badgeEl = $("#activeCountBadge");
-  if (badgeEl) badgeEl.textContent = `${activeCount} Active`;
-
   const el = $("#activeJobsList");
-  const listContainer = el.closest(".list");
-  const hasHardcoded = listContainer && listContainer.querySelector(".active-row:not(#activeJobsList .active-row)");
-
   if (!filtered.length) {
-    // If no dynamic jobs, only show empty state if there are NO other jobs (like hardcoded ones)
-    if (!hasHardcoded) {
-      el.innerHTML = `
-        <div class="card pad">
-          <p>No jobs found right now.</p>
-          <a class="btn btn-primary" href="./jobs.html">Find Jobs</a>
-        </div>
-      `;
-    } else {
-      el.innerHTML = "";
-    }
+    el.innerHTML = `
+      <div class="card pad">
+        <p>No jobs found in this category.</p>
+        <a class="btn btn-primary" href="./jobs.html">Find Jobs</a>
+      </div>
+    `;
     return;
   }
 
-  el.innerHTML = filtered.map(job => {
-    const app = getMyApplication(job, studentName);
-    // Prefer job status if it's beyond "Open", otherwise use app status
-    const displayStatus = (normalizeStatus(job.status) === "open" || normalizeStatus(job.status) === "draft") 
-      ? app.status : job.status;
-      
-    const badge = statusToBadgeClass(displayStatus);
+  el.innerHTML = filtered.map(app => {
+    const job = app.jobs;
+    const badge = statusToBadgeClass(app.status);
     const countdown = computeCountdown(job.deadline);
 
     return `
@@ -133,7 +103,7 @@ function renderJobs(){
           <div class="active-main-info">
             <div class="active-title-row">
               <h3 style="margin:0;">${job.title}</h3>
-              <span class="badge ${badge}">${displayStatus}</span>
+              <span class="badge ${badge}">${app.status}</span>
             </div>
             
             <div class="active-details-row">
@@ -158,22 +128,24 @@ function renderJobs(){
           </div>
 
           <p class="active-desc">
-            ${job.description ? job.description.slice(0, 110) + (job.description.length > 110 ? "..." : "") : ""}
+            ${job.description || "No description provided."}
           </p>
         </div>
 
         <div class="active-actions">
-          <button class="btn btn-outline" data-view="${job.id}">View</button>
+          <button class="btn btn-outline" onclick="window.location.href='job-details.html?id=${job.id}'">View</button>
 
-          ${normalizeStatus(job.status) === "inprogress" ? `
-            <button class="btn btn-primary" data-submit="${job.id}">Mark Submitted</button>
+          ${app.status === "confirmed" || app.status === "inprogress" ? `
+            <button class="btn btn-primary" data-submit="${app.id}">Mark Submitted</button>
           ` : ""}
 
-          ${normalizeStatus(job.status) === "submitted" ? `
+          ${app.status === "accepted" ? `
+            <button class="btn btn-blue" onclick="window.location.href='trans-details.html?job=${job.id}'">Pay Fee</button>
+          ` : ""}
+
+          ${app.status === "submitted" ? `
             <span class="badge pending" style="padding: 10px;">Waiting approval</span>
           ` : ""}
-
-          <button class="btn btn-outline" data-fail="${job.id}">Report Issue</button>
         </div>
       </div>
     `;
@@ -183,58 +155,38 @@ function renderJobs(){
 }
 
 function wireActions(){
-  const allJobs = getJobs();
-  const user = getCurrentUser();
-  const studentName = user?.fullName || "Student";
-
-  $$("[data-view]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.view;
-      alert("MVP: Full details page coming soon. ID: " + id);
-    });
-  });
-
   $$("[data-submit]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = Number(btn.dataset.submit);
-      const job = allJobs.find(j => j.id === id);
-      if (!job) return;
-
-      job.status = "Submitted";
+    btn.addEventListener("click", async () => {
+      const appId = btn.dataset.submit;
       
-      const app = getMyApplication(job, studentName);
-      if (app) app.status = "Submitted";
+      const { error } = await supabase
+        .from('applications')
+        .update({ status: 'submitted' })
+        .eq('id', appId);
 
-      saveJobs(allJobs);
-      renderJobs();
-      alert("Marked as Submitted ✅ Waiting for employer approval.");
-    });
-  });
-
-  $$("[data-fail]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      alert("MVP: Issue reporting flow coming soon.");
+      if (error) {
+        alert("Error updating status: " + error.message);
+      } else {
+        alert("Marked as Submitted ✅ Waiting for employer approval.");
+        renderJobs();
+      }
     });
   });
 }
 
-function init(){
+async function init(){
   setActiveNav();
+  wireLogout();
 
-  const user = getCurrentUser();
-  /*
-  if (!user) {
-    window.location.href = "../auth/student-login.html";
-    return;
-  }
-  */
+  const user = await authService.requireAuth("student");
+  if (!user) return;
 
   // Event Listeners for filters
   $("#searchInput").addEventListener("input", renderJobs);
   $("#statusFilter").addEventListener("change", renderJobs);
   $("#dateFilter").addEventListener("change", renderJobs);
 
-  renderJobs();
+  await renderJobs();
 }
 
 document.addEventListener("DOMContentLoaded", init);

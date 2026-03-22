@@ -2,48 +2,17 @@ import { $, $$ } from "../../utils/dom.js";
 import { statusToBadgeClass } from "../../components/status-badge.js";
 import { setActiveNav, wireLogout } from "../../components/navbar.js";
 import { authService } from "../../services/auth.service.js";
+import { jobsService } from "../../services/jobs.service.js";
 
-const JOBS = [
-  {
-    id: 1,
-    title: "Booth Helper (Weekend Event)",
-    employer: "Student Biz Society",
-    category: "event",
-    pay: 80,
-    location: "UTP Main Hall",
-    status: "Open"
-  },
-  {
-    id: 2,
-    title: "Poster Design for Club",
-    employer: "Robotics Club",
-    category: "creative",
-    pay: 120,
-    location: "Remote",
-    status: "Open"
-  },
-  {
-    id: 3,
-    title: "Math Tutor (Foundation)",
-    employer: "Academic Support Unit",
-    category: "academic",
-    pay: 150,
-    location: "UTP Block C",
-    status: "Open"
-  },
-  {
-    id: 4,
-    title: "Website Fix (HTML/CSS)",
-    employer: "Campus Startup",
-    category: "tech",
-    pay: 200,
-    location: "Remote",
-    status: "Open"
-  }
-];
+let allJobs = [];
 
 function renderJobs(list){
   const listEl = $("#jobsList");
+
+  if (!list || list.length === 0) {
+    listEl.innerHTML = `<p class="muted">No jobs found matching your criteria.</p>`;
+    return;
+  }
 
   listEl.innerHTML = list.map(job => {
     const badgeClass = statusToBadgeClass(job.status);
@@ -51,17 +20,17 @@ function renderJobs(list){
     return `
       <div class="card job">
         <div class="job-left">
-          <div style="display:flex; justify-content:space-between;">
+          <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
             <div>
-              <h3>${job.title}</h3>
-              <p>${job.employer}</p>
+              <h3 style="margin:0;">${job.title}</h3>
+              <p class="muted" style="margin:4px 0 0;">${job.employer_name || "Employer"}</p>
             </div>
             <span class="badge ${badgeClass}">${job.status}</span>
           </div>
 
           <div class="job-meta">
             <span class="kv">📍 ${job.location}</span>
-            <span class="kv">💰 RM ${job.pay}</span>
+            <span class="kv">💰 RM ${job.salary}</span>
             <span class="kv">🏷 ${job.category}</span>
           </div>
         </div>
@@ -96,9 +65,9 @@ function filterJobs(){
   const category = $("#categoryFilter").value;
   const pay = $("#payFilter").value;
 
-  let filtered = JOBS.filter(job =>
+  let filtered = allJobs.filter(job =>
     job.title.toLowerCase().includes(search) ||
-    job.employer.toLowerCase().includes(search)
+    (job.employer_name && job.employer_name.toLowerCase().includes(search))
   );
 
   if (category !== "all") {
@@ -106,7 +75,7 @@ function filterJobs(){
   }
 
   if (pay !== "all") {
-    filtered = filtered.filter(job => job.pay >= Number(pay));
+    filtered = filtered.filter(job => Number(job.salary) >= Number(pay));
   }
 
   renderJobs(filtered);
@@ -118,7 +87,10 @@ async function init(){
 
   setActiveNav();
   wireLogout();
-  renderJobs(JOBS);
+
+  // Load jobs from Supabase
+  allJobs = await jobsService.getJobs();
+  renderJobs(allJobs);
 
   $("#searchInput").addEventListener("input", filterJobs);
   $("#categoryFilter").addEventListener("change", filterJobs);

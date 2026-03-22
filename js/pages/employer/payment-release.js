@@ -1,31 +1,8 @@
 import { $, $$ } from "../../utils/dom.js";
 import { setActiveNav } from "../../components/navbar.js";
 import { statusToBadgeClass } from "../../components/status-badge.js";
-
-/**
- * Jobs source: localStorage "linkup_employer_jobs"
- * Payment history: localStorage "linkup_payments"
- *
- * We’ll treat these job statuses as "needs employer approval":
- * - "Submitted"
- * - "Awaiting Approval"
- * - "Awaiting Payment"
- * (Your system naming can vary; we’ll handle common names.)
- */
-
-function getJobs(){
-  return JSON.parse(localStorage.getItem("linkup_employer_jobs") || "[]");
-}
-function saveJobs(jobs){
-  localStorage.setItem("linkup_employer_jobs", JSON.stringify(jobs));
-}
-
-function getPayments(){
-  return JSON.parse(localStorage.getItem("linkup_payments") || "[]");
-}
-function savePayments(payments){
-  localStorage.setItem("linkup_payments", JSON.stringify(payments));
-}
+import { supabase } from "../../config/supabase.js";
+import { authService } from "../../services/auth.service.js";
 
 function normalizeStatus(s){
   return (s || "").toLowerCase().replace(/\s+/g, "_");
@@ -36,7 +13,7 @@ function jobIsPendingApproval(job){
   return ["submitted", "awaiting_approval", "awaiting_payment", "in_progress"].includes(s);
 }
 
-function renderPendingList(list){
+async function renderPendingList(list){
   const el = $("#paymentList");
 
   if (!list.length){
@@ -49,16 +26,20 @@ function renderPendingList(list){
     return;
   }
 
-  el.innerHTML = list.map(job => {
+  // Fetch student info for each job (from confirmed application)
+  const jobsWithStudent = await Promise.all(list.map(async (job) => {
+    const { data: app } = await supabase
+      .from('applications')
+      .select('*, profiles(full_name)')
+      .eq('job_id', job.id)
+      .in('status', ['confirmed', 'submitted', 'completed'])
+      .maybeSingle();
+    
+    return { ...job, student_name: app?.profiles?.full_name || "—", app_id: app?.id };
+  }));
+
+  el.innerHTML = jobsWithStudent.map(job => {
     const badgeClass = statusToBadgeClass(job.status);
-
-    // Pick a “student” to display if you accepted someone
-    const accepted = (job.applications || []).find(a =>
-      ["awaiting commitment fee","accepted","confirmed","in progress","submitted","completed"]
-      .includes((a.status || "").toLowerCase())
-    );
-
-    const studentName = accepted?.studentName || "—";
     const deposit = Number(job.deposit || 0);
     const salary = Number(job.salary || 0);
 
@@ -71,7 +52,7 @@ function renderPendingList(list){
           </div>
 
           <div class="pay-meta">
-            <span class="kv">👤 Student: ${studentName}</span>
+            <span class="kv">👤 Student: ${job.student_name}</span>
             <span class="kv">💰 Salary: RM ${salary}</span>
             <span class="kv">💳 Refund Fee: RM ${deposit}</span>
             <span class="kv">📅 Deadline: ${job.deadline || "-"}</span>
@@ -83,140 +64,139 @@ function renderPendingList(list){
         </div>
 
         <div class="pay-actions">
-          <button class="btn btn-outline" data-view="${job.id}">View</button>
-          <button class="btn btn-primary" data-approve="${job.id}">
+          <button class="btn btn-outline" onclick="window.location.href='job-manage.html'">View</button>
+          <button class="btn btn-primary" data-approve-job="${job.id}" data-app-id="${job.app_id}">
             Approve & Release
           </button>
-          <button class="btn btn-outline" data-dispute="${job.id}">Report Issue</button>
+          <button class="btn btn-outline">Report Issue</button>
         </div>
       </div>
     `;
   }).join("");
 
   // Wire actions
-  $$("[data-view]").forEach(btn => {
+  $$("[data-approve-job]").forEach(btn => {
     btn.addEventListener("click", () => {
-      // Optional: you can redirect to job-manage detail later
-      alert("MVP: view details page coming soon.");
+      const jobId = btn.dataset.approveJob;
+      const appId = btn.dataset.appId;
+      approveAndRelease(jobId, appId);
     });
-  });
-
-  $$("[data-dispute]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      alert("MVP: dispute flow coming soon (opens support ticket).");
-    });
-  });
-
-  $$("[data-approve]").forEach(btn => {
-    btn.addEventListener("click", () => approveAndRelease(Number(btn.dataset.approve)));
   });
 }
 
-function approveAndRelease(jobId){
-  const jobs = getJobs();
-  const payments = getPayments();
+async function approveAndRelease(jobId, appId){
+  if (!confirm("Are you sure you want to approve this work and release payment?")) return;
 
-  const job = jobs.find(j => j.id === jobId);
-  if (!job) return;
+  try {
+    // 1. Update job status
+    const { error: jobErr } = await supabase
+      .from('jobs')
+      .update({ status: 'Completed' })
+      .eq('id', jobId);
+    
+    if (jobErr) throw jobErr;
 
-  // Update job status
-  job.status = "Completed";
+    // 2. Update application status
+    if (appId) {
+      const { error: appErr } = await supabase
+        .from('applications')
+        .update({ status: 'completed' })
+        .eq('id', appId);
+      if (appErr) throw appErr;
+    }
 
-  // Update accepted applicant status (if exists)
-  if (job.applications && job.applications.length){
-    const chosen = job.applications.find(a =>
-      ["awaiting commitment fee", "accepted", "confirmed", "in progress", "submitted"]
-      .includes((a.status || "").toLowerCase())
-    );
-    if (chosen) chosen.status = "Completed";
+    // 3. Update commitment fee status (Refunded)
+    await supabase
+      .from('commitment_fees')
+      .update({ status: 'Refunded', refunded_at: new Date().toISOString() })
+      .eq('job_id', jobId);
+
+    alert("Payment released ✅ Job marked as Completed.");
+    await loadAndRender();
+  } catch (err) {
+    alert("Error releasing payment: " + err.message);
   }
-
-  // Create payment record
-  payments.unshift({
-    id: Date.now(),
-    jobId: job.id,
-    jobTitle: job.title,
-    salary: Number(job.salary || 0),
-    depositRefunded: Number(job.deposit || 0),
-    releasedAt: new Date().toISOString(),
-    status: "Released"
-  });
-
-  saveJobs(jobs);
-  savePayments(payments);
-
-  // re-render
-  loadAndRender();
-  alert("Payment released ✅ Job marked as Completed.");
 }
 
-function renderPaymentHistory(payments){
+async function renderPaymentHistory(){
+  const user = await authService.getCurrentUser();
+  if (!user) return;
+
+  // Fetch completed jobs for history
+  const { data: jobs, error } = await supabase
+    .from('jobs')
+    .select('*')
+    .eq('employer_id', user.id)
+    .eq('status', 'Completed')
+    .order('created_at', { ascending: false });
+
   const el = $("#paymentHistory");
 
-  if (!payments.length){
+  if (error || !jobs || !jobs.length){
     el.innerHTML = `
       <div class="card pad">
-        <p>No payments yet.</p>
+        <p>No completed payments yet.</p>
       </div>
     `;
     return;
   }
 
-  el.innerHTML = payments.slice(0, 8).map(p => `
-    <div class="card pad" style="display:flex; justify-content:space-between; gap:14px;">
+  el.innerHTML = jobs.map(p => `
+    <div class="card pad" style="display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap;">
       <div>
-        <h3 style="margin:0;">${p.jobTitle}</h3>
-        <p style="margin:6px 0 0;">Released: ${new Date(p.releasedAt).toLocaleString()}</p>
+        <h3 style="margin:0;">${p.title}</h3>
+        <p class="muted" style="margin:6px 0 0;">Location: ${p.location}</p>
       </div>
       <div style="text-align:right;">
         <div class="kv">💰 RM ${p.salary}</div>
-        <div class="kv">💳 Refund RM ${p.depositRefunded}</div>
-        <span class="badge accepted">${p.status}</span>
+        <div class="kv">💳 Fee Refund RM ${p.deposit}</div>
+        <span class="badge accepted">Completed</span>
       </div>
     </div>
   `).join("");
 }
 
-function loadAndRender(){
-  const jobs = getJobs();
-  const payments = getPayments();
+async function loadAndRender(){
+  const user = await authService.getCurrentUser();
+  if (!user) return;
+
+  // fetch my jobs that are not completed yet
+  const { data: jobs, error } = await supabase
+    .from('jobs')
+    .select('*')
+    .eq('employer_id', user.id)
+    .neq('status', 'Completed');
+
+  if (error) {
+    console.error("Error loading pending approvals:", error);
+    return;
+  }
 
   // pending jobs list
   let pending = jobs.filter(jobIsPendingApproval);
 
-  // Apply filters
-  const statusFilter = $("#payStatusFilter")?.value || "all";
+  // Apply filters (UI side for simplicity)
   const search = ($("#paySearch")?.value || "").toLowerCase();
-
   if (search){
     pending = pending.filter(j => (j.title || "").toLowerCase().includes(search));
   }
 
-  if (statusFilter !== "all"){
-    pending = pending.filter(j => {
-      const s = normalizeStatus(j.status);
-      if (statusFilter === "awaiting_approval") return ["submitted","awaiting_approval","awaiting_payment"].includes(s);
-      if (statusFilter === "in_progress") return s === "in_progress";
-      if (statusFilter === "completed") return s === "completed";
-      return true;
-    });
-  }
-
   // pending count badge
-  const pendingCount = jobs.filter(jobIsPendingApproval).length;
-  $("#pendingCountBadge").textContent = `${pendingCount} Pending`;
+  const pendingCount = pending.filter(j => normalizeStatus(j.status) === 'submitted').length;
+  $("#pendingCountBadge").textContent = `${pendingCount} New Submission(s)`;
   $("#pendingCountBadge").className = "badge " + (pendingCount ? "pending" : "accepted");
 
-  renderPendingList(pending);
-  renderPaymentHistory(payments);
+  await renderPendingList(pending);
+  await renderPaymentHistory();
 }
 
-function init(){
+async function init(){
   setActiveNav();
-  loadAndRender();
+  await authService.requireAuth("employer");
+  await loadAndRender();
 
-  $("#payStatusFilter").addEventListener("change", loadAndRender);
-  $("#paySearch").addEventListener("input", loadAndRender);
+  $("#payStatusFilter")?.addEventListener("change", loadAndRender);
+  $("#paySearch")?.addEventListener("input", loadAndRender);
 }
 
 document.addEventListener("DOMContentLoaded", init);

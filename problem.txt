@@ -1,0 +1,105 @@
+
+Unable to connect
+
+Firefox can’t establish a connection to the server at 127.0.0.1:5173.
+
+    The site could be temporarily unavailable or too busy. Try again in a few moments.
+    If you are unable to load any pages, check your computer’s network connection.
+    If your computer or network is protected by a firewall or proxy, make sure that Firefox is permitted to access the web.
+
+
+
+FPX test payment page
+
+Complete a required action for this test payment.
+About asynchronous payments
+
+Once the redirect is completed for this PaymentIntent, the payment will be completed. Your integration should rely on webhooks to receive the payment_intent.succeeded or payment_intent.failed events to determine if the payment was successful.
+Read best practices for webhooks
+What is this page?
+
+If you unexpectedly reached this page while checking out on a website, you won't be charged. Please reach out to us with the URL of this page in your message.
+Contact support
+Complete the test payment
+
+This is a test payment of RM51.00 MYR with FPX.
+Authorize Test Payment
+Fail Test Payment
+PaymentIntent object
+
+{
+  "id": "pi_3TDeIJQJ9PffpoHT0QOzSZXS",
+  "object": "payment_intent",
+  "amount": 5100,
+  "amount_details": {
+    "tip": {}
+  },
+  "automatic_payment_methods": null,
+  "canceled_at": null,
+  "cancellation_reason": null,
+  "capture_method": "automatic_async",
+  "client_secret": "pi_3TDeIJQJ9PffpoHT0QOzSZXS_secret_bXT2BE4d8iMToF74Qx3uYxRWu",
+  "confirmation_method": "automatic",
+  "created": 1774156283,
+  "currency": "myr",
+  "description": null,
+  "excluded_payment_method_types": null,
+  "last_payment_error": null,
+  "livemode": false,
+  "next_action": {
+    "redirect_to_url": {
+      "return_url": "https://checkout.stripe.com/c/pay/cs_test_a1qTxjrnbaSNqJ5oPGsdZEdAIXUWpLgR7BNYwALZJPUXHSC4t7snh7EV9r?redirect_pm_type=fpx\u0026lid=c5118fce-efec-473b-b106-e6af32f36edd\u0026ui_mode=hosted#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UUFQdU9UTzxVY2N1ak1RQ3A9V39DYFFWSjZLclJtQ39KTXJJak9JNzNNfDUxZ052X29SYktnTU9Eb09vMk1hXGpfTkkyf2QyQl1pcVFUZlM2cWd1MVZ3NTVhMzcwTHNcfScpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl",
+      "url": "https://pm-redirects.stripe.com/authorize/acct_1TDUpJQJ9PffpoHT/pa_nonce_UC2NQXnj5GpsyeBxvF6wZWf0vvXlo7m"
+    },
+    "type": "redirect_to_url"
+  },
+  "payment_method": "pm_1TDeIIQJ9PffpoHTUjNJeidX",
+  "payment_method_configuration_details": null,
+  "payment_method_types": [
+    "fpx"
+  ],
+  "processing": null,
+  "receipt_email": null,
+  "setup_future_usage": null,
+  "shipping": null,
+  "source": null,
+  "status": "requires_action"
+}
+
+Payment Method Options object
+
+{
+  "fpx": {}
+}
+
+Payment Method object
+
+{
+  "id": "pm_1TDeIIQJ9PffpoHTUjNJeidX",
+  "object": "payment_method",
+  "allow_redisplay": "limited",
+  "billing_details": {
+    "address": {
+      "city": null,
+      "country": null,
+      "line1": null,
+      "line2": null,
+      "postal_code": null,
+      "state": null
+    },
+    "email": "test@example.com",
+    "name": "Tester",
+    "phone": null,
+    "tax_id": null
+  },
+  "created": 1774156282,
+  "customer": null,
+  "customer_account": null,
+  "fpx": {
+    "account_holder_type": "individual",
+    "bank": "maybank2u"
+  },
+  "livemode": false,
+  "metadata": {},
+  "type": "fpx"
+}

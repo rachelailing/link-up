@@ -8,12 +8,19 @@ import { supabase } from "../config/supabase.js";
 export class JobService {
   /**
    * Fetches all available jobs from the 'jobs' table.
+   * Joins with profiles to get the employer's business name.
    * @returns {Promise<Array>}
    */
   async getJobs() {
     const { data, error } = await supabase
       .from('jobs')
-      .select('*')
+      .select(`
+        *,
+        employer:employer_id (
+          full_name,
+          business_name
+        )
+      `)
       .eq('status', 'Open')
       .order('created_at', { ascending: false });
 
@@ -21,7 +28,12 @@ export class JobService {
       console.error("[JobService] Error fetching jobs:", error.message);
       return [];
     }
-    return data;
+
+    // Flatten employer info
+    return data.map(job => ({
+      ...job,
+      employer_name: job.employer?.business_name || job.employer?.full_name || "Employer"
+    }));
   }
 
   /**
@@ -76,13 +88,20 @@ export class JobService {
 
   /**
    * Gets a single job by its ID.
+   * Joins with profiles to get employer name.
    * @param {string|number} id 
    * @returns {Promise<Object|null>}
    */
   async getJobById(id) {
     const { data, error } = await supabase
       .from('jobs')
-      .select('*')
+      .select(`
+        *,
+        employer:employer_id (
+          full_name,
+          business_name
+        )
+      `)
       .eq('id', id)
       .single();
 
@@ -90,7 +109,11 @@ export class JobService {
       console.error("[JobService] Error fetching job by ID:", error.message);
       return null;
     }
-    return data;
+
+    return {
+      ...data,
+      employer_name: data.employer?.business_name || data.employer?.full_name || "Employer"
+    };
   }
 
   /**

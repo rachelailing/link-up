@@ -70,14 +70,24 @@ async function init(){
     submitBtn.textContent = "Submitting...";
 
     try {
-      await jobsService.applyForJob(jobId, user.id, message);
-      alert("Application submitted successfully to Supabase! ✅");
-      window.location.href = "./job-section.html"; // Redirect to student job section
+      console.log(`[ApplyJob] Attempting to apply for job ID: ${jobId} as student ID: ${user.id}`);
+      
+      const result = await jobsService.applyForJob(jobId, user.id, message);
+      
+      console.log("[ApplyJob] Application success result:", result);
+      alert("Application submitted successfully! ✅");
+      
+      // Redirect to the applications list page
+      window.location.href = "/pages/student/job-section.html"; 
     } catch (err) {
+      console.error("[ApplyJob] Submission error caught in controller:", err);
+      
       if (err.code === "23505") {
         alert("You have already applied for this job.");
+      } else if (err.message && err.message.includes("row-level security")) {
+        alert("Permission denied: Please ensure you are registered as a student.");
       } else {
-        alert("Error submitting application: " + err.message);
+        alert("Error submitting application: " + (err.message || "Unknown error"));
       }
     } finally {
       submitBtn.disabled = false;

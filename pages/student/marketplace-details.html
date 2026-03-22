@@ -176,7 +176,7 @@
           <!-- Right Column: Payment -->
           <div class="card pad payment-card">
             <h3 style="margin-top:0;">Secure Checkout</h3>
-            <p class="small muted">Complete your purchase using FPX Online Banking.</p>
+            <p class="small muted">Complete your purchase safely using Stripe.</p>
 
             <div class="payment-summary">
               <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
@@ -193,23 +193,27 @@
               </div>
             </div>
 
-            <div style="margin-top:24px;">
-              <label style="font-weight:600; font-size:0.9rem;">Select Bank</label>
-              <div class="fpx-selector" id="bankSelector">
-                <div class="bank-option" data-bank="maybank">Maybank2u</div>
-                <div class="bank-option" data-bank="cimb">CIMB Clicks</div>
-                <div class="bank-option" data-bank="bankislam">Bank Islam</div>
-                <div class="bank-option" data-bank="rhb">RHB Now</div>
-                <div class="bank-option" data-bank="pbe">Public Bank</div>
-                <div class="bank-option" data-bank="hlb">Hong Leong</div>
-              </div>
+            <div style="margin-top:24px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
+              <p style="font-size: 0.85rem; color: #444; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 1.2rem;">💳</span> Supports Cards & FPX
+              </p>
+              <p style="font-size: 0.8rem; color: #666; line-height: 1.4;">
+                You will be redirected to Stripe's secure checkout page to complete your payment.
+              </p>
             </div>
 
-            <button id="payButton" class="btn btn-primary" style="width:100%; padding:16px; font-size:1.1rem; margin-top:16px;">
-              Pay via FPX
+            <button id="payButton" class="btn btn-primary" style="width:100%; padding:16px; font-size:1.1rem; margin-top:16px; background: #635bff; border-color: #635bff;">
+              Pay with Stripe
             </button>
+            
+            <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 16px;">
+               <img src="https://js.stripe.com/v3/fingerprinted/img/visa-7ad5574f9223e9ca64855609144e1ca4.svg" width="32" alt="Visa">
+               <img src="https://js.stripe.com/v3/fingerprinted/img/mastercard-4d8844910243b680210287e00fa26f1f.svg" width="32" alt="Mastercard">
+               <span style="font-size: 0.75rem; color: #888; font-weight: 600;">+ FPX</span>
+            </div>
+
             <p style="text-align:center; font-size:0.75rem; color:#888; margin-top:12px;">
-              🛡️ Secure payment powered by Link Up Pay
+              🛡️ Secure encrypted payment powered by Stripe
             </p>
           </div>
         </div>
