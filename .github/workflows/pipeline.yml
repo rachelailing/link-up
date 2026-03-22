@@ -61,14 +61,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install CLIs
-        run: npm install -g vercel supabase
-
       - name: Check Supabase Migrations
-        run: supabase db lint
+        run: pnpm exec supabase db lint
 
       - name: Pull Vercel environment information
-        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+        run: pnpm exec vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
       - name: Deploy to Vercel
-        run: vercel deploy --prod --token=$VERCEL_TOKEN
+        run: pnpm exec vercel deploy --prod --token=$VERCEL_TOKEN
