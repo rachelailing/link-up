@@ -36,6 +36,9 @@ importers:
       eslint:
         specifier: ^10.1.0
         version: 10.1.0
+      glob:
+        specifier: ^13.0.6
+        version: 13.0.6
       globals:
         specifier: ^17.4.0
         version: 17.4.0
