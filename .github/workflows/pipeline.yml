@@ -1,0 +1,78 @@
+name: Pipeline (CI/CD)
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+  SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  validate:
+    name: Validate & Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node & pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check Formatting
+        run: pnpm exec prettier --check "**/*.{js,css,html,md,json}"
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
+
+  deploy:
+    name: Deploy to Production
+    needs: validate # Only deploy if validation passes
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node & pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install CLIs
+        run: npm install -g vercel supabase
+
+      - name: Check Supabase Migrations
+        run: supabase db lint
+
+      - name: Pull Vercel environment information
+        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+
+      - name: Deploy to Vercel
+        run: vercel deploy --prod --token=$VERCEL_TOKEN
