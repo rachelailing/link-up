@@ -42,8 +42,7 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "esbuild",
-      "supabase"
+      "esbuild"
     ]
   },
   "dependencies": {
