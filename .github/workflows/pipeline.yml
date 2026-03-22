@@ -66,8 +66,12 @@ jobs:
         with:
           version: latest
 
-      - name: Push Supabase Migrations
-        run: supabase db push --project-ref $SUPABASE_PROJECT_ID --access-token $SUPABASE_ACCESS_TOKEN
+      - name: Link & Push Supabase Migrations
+        run: |
+          supabase link --project-ref $SUPABASE_PROJECT_ID --password $DB_PASSWORD
+          supabase db push --password $DB_PASSWORD
+        env:
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
       - name: Run Seed (Conditional)
         run: pnpm run seed
