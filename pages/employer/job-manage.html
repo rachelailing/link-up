@@ -1,57 +1,55 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Manage Jobs — Link Up</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Jobs — Link Up</title>
 
-  <link rel="stylesheet" href="/css/main.css" />
-</head>
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
 
-<body>
-  <div class="app">
-
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="logo">
-        <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up">
-        <div class="logo-title">Link <span>Up</span></div>
-      </div>
-
-      <nav class="nav">
-        <a data-nav href="employer_homepage.html">🏠 Home Page</a>
-        <a data-nav href="create-job.html">➕ Create Job</a>
-        <a data-nav href="job-manage.html" class="active">📋 My Job Listings</a>
-        <a data-nav href="applications.html">📨 Applications</a>
-        <a data-nav href="payment-release.html">💳 Payments</a>
-        <a data-nav href="ratings.html">⭐ Ratings</a>
-      </nav>
-    </aside>
-
-    <!-- Topbar -->
-    <header class="topbar">
-      <div style="font-weight:800;">Manage Jobs</div>
-      <div class="topbar-actions">
-        <a href="create-job.html" class="btn btn-primary">+ Create Job</a>
-        <button class="btn btn-blue" onclick="window.location.href='business-profile.html'">Business Profile</button>
-      </div>
-    </header>
-
-    <!-- Main -->
-    <main class="main">
-      <div class="container">
-
-        <div class="section-title">
-          <h2>Your Job Listings</h2>
+  <body>
+    <div class="app">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">
+          <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up" />
+          <div class="logo-title">Link <span>Up</span></div>
         </div>
 
-        <div id="jobManageList" class="list"></div>
+        <nav class="nav">
+          <a data-nav href="employer_homepage.html">🏠 Home Page</a>
+          <a data-nav href="create-job.html">➕ Create Job</a>
+          <a data-nav href="job-manage.html" class="active">📋 My Job Listings</a>
+          <a data-nav href="applications.html">📨 Applications</a>
+          <a data-nav href="payment-release.html">💳 Payments</a>
+          <a data-nav href="ratings.html">⭐ Ratings</a>
+        </nav>
+      </aside>
 
-      </div>
-    </main>
+      <!-- Topbar -->
+      <header class="topbar">
+        <div style="font-weight: 800">Manage Jobs</div>
+        <div class="topbar-actions">
+          <a href="create-job.html" class="btn btn-primary">+ Create Job</a>
+          <button class="btn btn-blue" onclick="window.location.href = 'business-profile.html'">
+            Business Profile
+          </button>
+        </div>
+      </header>
 
-  </div>
+      <!-- Main -->
+      <main class="main">
+        <div class="container">
+          <div class="section-title">
+            <h2>Your Job Listings</h2>
+          </div>
 
-  <script type="module" src="/js/pages/employer/job-manage.js"></script>
-</body>
+          <div id="jobManageList" class="list"></div>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="/js/pages/employer/job-manage.js"></script>
+  </body>
 </html>

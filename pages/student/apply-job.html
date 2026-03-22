@@ -1,102 +1,102 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Apply for Job — Link Up</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Apply for Job — Link Up</title>
 
-  <link rel="stylesheet" href="/css/main.css" />
-</head>
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
 
-<body>
-  <div class="app">
-
-    <aside class="sidebar">
-      <div class="logo">
-        <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up">
-        <div class="logo-title">Link <span>Up</span></div>
-      </div>
-
-      <nav class="nav">
-        <a data-nav href="marketplace.html">🏠 Home Page</a>
-        <a data-nav href="job-details.html">✅ Job Details</a>
-        <a data-nav href="trans-details.html">💳 Transaction Details</a>
-      </nav>
-    </aside>
-
-    <header class="topbar">
-      <div style="font-weight:800;">Apply for Job</div>
-      <a href="jobs.html" class="btn btn-outline">Back</a>
-    </header>
-...
-    <main class="main">
-      <div class="container">
-
-        <div class="grid cols-2 apply-grid">
-
-          <!-- Job Preview -->
-          <section class="card pad">
-            <h2 id="jobTitle">Job Title</h2>
-            <p id="jobEmployer" style="margin-top:6px;">Employer</p>
-
-            <div class="apply-meta">
-              <span class="kv" id="jobLocation">📍</span>
-              <span class="kv" id="jobSalary">💰</span>
-              <span class="kv" id="jobDeposit">💳</span>
-              <span class="kv" id="jobDeadline">📅</span>
-            </div>
-
-            <div style="height:10px;"></div>
-            <p id="jobDescription" class="muted"></p>
-
-            <div class="note" style="margin-top:14px;">
-              If accepted, you must pay the commitment fee to confirm the job.
-            </div>
-          </section>
-
-          <!-- Apply Form -->
-          <section class="card pad">
-            <h3>Application Form</h3>
-            <p class="muted">Write a short message and confirm your availability.</p>
-
-            <form id="applyForm">
-              <div class="field">
-                <label for="message">Short message</label>
-                <textarea id="message" rows="4" placeholder="Why are you suitable for this job?" required></textarea>
-                <small class="error" data-error-for="message"></small>
-              </div>
-
-              <div class="field">
-                <label for="cvLink">CV / Portfolio Link (optional)</label>
-                <input id="cvLink" type="url" placeholder="https://..." />
-              </div>
-
-              <div class="field">
-                <label for="availability">Availability</label>
-                <select id="availability" required>
-                  <option value="" selected disabled>Select</option>
-                  <option value="weekdays">Weekdays</option>
-                  <option value="weekends">Weekends</option>
-                  <option value="evenings">Evenings</option>
-                  <option value="flexible">Flexible</option>
-                </select>
-                <small class="error" data-error-for="availability"></small>
-              </div>
-
-              <button class="btn btn-primary btn-full" type="submit">Submit Application</button>
-
-              <div class="hint">
-                After submission, your application status will be <b>Pending</b>.
-              </div>
-            </form>
-          </section>
-
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="logo">
+          <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up" />
+          <div class="logo-title">Link <span>Up</span></div>
         </div>
 
-      </div>
-    </main>
-  </div>
+        <nav class="nav">
+          <a data-nav href="marketplace.html">🏠 Home Page</a>
+          <a data-nav href="job-details.html">✅ Job Details</a>
+          <a data-nav href="trans-details.html">💳 Transaction Details</a>
+        </nav>
+      </aside>
 
-  <script type="module" src="/js/pages/student/apply-job.js"></script>
-</body>
+      <header class="topbar">
+        <div style="font-weight: 800">Apply for Job</div>
+        <a href="jobs.html" class="btn btn-outline">Back</a>
+      </header>
+      ...
+      <main class="main">
+        <div class="container">
+          <div class="grid cols-2 apply-grid">
+            <!-- Job Preview -->
+            <section class="card pad">
+              <h2 id="jobTitle">Job Title</h2>
+              <p id="jobEmployer" style="margin-top: 6px">Employer</p>
+
+              <div class="apply-meta">
+                <span class="kv" id="jobLocation">📍</span>
+                <span class="kv" id="jobSalary">💰</span>
+                <span class="kv" id="jobDeposit">💳</span>
+                <span class="kv" id="jobDeadline">📅</span>
+              </div>
+
+              <div style="height: 10px"></div>
+              <p id="jobDescription" class="muted"></p>
+
+              <div class="note" style="margin-top: 14px">
+                If accepted, you must pay the commitment fee to confirm the job.
+              </div>
+            </section>
+
+            <!-- Apply Form -->
+            <section class="card pad">
+              <h3>Application Form</h3>
+              <p class="muted">Write a short message and confirm your availability.</p>
+
+              <form id="applyForm">
+                <div class="field">
+                  <label for="message">Short message</label>
+                  <textarea
+                    id="message"
+                    rows="4"
+                    placeholder="Why are you suitable for this job?"
+                    required
+                  ></textarea>
+                  <small class="error" data-error-for="message"></small>
+                </div>
+
+                <div class="field">
+                  <label for="cvLink">CV / Portfolio Link (optional)</label>
+                  <input id="cvLink" type="url" placeholder="https://..." />
+                </div>
+
+                <div class="field">
+                  <label for="availability">Availability</label>
+                  <select id="availability" required>
+                    <option value="" selected disabled>Select</option>
+                    <option value="weekdays">Weekdays</option>
+                    <option value="weekends">Weekends</option>
+                    <option value="evenings">Evenings</option>
+                    <option value="flexible">Flexible</option>
+                  </select>
+                  <small class="error" data-error-for="availability"></small>
+                </div>
+
+                <button class="btn btn-primary btn-full" type="submit">Submit Application</button>
+
+                <div class="hint">
+                  After submission, your application status will be <b>Pending</b>.
+                </div>
+              </form>
+            </section>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="/js/pages/student/apply-job.js"></script>
+  </body>
 </html>

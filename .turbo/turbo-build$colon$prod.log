@@ -1,0 +1,14 @@
+
+
+> link-up@1.0.0 build:prod /home/sharvin/projects/link-up
+> vite build
+
+[36mvite v8.0.1 [32mbuilding client environment for production...[36m[39m
+[2K[32m✓[39m 5 modules transformed.
+[2Krendering chunks (1)...[2Kcomputing gzip size...
+[2K[2mdist/[0m[32mindex.html                         [39m[2m[1m 8.17 kB[0m[0m[2m │ gzip: 2.16 kB[0m
+[2mdist/[0m[2massets/[0m[32mlink_up_icon-Dp0UMVwV.jpeg  [39m[2m[1m26.64 kB[0m[0m
+[2mdist/[0m[2massets/[0m[35mindex-CwkXS_Xb.css          [39m[2m[1m19.94 kB[0m[0m[2m │ gzip: 4.12 kB[0m
+[2mdist/[0m[2massets/[0m[36mindex-DPEkLJfh.js           [39m[2m[1m 1.09 kB[0m[0m[2m │ gzip: 0.58 kB[0m
+
+[32m✓ built in 121ms[39m

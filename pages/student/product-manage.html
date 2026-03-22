@@ -1,176 +1,201 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Post New Listing — Link Up</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Post New Listing — Link Up</title>
 
-  <link rel="stylesheet" href="/css/main.css" />
-  <style>
-    .manage-container {
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    .form-group {
-      margin-bottom: 20px;
-    }
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-    .form-group input, .form-group select, .form-group textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 1rem;
-    }
-    .image-upload-placeholder {
-      width: 100%;
-      height: 200px;
-      background: #f8f9fa;
-      border: 2px dashed #ccc;
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      color: #666;
-      margin-bottom: 10px;
-    }
-    .image-upload-placeholder:hover {
-      background: #f1f3f5;
-    }
-  </style>
-</head>
+    <link rel="stylesheet" href="/css/main.css" />
+    <style>
+      .manage-container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+      }
+      .image-upload-placeholder {
+        width: 100%;
+        height: 200px;
+        background: #f8f9fa;
+        border: 2px dashed #ccc;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #666;
+        margin-bottom: 10px;
+      }
+      .image-upload-placeholder:hover {
+        background: #f1f3f5;
+      }
+    </style>
+  </head>
 
-<body>
-  <div class="app">
-
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="logo">
-        <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up">
-        <div class="logo-title">Link <span>Up</span></div>
-      </div>
-
-      <nav class="nav">
-        <a data-nav href="marketplace.html">🏠 Home Page</a>
-        <a data-nav href="earnings.html">💰 Earning History</a>
-        <a data-nav href="purchase.html">🛍️ Purchase History</a>
-        <div class="nav-logout">
-          <a href="#" id="logoutBtn">🚪 Logout</a>
-        </div>
-      </nav>
-    </aside>
-
-    <!-- Topbar -->
-    <header class="topbar">
-      <div class="topbar-nav">
-        <a href="job-section.html" class="topbar-nav-link">Job Section</a>
-        <a href="marketplace.html" class="topbar-nav-link active">Marketplace Section</a>
-      </div>
-
-      <div style="display:flex; gap:10px;">
-        <button class="btn btn-outline">🔔</button>
-        <button class="btn btn-blue">My Profile</button>
-      </div>
-    </header>
-
-    <!-- Main -->
-    <main class="main">
-      <div class="container">
-        <div style="margin-bottom: 24px;">
-           <a href="marketplace-listings.html" style="text-decoration:none; color:#007bff;">← Back to My Listings</a>
+  <body>
+    <div class="app">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">
+          <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up" />
+          <div class="logo-title">Link <span>Up</span></div>
         </div>
 
-        <div class="manage-container card pad">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <h2 id="pageTitle" style="margin:0;">Add New Product</h2>
-            <button id="toggleEditBtn" class="btn btn-outline" style="display:none;">Edit Product</button>
+        <nav class="nav">
+          <a data-nav href="marketplace.html">🏠 Home Page</a>
+          <a data-nav href="earnings.html">💰 Earning History</a>
+          <a data-nav href="purchase.html">🛍️ Purchase History</a>
+          <div class="nav-logout">
+            <a href="#" id="logoutBtn">🚪 Logout</a>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-nav">
+          <a href="job-section.html" class="topbar-nav-link">Job Section</a>
+          <a href="marketplace.html" class="topbar-nav-link active">Marketplace Section</a>
+        </div>
+
+        <div style="display: flex; gap: 10px">
+          <button class="btn btn-outline">🔔</button>
+          <button class="btn btn-blue">My Profile</button>
+        </div>
+      </header>
+
+      <!-- Main -->
+      <main class="main">
+        <div class="container">
+          <div style="margin-bottom: 24px">
+            <a href="marketplace-listings.html" style="text-decoration: none; color: #007bff"
+              >← Back to My Listings</a
+            >
           </div>
 
-          <form id="listingForm">
-            <div class="form-group">
-              <label>Product Photo</label>
-              <div class="image-upload-placeholder" id="imageUpload">
-                <span>📷</span>
-                <span>Click to upload photo</span>
-              </div>
-              <input type="file" id="fileInput" style="display:none;" accept="image/*">
+          <div class="manage-container card pad">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 24px;
+              "
+            >
+              <h2 id="pageTitle" style="margin: 0">Add New Product</h2>
+              <button id="toggleEditBtn" class="btn btn-outline" style="display: none">
+                Edit Product
+              </button>
             </div>
 
-            <div class="form-group">
-              <label for="title">Title</label>
-              <input type="text" id="title" placeholder="e.g. Calculus Textbook" required>
-            </div>
-
-            <div class="grid cols-3 gap-16">
+            <form id="listingForm">
               <div class="form-group">
-                <label for="price">Price (RM)</label>
-                <input type="text" id="price" placeholder="e.g. 30" required>
+                <label>Product Photo</label>
+                <div class="image-upload-placeholder" id="imageUpload">
+                  <span>📷</span>
+                  <span>Click to upload photo</span>
+                </div>
+                <input type="file" id="fileInput" style="display: none" accept="image/*" />
               </div>
+
               <div class="form-group">
-                <label for="quantity">Quantity</label>
-                <input type="number" id="quantity" value="1" min="1" required>
+                <label for="title">Title</label>
+                <input type="text" id="title" placeholder="e.g. Calculus Textbook" required />
               </div>
+
+              <div class="grid cols-3 gap-16">
+                <div class="form-group">
+                  <label for="price">Price (RM)</label>
+                  <input type="text" id="price" placeholder="e.g. 30" required />
+                </div>
+                <div class="form-group">
+                  <label for="quantity">Quantity</label>
+                  <input type="number" id="quantity" value="1" min="1" required />
+                </div>
+                <div class="form-group">
+                  <label for="status">Status</label>
+                  <select id="status" required>
+                    <option value="Ongoing">Ongoing</option>
+                    <option value="Preorder">Preorder</option>
+                    <option value="NA">NA</option>
+                  </select>
+                </div>
+              </div>
+
               <div class="form-group">
-                <label for="status">Status</label>
-                <select id="status" required>
-                  <option value="Ongoing">Ongoing</option>
-                  <option value="Preorder">Preorder</option>
-                  <option value="NA">NA</option>
-                </select>
+                <label for="location">Location</label>
+                <input type="text" id="location" placeholder="e.g. V2, Block A" required />
               </div>
-            </div>
 
-            <div class="form-group">
-              <label for="location">Location</label>
-              <input type="text" id="location" placeholder="e.g. V2, Block A" required>
-            </div>
-
-            <div class="form-group">
-              <label>Product Categories (Select tags)</label>
-              <div class="chip-grid" id="productTags">
-                <div class="chip" data-value="textbooks">Textbooks</div>
-                <div class="chip" data-value="electronics">Electronics</div>
-                <div class="chip" data-value="stationery">Stationery</div>
-                <div class="chip" data-value="clothing">Clothing</div>
-                <div class="chip" data-value="household">Household</div>
-                <div class="chip" data-value="food">Food & Snacks</div>
-                <div class="chip" data-value="sports">Sports Gear</div>
-                <div class="chip" data-value="others">Others</div>
+              <div class="form-group">
+                <label>Product Categories (Select tags)</label>
+                <div class="chip-grid" id="productTags">
+                  <div class="chip" data-value="textbooks">Textbooks</div>
+                  <div class="chip" data-value="electronics">Electronics</div>
+                  <div class="chip" data-value="stationery">Stationery</div>
+                  <div class="chip" data-value="clothing">Clothing</div>
+                  <div class="chip" data-value="household">Household</div>
+                  <div class="chip" data-value="food">Food & Snacks</div>
+                  <div class="chip" data-value="sports">Sports Gear</div>
+                  <div class="chip" data-value="others">Others</div>
+                </div>
+                <small class="muted">Tags help buyers find your products more easily.</small>
               </div>
-              <small class="muted">Tags help buyers find your products more easily.</small>
-            </div>
 
-            <div class="form-group">
-              <label for="description">Description</label>
-              <textarea id="description" rows="4" placeholder="Describe your product condition, features, etc..." required></textarea>
-            </div>
+              <div class="form-group">
+                <label for="description">Description</label>
+                <textarea
+                  id="description"
+                  rows="4"
+                  placeholder="Describe your product condition, features, etc..."
+                  required
+                ></textarea>
+              </div>
 
-            <div class="form-group">
-              <label for="date">Date Posted</label>
-              <input type="date" id="date" required>
-            </div>
+              <div class="form-group">
+                <label for="date">Date Posted</label>
+                <input type="date" id="date" required />
+              </div>
 
-            <div class="form-group" style="display: flex; align-items: flex-start; gap: 10px;">
-              <input type="checkbox" id="terms" style="width: auto; margin-top: 4px;" required>
-              <label for="terms" style="font-weight: 400; font-size: 0.9rem;">I agree to the <a href="#" style="color: #007bff;">Terms and Conditions</a> and ensure that this listing complies with campus trade policies.</label>
-            </div>
+              <div class="form-group" style="display: flex; align-items: flex-start; gap: 10px">
+                <input type="checkbox" id="terms" style="width: auto; margin-top: 4px" required />
+                <label for="terms" style="font-weight: 400; font-size: 0.9rem"
+                  >I agree to the <a href="#" style="color: #007bff">Terms and Conditions</a> and
+                  ensure that this listing complies with campus trade policies.</label
+                >
+              </div>
 
-            <div style="height:20px;"></div>
+              <div style="height: 20px"></div>
 
-            <button type="submit" class="btn btn-primary" style="width:100%; padding:14px; font-size:1.1rem;">Post Now</button>
-          </form>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                style="width: 100%; padding: 14px; font-size: 1.1rem"
+              >
+                Post Now
+              </button>
+            </form>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
 
-  </div>
-
-  <script type="module" src="/js/pages/student/product-manage.js"></script>
-</body>
+    <script type="module" src="/js/pages/student/product-manage.js"></script>
+  </body>
 </html>

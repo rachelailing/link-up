@@ -1,133 +1,167 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Student Register — Link Up</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Register — Link Up</title>
 
-  <link rel="stylesheet" href="/css/main.css" />
-  
-</head>
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
 
-<body class="auth-body">
-  <header class="auth-top">
-    <a class="auth-brand" href="../../index.html">
-      <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up icon" class="auth-logo">
-      <span class="auth-brand__text">Link <b>Up</b></span>
-    </a>
+  <body class="auth-body">
+    <header class="auth-top">
+      <a class="auth-brand" href="../../index.html">
+        <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up icon" class="auth-logo" />
+        <span class="auth-brand__text">Link <b>Up</b></span>
+      </a>
 
-    <a class="btn btn-outline" href="./student-login.html">Student Login</a>
-  </header>
+      <a class="btn btn-outline" href="./student-login.html">Student Login</a>
+    </header>
 
-  <main class="auth-wrap">
-    <section class="auth-card card">
-      <div class="auth-card__inner">
-        <h1>Create your student account</h1>
-        <p class="auth-subtitle">Start applying for campus side hustles and build your profile.</p>
+    <main class="auth-wrap">
+      <section class="auth-card card">
+        <div class="auth-card__inner">
+          <h1>Create your student account</h1>
+          <p class="auth-subtitle">
+            Start applying for campus side hustles and build your profile.
+          </p>
 
-        <form id="studentRegisterForm" class="form">
-          <div class="form-grid">
-            <div class="field">
-              <label for="fullName">Full name</label>
-              <input id="fullName" name="fullName" type="text" placeholder="e.g., Rachel Ailing" required />
-              <small class="error" data-error-for="fullName"></small>
+          <form id="studentRegisterForm" class="form">
+            <div class="form-grid">
+              <div class="field">
+                <label for="fullName">Full name</label>
+                <input
+                  id="fullName"
+                  name="fullName"
+                  type="text"
+                  placeholder="e.g., Rachel Ailing"
+                  required
+                />
+                <small class="error" data-error-for="fullName"></small>
+              </div>
+
+              <div class="field">
+                <label for="studentEmail">Student email</label>
+                <input
+                  id="studentEmail"
+                  name="email"
+                  type="email"
+                  placeholder="e.g., user@utp.edu.my"
+                  required
+                />
+                <small class="error" data-error-for="studentEmail"></small>
+              </div>
+
+              <div class="field">
+                <label for="university">University</label>
+                <select id="university" name="university" required>
+                  <option value="" selected disabled>Select your university</option>
+                  <option value="UTP">Universiti Teknologi PETRONAS (UTP)</option>
+                  <option value="UM">Universiti Malaya (UM)</option>
+                  <option value="USM">Universiti Sains Malaysia (USM)</option>
+                  <option value="UKM">Universiti Kebangsaan Malaysia (UKM)</option>
+                  <option value="UPM">Universiti Putra Malaysia (UPM)</option>
+                  <option value="Other">Other</option>
+                </select>
+                <small class="error" data-error-for="university"></small>
+              </div>
+
+              <div class="field">
+                <label for="phone">Phone number</label>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  placeholder="e.g., 012-3456789"
+                  required
+                />
+                <small class="error" data-error-for="phone"></small>
+              </div>
+
+              <div class="field">
+                <label for="password">Password</label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="Min 8 characters"
+                  required
+                />
+                <small class="error" data-error-for="password"></small>
+              </div>
+
+              <div class="field">
+                <label for="confirmPassword">Confirm password</label>
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  placeholder="Re-enter password"
+                  required
+                />
+                <small class="error" data-error-for="confirmPassword"></small>
+              </div>
             </div>
 
             <div class="field">
-              <label for="studentEmail">Student email</label>
-              <input id="studentEmail" name="email" type="email" placeholder="e.g., user@utp.edu.my" required />
-              <small class="error" data-error-for="studentEmail"></small>
+              <label class="check">
+                <input id="agree" type="checkbox" required />
+                <span
+                  >I agree to the <a href="../shared/404.html">Terms</a> and
+                  <a href="../shared/404.html">Privacy Policy</a>.</span
+                >
+              </label>
+              <small class="error" data-error-for="agree"></small>
             </div>
 
-            <div class="field">
-              <label for="university">University</label>
-              <select id="university" name="university" required>
-                <option value="" selected disabled>Select your university</option>
-                <option value="UTP">Universiti Teknologi PETRONAS (UTP)</option>
-                <option value="UM">Universiti Malaya (UM)</option>
-                <option value="USM">Universiti Sains Malaysia (USM)</option>
-                <option value="UKM">Universiti Kebangsaan Malaysia (UKM)</option>
-                <option value="UPM">Universiti Putra Malaysia (UPM)</option>
-                <option value="Other">Other</option>
-              </select>
-              <small class="error" data-error-for="university"></small>
+            <button class="btn btn-primary btn-full" type="submit">Create Account</button>
+
+            <div class="auth-bottom">
+              <span>Already have an account?</span>
+              <a href="./student-login.html">Login</a>
             </div>
 
-            <div class="field">
-              <label for="phone">Phone number</label>
-              <input id="phone" name="phone" type="tel" placeholder="e.g., 012-3456789" required />
-              <small class="error" data-error-for="phone"></small>
+            <div class="hint">
+              After registration, you’ll be redirected to onboarding (skills & interests).
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <aside class="auth-side">
+        <div class="auth-side__box card pad">
+          <h3>What happens next?</h3>
+          <p>Complete onboarding so we can recommend better jobs.</p>
+
+          <div class="auth-steps">
+            <div class="step">
+              <span class="step-dot"></span>
+              <div>
+                <b>Set your skills</b>
+                <p>Design, tutoring, editing, booth helper, etc.</p>
+              </div>
             </div>
 
-            <div class="field">
-              <label for="password">Password</label>
-              <input id="password" name="password" type="password" placeholder="Min 8 characters" required />
-              <small class="error" data-error-for="password"></small>
+            <div class="step">
+              <span class="step-dot"></span>
+              <div>
+                <b>Choose interests</b>
+                <p>We’ll suggest relevant gigs & marketplace listings.</p>
+              </div>
             </div>
 
-            <div class="field">
-              <label for="confirmPassword">Confirm password</label>
-              <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Re-enter password" required />
-              <small class="error" data-error-for="confirmPassword"></small>
-            </div>
-          </div>
-
-          <div class="field">
-            <label class="check">
-              <input id="agree" type="checkbox" required />
-              <span>I agree to the <a href="../shared/404.html">Terms</a> and <a href="../shared/404.html">Privacy Policy</a>.</span>
-            </label>
-            <small class="error" data-error-for="agree"></small>
-          </div>
-
-          <button class="btn btn-primary btn-full" type="submit">Create Account</button>
-
-          <div class="auth-bottom">
-            <span>Already have an account?</span>
-            <a href="./student-login.html">Login</a>
-          </div>
-
-          <div class="hint">
-            After registration, you’ll be redirected to onboarding (skills & interests).
-          </div>
-        </form>
-      </div>
-    </section>
-
-    <aside class="auth-side">
-      <div class="auth-side__box card pad">
-        <h3>What happens next?</h3>
-        <p>Complete onboarding so we can recommend better jobs.</p>
-
-        <div class="auth-steps">
-          <div class="step">
-            <span class="step-dot"></span>
-            <div>
-              <b>Set your skills</b>
-              <p>Design, tutoring, editing, booth helper, etc.</p>
-            </div>
-          </div>
-
-          <div class="step">
-            <span class="step-dot"></span>
-            <div>
-              <b>Choose interests</b>
-              <p>We’ll suggest relevant gigs & marketplace listings.</p>
-            </div>
-          </div>
-
-          <div class="step">
-            <span class="step-dot"></span>
-            <div>
-              <b>Start applying</b>
-              <p>Track applications, commitment fees, and earnings.</p>
+            <div class="step">
+              <span class="step-dot"></span>
+              <div>
+                <b>Start applying</b>
+                <p>Track applications, commitment fees, and earnings.</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </aside>
-  </main>
+      </aside>
+    </main>
 
-  <script type="module" src="/js/pages/auth/student-register.js"></script>
-</body>
+    <script type="module" src="/js/pages/auth/student-register.js"></script>
+  </body>
 </html>

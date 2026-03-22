@@ -1,47 +1,49 @@
 /* css/pages/commitment-fee.css */
 
-.fee-row{
-  display:flex;
-  justify-content:space-between;
+.fee-row {
+  display: flex;
+  justify-content: space-between;
   gap: 16px;
   padding: 18px;
 }
 
-.fee-left{
-  display:flex;
-  flex-direction:column;
+.fee-left {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 
-.fee-meta{
-  display:flex;
-  flex-wrap:wrap;
+.fee-meta {
+  display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   font-size: 13px;
   color: var(--muted);
 }
 
-.fee-actions{
-  display:flex;
+.fee-actions {
+  display: flex;
   gap: 10px;
-  align-items:flex-start;
-  flex-wrap:wrap;
+  align-items: flex-start;
+  flex-wrap: wrap;
 }
 
-.fee-actions .btn{ font-size: 13px; }
+.fee-actions .btn {
+  font-size: 13px;
+}
 
-.amount{
+.amount {
   font-weight: 900;
   font-size: 24px;
   color: var(--linkup-blue);
 }
 
-.fee-box{
-  display:flex;
-  justify-content:space-between;
+.fee-box {
+  display: flex;
+  justify-content: space-between;
   gap: 14px;
   padding: 14px;
   border: 1px solid var(--border);
   border-radius: 14px;
-  background: rgba(46,84,143,.04);
+  background: rgba(46, 84, 143, 0.04);
 }

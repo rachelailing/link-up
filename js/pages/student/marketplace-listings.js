@@ -1,17 +1,17 @@
 // js/pages/student/marketplace-listings.js
-import { $ } from "../../utils/dom.js";
-import { setActiveNav, wireLogout } from "../../components/navbar.js";
-import { authService } from "../../services/auth.service.js";
-import { marketplaceService } from "../../services/marketplace.service.js";
+import { $ } from '../../utils/dom.js';
+import { setActiveNav, wireLogout } from '../../components/navbar.js';
+import { authService } from '../../services/auth.service.js';
+import { marketplaceService } from '../../services/marketplace.service.js';
 
 class MyMarketplaceListings {
   constructor() {
-    this.productsGrid = $("#myProductsGrid");
-    this.servicesGrid = $("#myServicesGrid");
+    this.productsGrid = $('#myProductsGrid');
+    this.servicesGrid = $('#myServicesGrid');
   }
 
   async init() {
-    const user = await authService.requireAuth("student");
+    const user = await authService.requireAuth('student');
     if (!user) return;
 
     setActiveNav();
@@ -23,8 +23,8 @@ class MyMarketplaceListings {
   async renderAll() {
     const items = await marketplaceService.getMyListings();
 
-    const products = items.filter(i => i.type === "Product");
-    const services = items.filter(i => i.type === "Service");
+    const products = items.filter((i) => i.type === 'Product');
+    const services = items.filter((i) => i.type === 'Service');
 
     this.renderItems(products, this.productsGrid);
     this.renderItems(services, this.servicesGrid);
@@ -32,8 +32,9 @@ class MyMarketplaceListings {
 
   createCard(item) {
     const placeholderImg = `https://via.placeholder.com/300x160/f0f0f0/999?text=${encodeURIComponent(item.title)}`;
-    const managePage = item.type === "Service" ? "service-manage" : "product-manage";
-    const displayPrice = typeof item.price === 'number' ? `RM ${item.price.toFixed(2)}` : item.price;
+    const managePage = item.type === 'Service' ? 'service-manage' : 'product-manage';
+    const displayPrice =
+      typeof item.price === 'number' ? `RM ${item.price.toFixed(2)}` : item.price;
 
     return `
       <a href="${managePage}?id=${item.id}" class="market-card" style="text-decoration: none; color: inherit;">
@@ -54,11 +55,11 @@ class MyMarketplaceListings {
       container.innerHTML = "<p class='muted'>No listings found.</p>";
       return;
     }
-    container.innerHTML = items.map(item => this.createCard(item)).join("");
+    container.innerHTML = items.map((item) => this.createCard(item)).join('');
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
   const page = new MyMarketplaceListings();
   page.init();
 });

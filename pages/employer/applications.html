@@ -1,56 +1,54 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Applications — Link Up</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Applications — Link Up</title>
 
-  <link rel="stylesheet" href="/css/main.css" />
-</head>
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
 
-<body>
-  <div class="app">
-
-    <aside class="sidebar">
-      <div class="logo">
-        <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up">
-        <div class="logo-title">Link <span>Up</span></div>
-      </div>
-
-      <nav class="nav">
-        <a data-nav href="employer_homepage.html">🏠 Home Page</a>
-        <a data-nav href="create-job.html">➕ Create Job</a>
-        <a data-nav href="job-manage.html">📋 My Job Listings</a>
-        <a data-nav href="applications.html" class="active">📨 Applications</a>
-        <a data-nav href="payment-release.html">💳 Payments</a>
-        <a data-nav href="ratings.html">⭐ Ratings</a>
-      </nav>
-    </aside>
-
-    <header class="topbar">
-      <div style="font-weight:800;">Applications</div>
-      <div class="topbar-actions">
-        <a href="job-manage.html" class="btn btn-outline">Back to Jobs</a>
-        <button class="btn btn-blue" onclick="window.location.href='business-profile.html'">Business Profile</button>
-      </div>
-    </header>
-
-    <main class="main">
-      <div class="container">
-
-        <div class="section-title">
-          <h2 id="jobTitleDisplay">Job Applications</h2>
-          <span class="badge pending" id="jobStatusBadge">Open</span>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="logo">
+          <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up" />
+          <div class="logo-title">Link <span>Up</span></div>
         </div>
 
-        <div id="applicationsList" class="list"></div>
+        <nav class="nav">
+          <a data-nav href="employer_homepage.html">🏠 Home Page</a>
+          <a data-nav href="create-job.html">➕ Create Job</a>
+          <a data-nav href="job-manage.html">📋 My Job Listings</a>
+          <a data-nav href="applications.html" class="active">📨 Applications</a>
+          <a data-nav href="payment-release.html">💳 Payments</a>
+          <a data-nav href="ratings.html">⭐ Ratings</a>
+        </nav>
+      </aside>
 
-      </div>
-    </main>
+      <header class="topbar">
+        <div style="font-weight: 800">Applications</div>
+        <div class="topbar-actions">
+          <a href="job-manage.html" class="btn btn-outline">Back to Jobs</a>
+          <button class="btn btn-blue" onclick="window.location.href = 'business-profile.html'">
+            Business Profile
+          </button>
+        </div>
+      </header>
 
-  </div>
+      <main class="main">
+        <div class="container">
+          <div class="section-title">
+            <h2 id="jobTitleDisplay">Job Applications</h2>
+            <span class="badge pending" id="jobStatusBadge">Open</span>
+          </div>
 
-  <!-- IMPORTANT: must be type="module" -->
-  <script type="module" src="/js/pages/employer/applications.js"></script>
-</body>
+          <div id="applicationsList" class="list"></div>
+        </div>
+      </main>
+    </div>
+
+    <!-- IMPORTANT: must be type="module" -->
+    <script type="module" src="/js/pages/employer/applications.js"></script>
+  </body>
 </html>

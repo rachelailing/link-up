@@ -1,0 +1,45 @@
+{
+  "files": {
+    "dist/assets": { "size": 0, "mtime_nanos": 0, "mode": 0, "is_dir": true },
+    ".turbo/turbo-build$colon$prod.log": {
+      "size": 733,
+      "mtime_nanos": 1774164468478507826,
+      "mode": 420,
+      "is_dir": false
+    },
+    "dist/assets/index-CwkXS_Xb.css": {
+      "size": 19949,
+      "mtime_nanos": 1774164468460507826,
+      "mode": 420,
+      "is_dir": false
+    },
+    "dist/assets/index-DPEkLJfh.js": {
+      "size": 1099,
+      "mtime_nanos": 1774164468460507826,
+      "mode": 420,
+      "is_dir": false
+    },
+    "dist": { "size": 0, "mtime_nanos": 0, "mode": 0, "is_dir": true },
+    "dist/index.html": {
+      "size": 8179,
+      "mtime_nanos": 1774164468460507826,
+      "mode": 420,
+      "is_dir": false
+    },
+    "dist/assets/link_up_icon-Dp0UMVwV.jpeg": {
+      "size": 26646,
+      "mtime_nanos": 1774164468460507826,
+      "mode": 420,
+      "is_dir": false
+    }
+  },
+  "order": [
+    ".turbo/turbo-build$colon$prod.log",
+    "dist",
+    "dist/assets",
+    "dist/assets/index-CwkXS_Xb.css",
+    "dist/assets/index-DPEkLJfh.js",
+    "dist/assets/link_up_icon-Dp0UMVwV.jpeg",
+    "dist/index.html"
+  ]
+}

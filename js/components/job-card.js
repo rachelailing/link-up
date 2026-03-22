@@ -1,5 +1,5 @@
 // js/components/job-card.js
-import { statusToBadgeClass } from "./status-badge.js";
+import { statusToBadgeClass } from './status-badge.js';
 
 /**
  * Renders a job card HTML.
@@ -9,12 +9,12 @@ import { statusToBadgeClass } from "./status-badge.js";
  */
 export function renderJobCard(job, { onView, onApply }) {
   const badgeClass = statusToBadgeClass(job.status);
-  
+
   // High Match Badge logic
   const isHighMatch = job.matchScore && job.matchScore >= 15;
-  const matchBadge = isHighMatch 
-    ? `<span class="badge" style="background: #e1f5fe; color: #0288d1; border: 1px solid #b3e5fc; margin-right: 8px;">✨ Best Match</span>` 
-    : "";
+  const matchBadge = isHighMatch
+    ? '<span class="badge" style="background: #e1f5fe; color: #0288d1; border: 1px solid #b3e5fc; margin-right: 8px;">✨ Best Match</span>'
+    : '';
 
   return `
     <div class="card job" data-job-id="${job.id}">
@@ -33,7 +33,7 @@ export function renderJobCard(job, { onView, onApply }) {
         <div class="job-meta">
           <span class="kv">📍 ${job.location}</span>
           <span class="kv">💰 RM ${job.pay}</span>
-          ${job.category ? `<span class="kv">🏷️ ${job.category}</span>` : ""}
+          ${job.category ? `<span class="kv">🏷️ ${job.category}</span>` : ''}
         </div>
       </div>
 
@@ -47,19 +47,19 @@ export function renderJobCard(job, { onView, onApply }) {
 
 /**
  * Wires events for a container of job cards.
- * @param {HTMLElement} container 
+ * @param {HTMLElement} container
  * @param {Object} actions - callback actions { onView, onApply }
  */
 export function wireJobCardEvents(container, { onView, onApply }) {
-  container.addEventListener("click", (e) => {
-    const btn = e.target.closest("button");
+  container.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
     if (!btn) return;
 
     const action = btn.dataset.action;
-    const card = btn.closest(".card.job");
+    const card = btn.closest('.card.job');
     const jobId = Number(card.dataset.jobId);
 
-    if (action === "view" && onView) onView(jobId);
-    if (action === "apply" && onApply) onApply(jobId);
+    if (action === 'view' && onView) onView(jobId);
+    if (action === 'apply' && onApply) onApply(jobId);
   });
 }

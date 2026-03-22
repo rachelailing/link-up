@@ -1,16 +1,20 @@
-.card{
+.card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
 }
-.card.pad{ padding: var(--s-4); }
+.card.pad {
+  padding: var(--s-4);
+}
 
-.section-title{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--s-3);
   margin: 0 0 var(--s-3);
 }
-.section-title h2{ font-size: 20px; }
+.section-title h2 {
+  font-size: 20px;
+}

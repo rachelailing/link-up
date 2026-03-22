@@ -1,81 +1,83 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Find Jobs — Link Up</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Find Jobs — Link Up</title>
 
-  <link rel="stylesheet" href="/css/main.css" />
-</head>
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
 
-<body>
-  <div class="app">
-
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="logo">
-        <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up">
-        <div class="logo-title">Link <span>Up</span></div>
-      </div>
-
-      <nav class="nav">
-        <a data-nav href="job-section.html">🏠 Home Page</a>
-        <a data-nav href="jobs.html" class="active">🔍 Find Jobs</a>
-        <a data-nav href="job-earnings.html">💰 My Earnings</a>
-        
-        <div class="nav-logout">
-          <a href="#" id="logoutBtn">🚪 Logout</a>
-        </div>
-      </nav>
-    </aside>
-
-    <!-- Topbar -->
-    <header class="topbar">
-      <div class="topbar-nav">
-        <a href="job-section.html" class="topbar-nav-link active">Job Section</a>
-        <a href="marketplace.html" class="topbar-nav-link">Marketplace Section</a>
-      </div>
-
-      <div style="display:flex; gap:10px;">
-        <button class="btn btn-outline">🔔</button>
-        <button class="btn btn-blue" onclick="window.location.href='profile.html'">My Profile</button>
-      </div>
-    </header>
-
-    <!-- Main -->
-    <main class="main">
-      <div class="container">
-
-        <!-- Filters -->
-        <div class="card pad filter-bar">
-          <input id="searchInput" type="text" placeholder="Search jobs (e.g. design, booth, tutor)" />
-
-          <select id="categoryFilter">
-            <option value="all">All Categories</option>
-            <option value="creative">Creative</option>
-            <option value="academic">Academic</option>
-            <option value="event">Event</option>
-            <option value="tech">Tech</option>
-          </select>
-
-          <select id="payFilter">
-            <option value="all">All Pay</option>
-            <option value="50">RM 50+</option>
-            <option value="100">RM 100+</option>
-            <option value="200">RM 200+</option>
-          </select>
+  <body>
+    <div class="app">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">
+          <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up" />
+          <div class="logo-title">Link <span>Up</span></div>
         </div>
 
-        <div style="height:20px;"></div>
+        <nav class="nav">
+          <a data-nav href="job-section.html">🏠 Home Page</a>
+          <a data-nav href="jobs.html" class="active">🔍 Find Jobs</a>
+          <a data-nav href="job-earnings.html">💰 My Earnings</a>
 
-        <!-- Jobs List -->
-        <div id="jobsList" class="list"></div>
+          <div class="nav-logout">
+            <a href="#" id="logoutBtn">🚪 Logout</a>
+          </div>
+        </nav>
+      </aside>
 
-      </div>
-    </main>
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-nav">
+          <a href="job-section.html" class="topbar-nav-link active">Job Section</a>
+          <a href="marketplace.html" class="topbar-nav-link">Marketplace Section</a>
+        </div>
 
-  </div>
+        <div style="display: flex; gap: 10px">
+          <button class="btn btn-outline">🔔</button>
+          <button class="btn btn-blue" onclick="window.location.href = 'profile.html'">
+            My Profile
+          </button>
+        </div>
+      </header>
 
-  <script type="module" src="/js/pages/student/jobs.js"></script>
-</body>
+      <!-- Main -->
+      <main class="main">
+        <div class="container">
+          <!-- Filters -->
+          <div class="card pad filter-bar">
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="Search jobs (e.g. design, booth, tutor)"
+            />
+
+            <select id="categoryFilter">
+              <option value="all">All Categories</option>
+              <option value="creative">Creative</option>
+              <option value="academic">Academic</option>
+              <option value="event">Event</option>
+              <option value="tech">Tech</option>
+            </select>
+
+            <select id="payFilter">
+              <option value="all">All Pay</option>
+              <option value="50">RM 50+</option>
+              <option value="100">RM 100+</option>
+              <option value="200">RM 200+</option>
+            </select>
+          </div>
+
+          <div style="height: 20px"></div>
+
+          <!-- Jobs List -->
+          <div id="jobsList" class="list"></div>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="/js/pages/student/jobs.js"></script>
+  </body>
 </html>

@@ -10,7 +10,7 @@ export const storage = {
       const serialized = JSON.stringify(value);
       localStorage.setItem(key, serialized);
     } catch (err) {
-      console.error("Error saving to localStorage", err);
+      console.error('Error saving to localStorage', err);
     }
   },
 
@@ -19,7 +19,7 @@ export const storage = {
       const serialized = localStorage.getItem(key);
       return serialized ? JSON.parse(serialized) : null;
     } catch (err) {
-      console.error("Error reading from localStorage", err);
+      console.error('Error reading from localStorage', err);
       return null;
     }
   },
@@ -30,5 +30,5 @@ export const storage = {
 
   clear() {
     localStorage.clear();
-  }
+  },
 };

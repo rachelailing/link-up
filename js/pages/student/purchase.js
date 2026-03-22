@@ -1,16 +1,16 @@
 // js/pages/student/purchase.js
-import { $, $$ } from "../../utils/dom.js";
-import { setActiveNav, wireLogout } from "../../components/navbar.js";
-import { authService } from "../../services/auth.service.js";
-import { supabase } from "../../config/supabase.js";
+import { $, $$ } from '../../utils/dom.js';
+import { setActiveNav, wireLogout } from '../../components/navbar.js';
+import { authService } from '../../services/auth.service.js';
+import { supabase } from '../../config/supabase.js';
 
 class PurchaseHistory {
   constructor() {
-    this.listEl = $("#purchaseList");
+    this.listEl = $('#purchaseList');
   }
 
   async init() {
-    const user = await authService.requireAuth("student");
+    const user = await authService.requireAuth('student');
     if (!user) return;
 
     setActiveNav();
@@ -26,12 +26,12 @@ class PurchaseHistory {
    */
   async handlePaymentVerification() {
     const params = new URLSearchParams(window.location.search);
-    const sessionId = params.get("session_id");
-    const paymentStatus = params.get("payment");
+    const sessionId = params.get('session_id');
+    const paymentStatus = params.get('payment');
 
-    if (paymentStatus === "success" && sessionId) {
-      console.log("[Purchase] New successful payment detected. Verifying session...");
-      
+    if (paymentStatus === 'success' && sessionId) {
+      console.log('[Purchase] New successful payment detected. Verifying session...');
+
       // Clear URL params so we don't re-verify on refresh
       window.history.replaceState({}, document.title, window.location.pathname);
 
@@ -40,12 +40,12 @@ class PurchaseHistory {
         const data = await response.json();
 
         if (data.success) {
-          alert("Payment Verified! Your order has been recorded.");
+          alert('Payment Verified! Your order has been recorded.');
         } else {
-          console.error("Verification failed:", data.error);
+          console.error('Verification failed:', data.error);
         }
       } catch (err) {
-        console.error("Error calling verification API:", err);
+        console.error('Error calling verification API:', err);
       }
     }
   }
@@ -53,18 +53,20 @@ class PurchaseHistory {
   async renderPurchases(userId) {
     const { data: orders, error } = await supabase
       .from('marketplace_orders')
-      .select(`
+      .select(
+        `
         *,
         marketplace_items (
           title,
           image_url
         )
-      `)
+      `
+      )
       .eq('buyer_id', userId)
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error("Error fetching purchases:", error);
+      console.error('Error fetching purchases:', error);
       return;
     }
 
@@ -78,14 +80,15 @@ class PurchaseHistory {
       return;
     }
 
-    this.listEl.innerHTML = orders.map(order => {
-      const item = order.marketplace_items;
-      return `
+    this.listEl.innerHTML = orders
+      .map((order) => {
+        const item = order.marketplace_items;
+        return `
         <div class="card pad" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
           <div style="display: flex; gap: 15px; align-items: center;">
             <img src="${item?.image_url || 'https://via.placeholder.com/50'}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
             <div>
-              <h3 style="margin:0;">${item?.title || "Unknown Item"}</h3>
+              <h3 style="margin:0;">${item?.title || 'Unknown Item'}</h3>
               <p class="muted" style="margin:4px 0 0 0;">Purchased on: ${new Date(order.created_at).toLocaleDateString()}</p>
             </div>
           </div>
@@ -95,11 +98,12 @@ class PurchaseHistory {
           </div>
         </div>
       `;
-    }).join("");
+      })
+      .join('');
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
   const page = new PurchaseHistory();
   page.init();
 });

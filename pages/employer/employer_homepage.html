@@ -1,110 +1,107 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Employer Home Page — Link Up</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Employer Home Page — Link Up</title>
 
-  <link rel="stylesheet" href="/css/main.css" />
-</head>
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
 
-<body>
-  <div class="app">
-
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="logo">
-        <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up">
-        <div class="logo-title">Link <span>Up</span></div>
-      </div>
-
-      <nav class="nav">
-        <a data-nav href="employer_homepage.html" class="active">🏠 Home Page</a>
-        <a data-nav href="create-job.html">➕ Create Job</a>
-        <a data-nav href="job-manage.html">📋 My Job Listings</a>
-        <a data-nav href="applications.html">📨 Applications</a>
-        <a data-nav href="payment-release.html">💳 Payments</a>
-        <a data-nav href="ratings.html">⭐ Ratings</a>
-        
-        <div class="nav-logout">
-          <a href="#" id="logoutBtn">🚪 Logout</a>
-        </div>
-      </nav>
-    </aside>
-
-    <!-- Topbar -->
-    <header class="topbar">
-      <div class="topbar-title">
-        <span class="dot"></span>
-        Employer Home Page
-      </div>
-
-      <div class="topbar-actions">
-        <button class="btn btn-outline">🔔</button>
-        <button class="btn btn-blue" onclick="window.location.href='business-profile.html'">Business Profile</button>
-      </div>
-    </header>
-
-    <!-- Main -->
-    <main class="main">
-      <div class="container">
-
-        <div class="section-title">
-          <h2>Overview</h2>
-          <a class="btn btn-primary" href="./create-job.html">+ Create Job</a>
+  <body>
+    <div class="app">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">
+          <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up" />
+          <div class="logo-title">Link <span>Up</span></div>
         </div>
 
-        <!-- Stats -->
-        <div class="grid cols-4">
-          <div class="card pad stat-card">
-            <h3>Open Jobs</h3>
-            <p id="statOpenJobs">0</p>
+        <nav class="nav">
+          <a data-nav href="employer_homepage.html" class="active">🏠 Home Page</a>
+          <a data-nav href="create-job.html">➕ Create Job</a>
+          <a data-nav href="job-manage.html">📋 My Job Listings</a>
+          <a data-nav href="applications.html">📨 Applications</a>
+          <a data-nav href="payment-release.html">💳 Payments</a>
+          <a data-nav href="ratings.html">⭐ Ratings</a>
+
+          <div class="nav-logout">
+            <a href="#" id="logoutBtn">🚪 Logout</a>
           </div>
-          <div class="card pad stat-card">
-            <h3>Pending Apps</h3>
-            <p id="statPendingApps">0</p>
-          </div>
-          <div class="card pad stat-card">
-            <h3>Pending Payments</h3>
-            <p id="statPendingPay">RM 0</p>
-          </div>
-          <div class="card pad stat-card">
-            <h3>Completed Jobs</h3>
-            <p id="statCompleted">0</p>
-          </div>
+        </nav>
+      </aside>
+
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-title">
+          <span class="dot"></span>
+          Employer Home Page
         </div>
 
-        <div style="height:24px;"></div>
+        <div class="topbar-actions">
+          <button class="btn btn-outline">🔔</button>
+          <button class="btn btn-blue" onclick="window.location.href = 'business-profile.html'">
+            Business Profile
+          </button>
+        </div>
+      </header>
 
-        <!-- Two columns -->
-        <div class="grid cols-2">
+      <!-- Main -->
+      <main class="main">
+        <div class="container">
+          <div class="section-title">
+            <h2>Overview</h2>
+            <a class="btn btn-primary" href="./create-job.html">+ Create Job</a>
+          </div>
 
-          <!-- Recent Jobs -->
-          <section class="card pad">
-            <div class="section-title">
-              <h2 class="h2-sm">Recent Jobs</h2>
-              <a class="btn btn-outline" href="./job-manage.html">View all</a>
+          <!-- Stats -->
+          <div class="grid cols-4">
+            <div class="card pad stat-card">
+              <h3>Open Jobs</h3>
+              <p id="statOpenJobs">0</p>
             </div>
-
-            <div id="recentJobs" class="list"></div>
-          </section>
-
-          <!-- Recent Applications -->
-          <section class="card pad">
-            <div class="section-title">
-              <h2 class="h2-sm">Recent Applications</h2>
-              <a class="btn btn-outline" href="./applications.html">View all</a>
+            <div class="card pad stat-card">
+              <h3>Pending Apps</h3>
+              <p id="statPendingApps">0</p>
             </div>
+            <div class="card pad stat-card">
+              <h3>Pending Payments</h3>
+              <p id="statPendingPay">RM 0</p>
+            </div>
+            <div class="card pad stat-card">
+              <h3>Completed Jobs</h3>
+              <p id="statCompleted">0</p>
+            </div>
+          </div>
 
-            <div id="recentApplications" class="list"></div>
-          </section>
+          <div style="height: 24px"></div>
 
+          <!-- Two columns -->
+          <div class="grid cols-2">
+            <!-- Recent Jobs -->
+            <section class="card pad">
+              <div class="section-title">
+                <h2 class="h2-sm">Recent Jobs</h2>
+                <a class="btn btn-outline" href="./job-manage.html">View all</a>
+              </div>
+
+              <div id="recentJobs" class="list"></div>
+            </section>
+
+            <!-- Recent Applications -->
+            <section class="card pad">
+              <div class="section-title">
+                <h2 class="h2-sm">Recent Applications</h2>
+                <a class="btn btn-outline" href="./applications.html">View all</a>
+              </div>
+
+              <div id="recentApplications" class="list"></div>
+            </section>
+          </div>
         </div>
+      </main>
+    </div>
 
-      </div>
-    </main>
-  </div>
-
-  <script type="module" src="/js/pages/employer/employer_homepage.js"></script>
-</body>
+    <script type="module" src="/js/pages/employer/employer_homepage.js"></script>
+  </body>
 </html>

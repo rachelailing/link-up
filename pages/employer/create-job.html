@@ -1,133 +1,136 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Create Job — Link Up</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Job — Link Up</title>
 
-  <link rel="stylesheet" href="/css/main.css" />
-</head>
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
 
-<body>
-  <div class="app">
-
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="logo">
-        <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up">
-        <div class="logo-title">Link <span>Up</span></div>
-      </div>
-
-      <nav class="nav">
-        <a data-nav href="employer_homepage.html">🏠 Home Page</a>
-        <a data-nav href="create-job.html" class="active">➕ Create Job</a>
-        <a data-nav href="job-manage.html">📋 My Job Listings</a>
-        <a data-nav href="applications.html">📨 Applications</a>
-        <a data-nav href="payment-release.html">💳 Payments</a>
-        <a data-nav href="ratings.html">⭐ Ratings</a>
-      </nav>
-    </aside>
-
-    <!-- Topbar -->
-    <header class="topbar">
-      <div style="font-weight:800;">Create Job</div>
-      <button class="btn btn-blue" onclick="window.location.href='business-profile.html'">Business Profile</button>
-    </header>
-
-    <!-- Main -->
-    <main class="main">
-      <div class="container">
-
-        <div class="section-title">
-          <h2>New Job Posting</h2>
-          <span class="badge pending" id="jobStatusBadge">Draft</span>
+  <body>
+    <div class="app">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">
+          <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up" />
+          <div class="logo-title">Link <span>Up</span></div>
         </div>
 
-        <form id="createJobForm" class="create-job-grid">
+        <nav class="nav">
+          <a data-nav href="employer_homepage.html">🏠 Home Page</a>
+          <a data-nav href="create-job.html" class="active">➕ Create Job</a>
+          <a data-nav href="job-manage.html">📋 My Job Listings</a>
+          <a data-nav href="applications.html">📨 Applications</a>
+          <a data-nav href="payment-release.html">💳 Payments</a>
+          <a data-nav href="ratings.html">⭐ Ratings</a>
+        </nav>
+      </aside>
 
-          <!-- LEFT COLUMN -->
-          <div class="card pad">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div style="font-weight: 800">Create Job</div>
+        <button class="btn btn-blue" onclick="window.location.href = 'business-profile.html'">
+          Business Profile
+        </button>
+      </header>
 
-            <div class="field">
-              <label>Job Title</label>
-              <input id="jobTitle" type="text" placeholder="e.g. Booth Helper (Weekend Event)" required />
-            </div>
-
-            <div class="field">
-              <label>Category</label>
-              <select id="jobCategory" required>
-                <option value="">Select category</option>
-                <option value="creative">Creative</option>
-                <option value="academic">Academic</option>
-                <option value="event">Event</option>
-                <option value="tech">Tech</option>
-                <option value="food">Food</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label>Location</label>
-              <input id="jobLocation" type="text" placeholder="e.g. UTP Main Hall / Remote" required />
-            </div>
-
-            <div class="field">
-              <label>Description</label>
-              <textarea id="jobDescription" rows="5"
-                placeholder="Describe the task clearly, expectations, deadline, etc."
-                required></textarea>
-            </div>
-
+      <!-- Main -->
+      <main class="main">
+        <div class="container">
+          <div class="section-title">
+            <h2>New Job Posting</h2>
+            <span class="badge pending" id="jobStatusBadge">Draft</span>
           </div>
 
-          <!-- RIGHT COLUMN -->
-          <div class="card pad">
+          <form id="createJobForm" class="create-job-grid">
+            <!-- LEFT COLUMN -->
+            <div class="card pad">
+              <div class="field">
+                <label>Job Title</label>
+                <input
+                  id="jobTitle"
+                  type="text"
+                  placeholder="e.g. Booth Helper (Weekend Event)"
+                  required
+                />
+              </div>
 
-            <div class="field">
-              <label>Salary (RM)</label>
-              <input id="jobSalary" type="number" min="0" placeholder="e.g. 120" required />
+              <div class="field">
+                <label>Category</label>
+                <select id="jobCategory" required>
+                  <option value="">Select category</option>
+                  <option value="creative">Creative</option>
+                  <option value="academic">Academic</option>
+                  <option value="event">Event</option>
+                  <option value="tech">Tech</option>
+                  <option value="food">Food</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label>Location</label>
+                <input
+                  id="jobLocation"
+                  type="text"
+                  placeholder="e.g. UTP Main Hall / Remote"
+                  required
+                />
+              </div>
+
+              <div class="field">
+                <label>Description</label>
+                <textarea
+                  id="jobDescription"
+                  rows="5"
+                  placeholder="Describe the task clearly, expectations, deadline, etc."
+                  required
+                ></textarea>
+              </div>
             </div>
 
-            <div class="field">
-              <label>Commitment Fee (RM)</label>
-              <input id="jobDeposit" type="number" min="0" placeholder="e.g. 30" required />
-              <small class="muted">
-                Student must pay this to confirm job. Refunded upon completion.
-              </small>
+            <!-- RIGHT COLUMN -->
+            <div class="card pad">
+              <div class="field">
+                <label>Salary (RM)</label>
+                <input id="jobSalary" type="number" min="0" placeholder="e.g. 120" required />
+              </div>
+
+              <div class="field">
+                <label>Commitment Fee (RM)</label>
+                <input id="jobDeposit" type="number" min="0" placeholder="e.g. 30" required />
+                <small class="muted">
+                  Student must pay this to confirm job. Refunded upon completion.
+                </small>
+              </div>
+
+              <div class="field">
+                <label>Deadline</label>
+                <input id="jobDeadline" type="date" required />
+              </div>
+
+              <div class="field">
+                <label>Number of Students Needed</label>
+                <input id="jobSlots" type="number" min="1" value="1" required />
+              </div>
+
+              <div class="create-job-actions">
+                <button type="button" class="btn btn-outline" id="saveDraftBtn">
+                  Save as Draft
+                </button>
+
+                <button type="submit" class="btn btn-primary">Publish Job</button>
+              </div>
+
+              <div class="note" style="margin-top: 14px">
+                Published jobs become <b>Open</b> and visible in student “Find Jobs”.
+              </div>
             </div>
+          </form>
+        </div>
+      </main>
+    </div>
 
-            <div class="field">
-              <label>Deadline</label>
-              <input id="jobDeadline" type="date" required />
-            </div>
-
-            <div class="field">
-              <label>Number of Students Needed</label>
-              <input id="jobSlots" type="number" min="1" value="1" required />
-            </div>
-
-            <div class="create-job-actions">
-              <button type="button" class="btn btn-outline" id="saveDraftBtn">
-                Save as Draft
-              </button>
-
-              <button type="submit" class="btn btn-primary">
-                Publish Job
-              </button>
-            </div>
-
-            <div class="note" style="margin-top:14px;">
-              Published jobs become <b>Open</b> and visible in student “Find Jobs”.
-            </div>
-
-          </div>
-
-        </form>
-
-      </div>
-    </main>
-
-  </div>
-
-  <script type="module" src="/js/pages/employer/create-job.js"></script>
-</body>
+    <script type="module" src="/js/pages/employer/create-job.js"></script>
+  </body>
 </html>

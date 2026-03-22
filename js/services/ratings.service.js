@@ -1,5 +1,5 @@
 // js/services/ratings.service.js
-import { supabase } from "../config/supabase.js";
+import { supabase } from '../config/supabase.js';
 
 /**
  * Ratings Service
@@ -8,22 +8,24 @@ import { supabase } from "../config/supabase.js";
 class RatingsService {
   /**
    * Fetches all ratings for a specific target user.
-   * @param {string} targetId 
+   * @param {string} targetId
    */
   async getRatingsForUser(targetId) {
     const { data, error } = await supabase
       .from('ratings')
-      .select(`
+      .select(
+        `
         *,
         reviewer:reviewer_id (
           full_name
         )
-      `)
+      `
+      )
       .eq('target_id', targetId)
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error("[RatingsService] Error fetching ratings:", error.message);
+      console.error('[RatingsService] Error fetching ratings:', error.message);
       return [];
     }
     return data;
@@ -42,13 +44,13 @@ class RatingsService {
           target_id: ratingData.targetId,
           job_id: ratingData.jobId,
           rating: ratingData.rating,
-          comment: ratingData.comment
-        }
+          comment: ratingData.comment,
+        },
       ])
       .select();
 
     if (error) {
-      console.error("[RatingsService] Error submitting rating:", error.message);
+      console.error('[RatingsService] Error submitting rating:', error.message);
       throw error;
     }
     return data[0];
@@ -56,13 +58,10 @@ class RatingsService {
 
   /**
    * Calculates the average rating for a user.
-   * @param {string} userId 
+   * @param {string} userId
    */
   async getAverageRating(userId) {
-    const { data, error } = await supabase
-      .from('ratings')
-      .select('rating')
-      .eq('target_id', userId);
+    const { data, error } = await supabase.from('ratings').select('rating').eq('target_id', userId);
 
     if (error || !data.length) return 0;
 

@@ -1,80 +1,83 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Payment Release — Link Up</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Release — Link Up</title>
 
-  <link rel="stylesheet" href="/css/main.css" />
-  <link rel="stylesheet" href="../../css/pages/payment-release.css" />
-</head>
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="../../css/pages/payment-release.css" />
+  </head>
 
-<body>
-  <div class="app">
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="logo">
+          <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up" />
+          <div class="logo-title">Link <span>Up</span></div>
+        </div>
 
-    <aside class="sidebar">
-      <div class="logo">
-        <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up">
-        <div class="logo-title">Link <span>Up</span></div>
-      </div>
+        <nav class="nav">
+          <a data-nav href="employer_homepage.html">🏠 Home Page</a>
+          <a data-nav href="create-job.html">➕ Create Job</a>
+          <a data-nav href="job-manage.html">📋 My Job Listings</a>
+          <a data-nav href="applications.html">📨 Applications</a>
+          <a data-nav href="payment-release.html" class="active">💳 Payments</a>
+          <a data-nav href="ratings.html">⭐ Ratings</a>
+        </nav>
+      </aside>
 
-      <nav class="nav">
-        <a data-nav href="employer_homepage.html">🏠 Home Page</a>
-        <a data-nav href="create-job.html">➕ Create Job</a>
-        <a data-nav href="job-manage.html">📋 My Job Listings</a>
-        <a data-nav href="applications.html">📨 Applications</a>
-        <a data-nav href="payment-release.html" class="active">💳 Payments</a>
-        <a data-nav href="ratings.html">⭐ Ratings</a>
-      </nav>
-    </aside>
+      <header class="topbar">
+        <div class="topbar-title">
+          <span class="dot"></span>
+          Payment Approvals
+        </div>
 
-    <header class="topbar">
-      <div class="topbar-title">
-        <span class="dot"></span>
-        Payment Approvals
-      </div>
+        <div class="topbar-actions">
+          <span class="badge pending" id="pendingCountBadge">0 Pending</span>
+          <button class="btn btn-blue" onclick="window.location.href = 'business-profile.html'">
+            Business Profile
+          </button>
+        </div>
+      </header>
 
-      <div class="topbar-actions">
-        <span class="badge pending" id="pendingCountBadge">0 Pending</span>
-        <button class="btn btn-blue" onclick="window.location.href='business-profile.html'">Business Profile</button>
-      </div>
-    </header>
+      <main class="main">
+        <div class="container">
+          <div class="section-title">
+            <h2>Release Payments</h2>
+            <div style="display: flex; gap: 10px">
+              <input
+                type="text"
+                id="paySearch"
+                placeholder="Search job title..."
+                class="input-sm"
+              />
+              <select id="payStatusFilter" class="input-sm">
+                <option value="all">All Pending</option>
+                <option value="awaiting_approval">Submitted</option>
+                <option value="in_progress">In Progress</option>
+              </select>
+            </div>
+          </div>
 
-    <main class="main">
-      <div class="container">
+          <!-- Pending list -->
+          <div id="paymentList" class="list">
+            <div class="loading">Loading pending payments...</div>
+          </div>
 
-        <div class="section-title">
-          <h2>Release Payments</h2>
-          <div style="display:flex; gap:10px;">
-            <input type="text" id="paySearch" placeholder="Search job title..." class="input-sm" />
-            <select id="payStatusFilter" class="input-sm">
-              <option value="all">All Pending</option>
-              <option value="awaiting_approval">Submitted</option>
-              <option value="in_progress">In Progress</option>
-            </select>
+          <div style="height: 40px"></div>
+
+          <div class="section-title">
+            <h2>Recent Payouts</h2>
+          </div>
+
+          <div id="paymentHistory" class="list">
+            <!-- Mock history -->
           </div>
         </div>
+      </main>
+    </div>
 
-        <!-- Pending list -->
-        <div id="paymentList" class="list">
-          <div class="loading">Loading pending payments...</div>
-        </div>
-
-        <div style="height:40px;"></div>
-
-        <div class="section-title">
-          <h2>Recent Payouts</h2>
-        </div>
-        
-        <div id="paymentHistory" class="list">
-          <!-- Mock history -->
-        </div>
-
-      </div>
-    </main>
-
-  </div>
-
-  <script type="module" src="/js/pages/employer/payment-release.js"></script>
-</body>
+    <script type="module" src="/js/pages/employer/payment-release.js"></script>
+  </body>
 </html>

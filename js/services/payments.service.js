@@ -1,5 +1,5 @@
 // js/services/payments.service.js
-import { supabase } from "../config/supabase.js";
+import { supabase } from '../config/supabase.js';
 
 /**
  * Payments Service
@@ -8,29 +8,31 @@ import { supabase } from "../config/supabase.js";
 class PaymentsService {
   /**
    * Fetches all commitment fee records for a specific student.
-   * @param {string} studentId 
+   * @param {string} studentId
    */
   async getFeeHistory(studentId) {
     const { data, error } = await supabase
       .from('commitment_fees')
-      .select(`
+      .select(
+        `
         *,
         jobs (
           title
         )
-      `)
+      `
+      )
       .eq('student_id', studentId)
       .order('paid_at', { ascending: false });
 
     if (error) {
-      console.error("[PaymentsService] Error fetching fee history:", error.message);
+      console.error('[PaymentsService] Error fetching fee history:', error.message);
       return [];
     }
-    
+
     // Flatten the result to include job title directly
-    return data.map(fee => ({
+    return data.map((fee) => ({
       ...fee,
-      jobTitle: fee.jobs?.title || "Unknown Job"
+      jobTitle: fee.jobs?.title || 'Unknown Job',
     }));
   }
 
@@ -46,13 +48,13 @@ class PaymentsService {
           job_id: feeData.jobId,
           student_id: feeData.studentId,
           amount: feeData.amount,
-          status: 'Held'
-        }
+          status: 'Held',
+        },
       ])
       .select();
 
     if (error) {
-      console.error("[PaymentsService] Error recording payment:", error.message);
+      console.error('[PaymentsService] Error recording payment:', error.message);
       throw error;
     }
 
@@ -73,12 +75,14 @@ class PaymentsService {
     // In a real app, this would sum up completed 'applications' where pay is released.
     const { data, error } = await supabase
       .from('applications')
-      .select(`
+      .select(
+        `
         status,
         jobs (
           salary
         )
-      `)
+      `
+      )
       .eq('student_id', studentId)
       .eq('status', 'completed');
 
@@ -87,7 +91,7 @@ class PaymentsService {
     const total = data.reduce((acc, app) => acc + Number(app.jobs?.salary || 0), 0);
     return {
       total,
-      count: data.length
+      count: data.length,
     };
   }
 }

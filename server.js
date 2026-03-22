@@ -12,7 +12,7 @@ const app = express();
 // Initialize Stripe only if the key is provided to prevent startup crashes
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 if (!stripeSecretKey) {
-  console.warn("⚠️  STRIPE_SECRET_KEY is missing from .env. Stripe features will be unavailable.");
+  console.warn('⚠️  STRIPE_SECRET_KEY is missing from .env. Stripe features will be unavailable.');
 }
 const stripe = stripeSecretKey ? new Stripe(stripeSecretKey) : null;
 
@@ -30,7 +30,7 @@ app.use(express.json());
 app.post('/api/create-checkout-session', async (req, res) => {
   try {
     if (!stripe) {
-      throw new Error("Stripe is not configured. Please add STRIPE_SECRET_KEY to your .env file.");
+      throw new Error('Stripe is not configured. Please add STRIPE_SECRET_KEY to your .env file.');
     }
 
     const { itemId, itemTitle, amount, quantity, buyerId, sellerId } = req.body;
@@ -39,16 +39,18 @@ app.post('/api/create-checkout-session', async (req, res) => {
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card', 'fpx'],
-      line_items: [{
-        price_data: {
-          currency: 'myr',
-          product_data: {
-            name: itemTitle,
+      line_items: [
+        {
+          price_data: {
+            currency: 'myr',
+            product_data: {
+              name: itemTitle,
+            },
+            unit_amount: Math.round(amount * 100), // convert to cents
           },
-          unit_amount: Math.round(amount * 100), // convert to cents
+          quantity: quantity,
         },
-        quantity: quantity,
-      }],
+      ],
       mode: 'payment',
       // Pointing to your local frontend pages as requested, now including session_id
       success_url: `${process.env.VITE_APP_URL || 'http://127.0.0.1:5173'}/pages/student/purchase.html?payment=success&session_id={CHECKOUT_SESSION_ID}`,
@@ -57,13 +59,13 @@ app.post('/api/create-checkout-session', async (req, res) => {
         itemId: itemId.toString(),
         buyerId,
         sellerId,
-        quantity: quantity.toString()
-      }
+        quantity: quantity.toString(),
+      },
     });
 
     res.json({ url: session.url });
   } catch (err) {
-    console.error("[API] Checkout Error:", err.message);
+    console.error('[API] Checkout Error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -76,7 +78,7 @@ app.get('/api/verify-session', async (req, res) => {
   const { session_id } = req.query;
 
   try {
-    if (!stripe) throw new Error("Stripe not configured.");
+    if (!stripe) throw new Error('Stripe not configured.');
 
     const session = await stripe.checkout.sessions.retrieve(session_id);
 
@@ -96,40 +98,40 @@ app.get('/api/verify-session', async (req, res) => {
 
       if (!existingOrder) {
         console.log(`[Verify] Recording order for item ${itemId}`);
-        const { error } = await supabase
-          .from('marketplace_orders')
-          .insert([{
+        const { error } = await supabase.from('marketplace_orders').insert([
+          {
             item_id: parseInt(itemId),
             buyer_id: buyerId,
             seller_id: sellerId,
             quantity: parseInt(quantity),
             total_amount: session.amount_total / 100,
             bank_name: 'Stripe',
-            status: 'Completed'
-          }]);
+            status: 'Completed',
+          },
+        ]);
 
         if (error) throw error;
       }
 
       res.json({ success: true, order: session.metadata });
     } else {
-      res.status(400).json({ success: false, error: "Payment not completed" });
+      res.status(400).json({ success: false, error: 'Payment not completed' });
     }
   } catch (err) {
-    console.error("[Verify] Error:", err.message);
+    console.error('[Verify] Error:', err.message);
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, '127.0.0.1', () => {
-  console.log(`--------------------------------------------------`);
+  console.log('--------------------------------------------------');
   console.log(`🚀 Stripe Backend Server running on http://127.0.0.1:${PORT}`);
-  console.log(`--------------------------------------------------`);
+  console.log('--------------------------------------------------');
 });
 
 server.on('error', (err) => {
-  console.error("❌ SERVER ERROR:", err.message);
+  console.error('❌ SERVER ERROR:', err.message);
   if (err.code === 'EADDRINUSE') {
     console.error(`Port ${PORT} is already in use.`);
   }

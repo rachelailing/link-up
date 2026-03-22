@@ -1,17 +1,17 @@
 // js/pages/student/marketplace-recommended.js
-import { $ } from "../../utils/dom.js";
-import { setActiveNav, wireLogout } from "../../components/navbar.js";
-import { authService } from "../../services/auth.service.js";
-import { marketplaceService } from "../../services/marketplace.service.js";
+import { $ } from '../../utils/dom.js';
+import { setActiveNav, wireLogout } from '../../components/navbar.js';
+import { authService } from '../../services/auth.service.js';
+import { marketplaceService } from '../../services/marketplace.service.js';
 
 class RecommendedMarketplace {
   constructor() {
-    this.productsGrid = $("#productsGrid");
-    this.servicesGrid = $("#servicesGrid");
+    this.productsGrid = $('#productsGrid');
+    this.servicesGrid = $('#servicesGrid');
   }
 
   async init() {
-    const user = await authService.requireAuth("student");
+    const user = await authService.requireAuth('student');
     if (!user) return;
 
     setActiveNav();
@@ -26,7 +26,8 @@ class RecommendedMarketplace {
 
   createCard(item) {
     const placeholderImg = `https://via.placeholder.com/300x160/f0f0f0/999?text=${encodeURIComponent(item.title)}`;
-    const displayPrice = typeof item.price === 'number' ? `RM ${item.price.toFixed(2)}` : item.price;
+    const displayPrice =
+      typeof item.price === 'number' ? `RM ${item.price.toFixed(2)}` : item.price;
     const detailsUrl = `marketplace-details?id=${item.id}`;
 
     return `
@@ -49,11 +50,11 @@ class RecommendedMarketplace {
       container.innerHTML = "<p class='muted'>No items found.</p>";
       return;
     }
-    container.innerHTML = items.map(item => this.createCard(item)).join("");
+    container.innerHTML = items.map((item) => this.createCard(item)).join('');
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
   const page = new RecommendedMarketplace();
   page.init();
 });

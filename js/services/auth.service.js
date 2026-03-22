@@ -1,6 +1,6 @@
 // js/services/auth.service.js
-import { supabase } from "../config/supabase.js";
-import { storage } from "../utils/storage.js";
+import { supabase } from '../config/supabase.js';
+import { storage } from '../utils/storage.js';
 
 /**
  * Authentication Service
@@ -9,20 +9,20 @@ import { storage } from "../utils/storage.js";
 export class AuthService {
   constructor() {
     this.STORAGE_KEYS = {
-      REMEMBER_EMAIL: "linkup_remember_email"
+      REMEMBER_EMAIL: 'linkup_remember_email',
     };
   }
 
   /**
    * Login for students/employers using Supabase Auth
-   * @param {string} email 
-   * @param {string} password 
+   * @param {string} email
+   * @param {string} password
    * @returns {Promise<Object>} User data on success
    * @throws {Error} On failure
    */
   async login(email, password) {
     console.log(`[AuthService] Attempting login for: ${email}`);
-    
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -60,27 +60,27 @@ export class AuthService {
         data: {
           role,
           ...cleanMetadata,
-          onboardingDone: false
-        }
-      }
+          onboardingDone: false,
+        },
+      },
     });
 
     if (error) {
-      console.error(`[AuthService] Supabase signUp error:`, error);
+      console.error('[AuthService] Supabase signUp error:', error);
       throw error;
     }
 
-    console.log(`[AuthService] Registration successful for:`, data.user?.email);
+    console.log('[AuthService] Registration successful for:', data.user?.email);
     return data.user;
   }
 
   /**
    * Update the current user's metadata
-   * @param {Object} metadata 
+   * @param {Object} metadata
    */
   async updateUserMetadata(metadata) {
     const { data, error } = await supabase.auth.updateUser({
-      data: metadata
+      data: metadata,
     });
     if (error) throw error;
     return data.user;
@@ -91,15 +91,18 @@ export class AuthService {
    */
   async logout() {
     const { error } = await supabase.auth.signOut();
-    if (error) console.error("Error logging out:", error.message);
-    window.location.href = "/index.html";
+    if (error) console.error('Error logging out:', error.message);
+    window.location.href = '/index.html';
   }
 
   /**
    * Gets the currently logged-in user session
    */
   async getCurrentUser() {
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
     if (error) return null;
     return user;
   }
@@ -111,21 +114,25 @@ export class AuthService {
    */
   async requireAuth(requiredRole = null) {
     const user = await this.getCurrentUser();
-    
+
     if (!user) {
-      console.warn("[AuthService] No session found, redirecting to login.");
-      const loginPage = requiredRole === "employer" 
-        ? "/pages/auth/employer-login.html" 
-        : "/pages/auth/student-login.html";
+      console.warn('[AuthService] No session found, redirecting to login.');
+      const loginPage =
+        requiredRole === 'employer'
+          ? '/pages/auth/employer-login.html'
+          : '/pages/auth/student-login.html';
       window.location.href = loginPage;
       return null;
     }
 
     if (requiredRole && user.user_metadata?.role !== requiredRole) {
-      console.warn(`[AuthService] Role mismatch: required ${requiredRole}, got ${user.user_metadata?.role}`);
-      const homePage = user.user_metadata?.role === "employer"
-        ? "/pages/employer/employer_homepage.html"
-        : "/pages/student/job-section.html";
+      console.warn(
+        `[AuthService] Role mismatch: required ${requiredRole}, got ${user.user_metadata?.role}`
+      );
+      const homePage =
+        user.user_metadata?.role === 'employer'
+          ? '/pages/employer/employer_homepage.html'
+          : '/pages/student/job-section.html';
       window.location.href = homePage;
       return null;
     }
@@ -156,7 +163,7 @@ export class AuthService {
    * Helper to get remembered email
    */
   getRememberedEmail() {
-    return storage.get(this.STORAGE_KEYS.REMEMBER_EMAIL) || "";
+    return storage.get(this.STORAGE_KEYS.REMEMBER_EMAIL) || '';
   }
 }
 

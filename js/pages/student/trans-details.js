@@ -1,10 +1,10 @@
-import { $, $$ } from "../../utils/dom.js";
-import { setActiveNav } from "../../components/navbar.js";
-import { statusToBadgeClass } from "../../components/status-badge.js";
-import { supabase } from "../../config/supabase.js";
-import { authService } from "../../services/auth.service.js";
-import { jobsService } from "../../services/jobs.service.js";
-import { paymentsService } from "../../services/payments.service.js";
+import { $, $$ } from '../../utils/dom.js';
+import { setActiveNav } from '../../components/navbar.js';
+import { statusToBadgeClass } from '../../components/status-badge.js';
+import { supabase } from '../../config/supabase.js';
+import { authService } from '../../services/auth.service.js';
+import { jobsService } from '../../services/jobs.service.js';
+import { paymentsService } from '../../services/payments.service.js';
 
 async function fetchMyApplication(jobId, studentId) {
   const { data, error } = await supabase
@@ -13,32 +13,36 @@ async function fetchMyApplication(jobId, studentId) {
     .eq('job_id', jobId)
     .eq('student_id', studentId)
     .single();
-  
+
   if (error) return null;
   return data;
 }
 
-function renderDetail(job, app, feeRecord){
-  const detail = $("#feeDetail");
-  detail.style.display = "block";
+function renderDetail(job, app, feeRecord) {
+  const detail = $('#feeDetail');
+  detail.style.display = 'block';
 
-  const status = feeRecord ? feeRecord.status : (app.status === 'accepted' ? 'Unpaid' : 'Pending');
+  const status = feeRecord ? feeRecord.status : app.status === 'accepted' ? 'Unpaid' : 'Pending';
   const badge = statusToBadgeClass(status);
 
   const statusText =
-    status === "Unpaid" ? "Payment required to confirm this job."
-    : status === "Held" ? "Fee is held. It will be refunded after completion."
-    : status === "Refunded" ? "Fee was refunded after completion."
-    : status === "Forfeited" ? "Fee was forfeited (job not completed)."
-    : "Waiting for employer to accept your application.";
+    status === 'Unpaid'
+      ? 'Payment required to confirm this job.'
+      : status === 'Held'
+        ? 'Fee is held. It will be refunded after completion.'
+        : status === 'Refunded'
+          ? 'Fee was refunded after completion.'
+          : status === 'Forfeited'
+            ? 'Fee was forfeited (job not completed).'
+            : 'Waiting for employer to accept your application.';
 
-  const showPayBtn = status === "Unpaid";
+  const showPayBtn = status === 'Unpaid';
 
   detail.innerHTML = `
     <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
       <div>
         <h2 style="margin:0;">${job.title}</h2>
-        <p style="margin:6px 0 0;">${job.location} • Deadline: ${job.deadline || "-"}</p>
+        <p style="margin:6px 0 0;">${job.location} • Deadline: ${job.deadline || '-'}</p>
       </div>
       <span class="badge ${badge}">${status}</span>
     </div>
@@ -60,48 +64,48 @@ function renderDetail(job, app, feeRecord){
     <p class="small-note">${statusText}</p>
 
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
-      ${showPayBtn ? `<button class="btn btn-primary" id="payNowBtn">Pay Now (PayPal Simulation)</button>` : ""}
+      ${showPayBtn ? '<button class="btn btn-primary" id="payNowBtn">Pay Now (PayPal Simulation)</button>' : ''}
       <a class="btn btn-outline" href="./job-section.html">Back to Home</a>
     </div>
   `;
 
-  if (showPayBtn){
-    $("#payNowBtn").addEventListener("click", () => payFee(job, app));
+  if (showPayBtn) {
+    $('#payNowBtn').addEventListener('click', () => payFee(job, app));
   }
 }
 
-async function payFee(job, app){
+async function payFee(job, app) {
   const user = await authService.getCurrentUser();
-  
-  const payBtn = $("#payNowBtn");
+
+  const payBtn = $('#payNowBtn');
   payBtn.disabled = true;
-  payBtn.textContent = "Processing...";
+  payBtn.textContent = 'Processing...';
 
   try {
     // Simulate PayPal / External Gateway
-    console.log("[Payment] Simulating PayPal redirect...");
-    await new Promise(res => setTimeout(res, 1500));
+    console.log('[Payment] Simulating PayPal redirect...');
+    await new Promise((res) => setTimeout(res, 1500));
 
     await paymentsService.payFee({
       jobId: job.id,
       studentId: user.id,
-      amount: job.deposit
+      amount: job.deposit,
     });
 
-    alert("Payment Successful! ✅ Your job is now confirmed.");
+    alert('Payment Successful! ✅ Your job is now confirmed.');
     window.location.reload();
   } catch (err) {
-    alert("Payment failed: " + err.message);
+    alert('Payment failed: ' + err.message);
     payBtn.disabled = false;
-    payBtn.textContent = "Pay Now";
+    payBtn.textContent = 'Pay Now';
   }
 }
 
-async function renderList(userId){
+async function renderList(userId) {
   const fees = await paymentsService.getFeeHistory(userId);
-  const el = $("#feeList");
-  
-  if (!fees || !fees.length){
+  const el = $('#feeList');
+
+  if (!fees || !fees.length) {
     el.innerHTML = `
       <div class="card pad">
         <p>No transaction records found.</p>
@@ -110,9 +114,10 @@ async function renderList(userId){
     return;
   }
 
-  el.innerHTML = fees.map(r => {
-    const badge = statusToBadgeClass(r.status);
-    return `
+  el.innerHTML = fees
+    .map((r) => {
+      const badge = statusToBadgeClass(r.status);
+      return `
       <div class="card fee-row">
         <div class="fee-left">
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
@@ -131,26 +136,27 @@ async function renderList(userId){
         </div>
       </div>
     `;
-  }).join("");
+    })
+    .join('');
 }
 
-async function init(){
+async function init() {
   setActiveNav();
-  const user = await authService.requireAuth("student");
+  const user = await authService.requireAuth('student');
   if (!user) return;
 
   await renderList(user.id);
 
   const params = new URLSearchParams(window.location.search);
-  const jobId = params.get("job");
+  const jobId = params.get('job');
   if (!jobId) return;
 
   const job = await jobsService.getJobById(jobId);
   const app = await fetchMyApplication(jobId, user.id);
 
-  if (!job || !app){
-    $("#feeDetail").style.display = "block";
-    $("#feeDetail").innerHTML = `<p>Record not found.</p>`;
+  if (!job || !app) {
+    $('#feeDetail').style.display = 'block';
+    $('#feeDetail').innerHTML = '<p>Record not found.</p>';
     return;
   }
 
@@ -165,4 +171,4 @@ async function init(){
   renderDetail(job, app, existingFee);
 }
 
-document.addEventListener("DOMContentLoaded", init);
+document.addEventListener('DOMContentLoaded', init);

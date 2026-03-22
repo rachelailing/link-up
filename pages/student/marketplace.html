@@ -1,142 +1,140 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Marketplace — Link Up</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Marketplace — Link Up</title>
 
-  <link rel="stylesheet" href="/css/main.css" />
-  <style>
-    /* Inline styles for section header and grid */
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    .market-preview-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
-    }
-    .market-card {
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-      border: 1px solid #eee;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.2s ease;
-      cursor: pointer;
-    }
-    .market-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-    }
-    .market-card-image {
-      width: 100%;
-      height: 150px;
-      background: #f0f0f0;
-      object-fit: cover;
-      border-bottom: 1px solid #eee;
-    }
-    .market-card-content {
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .market-card h3 {
-      margin: 0;
-      font-size: 1.1rem;
-      color: #333;
-    }
-    .market-card .price {
-      font-weight: 700;
-      color: #007bff;
-      font-size: 1.2rem;
-    }
-    .market-card .meta {
-      font-size: 0.9rem;
-      color: #666;
-    }
-    .empty-state {
-      text-align: center;
-      padding: 40px;
-      background: #f9f9f9;
-      border-radius: 12px;
-      border: 2px dashed #ddd;
-    }
-  </style>
-</head>
+    <link rel="stylesheet" href="/css/main.css" />
+    <style>
+      /* Inline styles for section header and grid */
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .market-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+      }
+      .market-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #eee;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.2s ease;
+        cursor: pointer;
+      }
+      .market-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+      }
+      .market-card-image {
+        width: 100%;
+        height: 150px;
+        background: #f0f0f0;
+        object-fit: cover;
+        border-bottom: 1px solid #eee;
+      }
+      .market-card-content {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .market-card h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        color: #333;
+      }
+      .market-card .price {
+        font-weight: 700;
+        color: #007bff;
+        font-size: 1.2rem;
+      }
+      .market-card .meta {
+        font-size: 0.9rem;
+        color: #666;
+      }
+      .empty-state {
+        text-align: center;
+        padding: 40px;
+        background: #f9f9f9;
+        border-radius: 12px;
+        border: 2px dashed #ddd;
+      }
+    </style>
+  </head>
 
-<body>
-  <div class="app">
-
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="logo">
-        <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up">
-        <div class="logo-title">Link <span>Up</span></div>
-      </div>
-
-      <nav class="nav">
-        <a data-nav href="marketplace.html" class="active">🏠 Home Page</a>
-        <a data-nav href="earnings.html">💰 Earning History</a>
-        <a data-nav href="purchase.html">🛍️ Purchase History</a>
-        <div class="nav-logout">
-          <a href="#" id="logoutBtn">🚪 Logout</a>
+  <body>
+    <div class="app">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">
+          <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up" />
+          <div class="logo-title">Link <span>Up</span></div>
         </div>
-      </nav>
-    </aside>
 
-    <!-- Topbar -->
-    <header class="topbar">
-      <div class="topbar-nav">
-        <a href="job-section.html" class="topbar-nav-link">Job Section</a>
-        <a href="marketplace.html" class="topbar-nav-link active">Marketplace Section</a>
-      </div>
-
-      <div style="display:flex; gap:10px;">
-        <button class="btn btn-outline">🔔</button>
-        <button class="btn btn-blue" onclick="window.location.href='profile.html'">My Profile</button>
-      </div>
-    </header>
-
-    <!-- Main -->
-    <main class="main">
-      <div class="container">
-
-        <!-- Recommended Section -->
-        <section class="market-section">
-          <div class="section-header">
-            <h2>Recommended for you</h2>
-            <button id="seeMoreRecommended" class="btn btn-outline">See more...</button>
+        <nav class="nav">
+          <a data-nav href="marketplace.html" class="active">🏠 Home Page</a>
+          <a data-nav href="earnings.html">💰 Earning History</a>
+          <a data-nav href="purchase.html">🛍️ Purchase History</a>
+          <div class="nav-logout">
+            <a href="#" id="logoutBtn">🚪 Logout</a>
           </div>
-          <div id="recommendedPreview" class="market-preview-grid">
-            <!-- JS dynamic content -->
-          </div>
-        </section>
+        </nav>
+      </aside>
 
-        <div style="height:40px;"></div>
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-nav">
+          <a href="job-section.html" class="topbar-nav-link">Job Section</a>
+          <a href="marketplace.html" class="topbar-nav-link active">Marketplace Section</a>
+        </div>
 
-        <!-- My Listings Section -->
-        <section class="market-section">
-          <div class="section-header">
-            <h2>My Listings</h2>
-            <button id="seeMoreMyListings" class="btn btn-outline">See more...</button>
-          </div>
-          <div id="myListingsPreview" class="market-preview-grid">
-            <!-- JS dynamic content -->
-          </div>
-        </section>
+        <div style="display: flex; gap: 10px">
+          <button class="btn btn-outline">🔔</button>
+          <button class="btn btn-blue" onclick="window.location.href = 'profile.html'">
+            My Profile
+          </button>
+        </div>
+      </header>
 
-      </div>
-    </main>
+      <!-- Main -->
+      <main class="main">
+        <div class="container">
+          <!-- Recommended Section -->
+          <section class="market-section">
+            <div class="section-header">
+              <h2>Recommended for you</h2>
+              <button id="seeMoreRecommended" class="btn btn-outline">See more...</button>
+            </div>
+            <div id="recommendedPreview" class="market-preview-grid">
+              <!-- JS dynamic content -->
+            </div>
+          </section>
 
-  </div>
+          <div style="height: 40px"></div>
 
-  <script type="module" src="/js/pages/student/marketplace.js"></script>
-</body>
+          <!-- My Listings Section -->
+          <section class="market-section">
+            <div class="section-header">
+              <h2>My Listings</h2>
+              <button id="seeMoreMyListings" class="btn btn-outline">See more...</button>
+            </div>
+            <div id="myListingsPreview" class="market-preview-grid">
+              <!-- JS dynamic content -->
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="/js/pages/student/marketplace.js"></script>
+  </body>
 </html>

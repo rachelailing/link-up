@@ -1,19 +1,19 @@
 // js/pages/auth/employer-login.js
-import { isEmail, minLength } from "../../utils/validators.js";
-import { authService } from "../../services/auth.service.js";
+import { isEmail, minLength } from '../../utils/validators.js';
+import { authService } from '../../services/auth.service.js';
 
 /**
  * Employer Login Controller
  */
 class EmployerLogin {
   constructor() {
-    this.form = document.getElementById("employerLoginForm");
+    this.form = document.getElementById('employerLoginForm');
     if (!this.form) return;
 
-    this.banner = document.getElementById("errorBanner");
-    this.emailInput = document.getElementById("email");
-    this.passwordInput = document.getElementById("password");
-    this.remember = document.getElementById("remember");
+    this.banner = document.getElementById('errorBanner');
+    this.emailInput = document.getElementById('email');
+    this.passwordInput = document.getElementById('password');
+    this.remember = document.getElementById('remember');
   }
 
   init() {
@@ -22,7 +22,7 @@ class EmployerLogin {
     this.prefillEmail();
     this.wirePasswordToggles();
     this.wireLiveCleanup();
-    this.form.addEventListener("submit", (e) => this.handleSubmit(e));
+    this.form.addEventListener('submit', (e) => this.handleSubmit(e));
   }
 
   prefillEmail() {
@@ -34,22 +34,28 @@ class EmployerLogin {
   }
 
   wirePasswordToggles() {
-    document.querySelectorAll("[data-toggle-password]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const selector = btn.getAttribute("data-toggle-password");
+    document.querySelectorAll('[data-toggle-password]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const selector = btn.getAttribute('data-toggle-password');
         const input = document.querySelector(selector);
         if (!input) return;
 
-        const hidden = input.type === "password";
-        input.type = hidden ? "text" : "password";
-        btn.textContent = hidden ? "Hide" : "Show";
+        const hidden = input.type === 'password';
+        input.type = hidden ? 'text' : 'password';
+        btn.textContent = hidden ? 'Hide' : 'Show';
       });
     });
   }
 
   wireLiveCleanup() {
-    this.emailInput.addEventListener("input", () => { this.hideBanner(); this.clearFieldError("email"); });
-    this.passwordInput.addEventListener("input", () => { this.hideBanner(); this.clearFieldError("password"); });
+    this.emailInput.addEventListener('input', () => {
+      this.hideBanner();
+      this.clearFieldError('email');
+    });
+    this.passwordInput.addEventListener('input', () => {
+      this.hideBanner();
+      this.clearFieldError('password');
+    });
   }
 
   async handleSubmit(e) {
@@ -58,38 +64,37 @@ class EmployerLogin {
 
     const submitBtn = this.form.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
-    submitBtn.textContent = "Logging in...";
+    submitBtn.textContent = 'Logging in...';
 
-    console.log("[EmployerLogin] Form submitted, calling AuthService...");
+    console.log('[EmployerLogin] Form submitted, calling AuthService...');
 
     try {
       const email = this.emailInput.value.trim();
       const password = this.passwordInput.value;
-      
+
       const user = await authService.login(email, password);
 
       // Verify role
-      if (user.user_metadata?.role !== "employer") {
-        console.warn("[EmployerLogin] Role mismatch: user is not an employer.", user.user_metadata);
+      if (user.user_metadata?.role !== 'employer') {
+        console.warn('[EmployerLogin] Role mismatch: user is not an employer.', user.user_metadata);
         await authService.logout();
-        throw new Error("This account is not registered as an employer.");
+        throw new Error('This account is not registered as an employer.');
       }
 
-      console.log("[EmployerLogin] Login successful, redirecting to dashboard...");
+      console.log('[EmployerLogin] Login successful, redirecting to dashboard...');
       // Remember email if checked
       authService.setRememberMe(email, this.remember.checked);
 
       // Redirect to employer homepage
-      window.location.href = "../employer/employer_homepage.html";
-
+      window.location.href = '../employer/employer_homepage.html';
     } catch (err) {
-      console.error("[EmployerLogin] Login error:", err);
-      this.showBanner(err.message || "Invalid email or password.");
-      this.setFieldError("email", "");
-      this.setFieldError("password", "");
+      console.error('[EmployerLogin] Login error:', err);
+      this.showBanner(err.message || 'Invalid email or password.');
+      this.setFieldError('email', '');
+      this.setFieldError('password', '');
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = "Login";
+      submitBtn.textContent = 'Login';
     }
   }
 
@@ -98,50 +103,50 @@ class EmployerLogin {
     let ok = true;
 
     if (!this.emailInput.value.trim()) {
-      this.setFieldError("email", "Email is required.");
+      this.setFieldError('email', 'Email is required.');
       ok = false;
     } else if (!isEmail(this.emailInput.value)) {
-      this.setFieldError("email", "Please enter a valid email.");
+      this.setFieldError('email', 'Please enter a valid email.');
       ok = false;
     }
 
     if (!this.passwordInput.value) {
-      this.setFieldError("password", "Password is required.");
+      this.setFieldError('password', 'Password is required.');
       ok = false;
     } else if (!minLength(this.passwordInput.value, 8)) {
-      this.setFieldError("password", "Password must be at least 8 characters.");
+      this.setFieldError('password', 'Password must be at least 8 characters.');
       ok = false;
     }
 
-    if (!ok) this.showBanner("Please fix the highlighted fields and try again.");
+    if (!ok) this.showBanner('Please fix the highlighted fields and try again.');
     return ok;
   }
 
   showBanner(msg) {
     if (!this.banner) return;
     this.banner.textContent = msg;
-    this.banner.classList.add("show");
+    this.banner.classList.add('show');
   }
 
   hideBanner() {
     if (!this.banner) return;
-    this.banner.textContent = "";
-    this.banner.classList.remove("show");
+    this.banner.textContent = '';
+    this.banner.classList.remove('show');
   }
 
   setFieldError(name, msg) {
     const errorEl = this.form.querySelector(`[data-error-for="${name}"]`);
-    if (errorEl) errorEl.textContent = msg || "";
+    if (errorEl) errorEl.textContent = msg || '';
   }
 
   clearFieldError(name) {
     const errorEl = this.form.querySelector(`[data-error-for="${name}"]`);
-    if (errorEl) errorEl.textContent = "";
+    if (errorEl) errorEl.textContent = '';
   }
 }
 
 // Bootstrap
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
   const page = new EmployerLogin();
   page.init();
 });

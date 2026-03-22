@@ -1,0 +1,80 @@
+
+
+> link-up@1.0.0 lint:code /home/sharvin/projects/link-up
+> eslint .
+
+(node:12328) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/sharvin/projects/link-up/eslint.config.js?mtime=1774164395130 is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/sharvin/projects/link-up/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[0m
+[4m/home/sharvin/projects/link-up/js/components/job-card.js[24m
+  [2m10:38[22m  [33mwarning[39m  'onView' is defined but never used   [2mno-unused-vars[22m
+  [2m10:46[22m  [33mwarning[39m  'onApply' is defined but never used  [2mno-unused-vars[22m
+  [2m16:7[22m   [31merror[39m    Strings must use singlequote         [2mquotes[22m
+
+[4m/home/sharvin/projects/link-up/js/pages/auth/onboarding.js[24m
+  [2m106:11[22m  [33mwarning[39m  'data' is assigned a value but never used  [2mno-unused-vars[22m
+
+[4m/home/sharvin/projects/link-up/js/pages/employer/create-job.js[24m
+  [2m1:13[22m  [33mwarning[39m  '$$' is defined but never used  [2mno-unused-vars[22m
+
+[4m/home/sharvin/projects/link-up/js/pages/employer/employer_homepage.js[24m
+  [2m124:13[22m  [31merror[39m  Strings must use singlequote  [2mquotes[22m
+
+[4m/home/sharvin/projects/link-up/js/pages/student/job-details.js[24m
+  [2m49:7[22m  [31merror[39m  'filtered' is never reassigned. Use 'const' instead  [2mprefer-const[22m
+
+[4m/home/sharvin/projects/link-up/js/pages/student/job-section.js[24m
+   [2m7:10[22m  [33mwarning[39m  'supabase' is defined but never used  [2mno-unused-vars[22m
+  [2m35:31[22m  [31merror[39m    Strings must use singlequote          [2mquotes[22m
+
+[4m/home/sharvin/projects/link-up/js/pages/student/jobs.js[24m
+   [2m9:5[22m   [33mwarning[39m  'hasMore' is assigned a value but never used  [2mno-unused-vars[22m
+  [2m15:24[22m  [31merror[39m    Strings must use singlequote                  [2mquotes[22m
+
+[4m/home/sharvin/projects/link-up/js/pages/student/marketplace-details.js[24m
+  [2m2:13[22m  [33mwarning[39m  '$$' is defined but never used  [2mno-unused-vars[22m
+
+[4m/home/sharvin/projects/link-up/js/pages/student/marketplace-listings.js[24m
+  [2m55:29[22m  [31merror[39m  Strings must use singlequote  [2mquotes[22m
+
+[4m/home/sharvin/projects/link-up/js/pages/student/marketplace-recommended.js[24m
+  [2m50:29[22m  [31merror[39m  Strings must use singlequote  [2mquotes[22m
+
+[4m/home/sharvin/projects/link-up/js/pages/student/marketplace.js[24m
+  [2m39:9[22m  [31merror[39m  Strings must use singlequote  [2mquotes[22m
+
+[4m/home/sharvin/projects/link-up/js/pages/student/product-manage.js[24m
+    [2m2:13[22m  [33mwarning[39m  '$$' is defined but never used             [2mno-unused-vars[22m
+    [2m7:7[22m   [33mwarning[39m  'ProductManage' is defined but never used  [2mno-unused-vars[22m
+   [2m14:24[22m  [31merror[39m    Strings must use singlequote               [2mquotes[22m
+   [2m67:13[22m  [33mwarning[39m  'data' is assigned a value but never used  [2mno-unused-vars[22m
+  [2m115:13[22m  [31merror[39m    'marketplaceService' is not defined        [2mno-undef[22m
+
+[4m/home/sharvin/projects/link-up/js/pages/student/purchase.js[24m
+  [2m2:13[22m  [33mwarning[39m  '$$' is defined but never used  [2mno-unused-vars[22m
+
+[4m/home/sharvin/projects/link-up/js/pages/student/service-manage.js[24m
+   [2m2:13[22m  [33mwarning[39m  '$$' is defined but never used  [2mno-unused-vars[22m
+  [2m12:24[22m  [31merror[39m    Strings must use singlequote    [2mquotes[22m
+
+[4m/home/sharvin/projects/link-up/js/pages/student/trans-details.js[24m
+    [2m1:13[22m  [33mwarning[39m  '$$' is defined but never used   [2mno-unused-vars[22m
+   [2m67:22[22m  [31merror[39m    Strings must use singlequote     [2mquotes[22m
+   [2m77:28[22m  [33mwarning[39m  'app' is defined but never used  [2mno-unused-vars[22m
+  [2m159:33[22m  [31merror[39m    Strings must use singlequote     [2mquotes[22m
+
+[4m/home/sharvin/projects/link-up/js/services/auth.service.js[24m
+  [2m51:41[22m  [33mwarning[39m  '_' is defined but never used  [2mno-unused-vars[22m
+  [2m69:21[22m  [31merror[39m    Strings must use singlequote   [2mquotes[22m
+  [2m73:17[22m  [31merror[39m    Strings must use singlequote   [2mquotes[22m
+
+[4m/home/sharvin/projects/link-up/server.js[24m
+  [2m128:15[22m  [31merror[39m  Strings must use singlequote  [2mquotes[22m
+  [2m130:15[22m  [31merror[39m  Strings must use singlequote  [2mquotes[22m
+
+[31m[1m✖ 32 problems (17 errors, 15 warnings)[22m[39m
+[31m[1m  16 errors and 0 warnings potentially fixable with the `--fix` option.[22m[39m
+[0m
+[41m[30m ELIFECYCLE [39m[49m [31mCommand failed with exit code 1.[39m

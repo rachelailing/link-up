@@ -1,43 +1,43 @@
 /* css/pages/create-job.css */
 
-.create-job-grid{
-  display:grid;
-  grid-template-columns: 1.2fr .8fr;
+.create-job-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
   gap: 20px;
 }
 
-.field{
-  display:flex;
-  flex-direction:column;
+.field {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
   margin-bottom: 14px;
 }
 
 .field input,
 .field select,
-.field textarea{
+.field textarea {
   padding: 12px;
   border: 1px solid var(--border);
   border-radius: 14px;
-  outline:none;
-  transition:.15s ease;
+  outline: none;
+  transition: 0.15s ease;
 }
 
 .field input:focus,
 .field select:focus,
-.field textarea:focus{
-  border-color: rgba(46,84,143,.4);
-  box-shadow: 0 0 0 4px rgba(46,84,143,.1);
+.field textarea:focus {
+  border-color: rgba(46, 84, 143, 0.4);
+  box-shadow: 0 0 0 4px rgba(46, 84, 143, 0.1);
 }
 
-.create-job-actions{
-  display:flex;
+.create-job-actions {
+  display: flex;
   gap: 12px;
   margin-top: 10px;
 }
 
-@media (max-width: 960px){
-  .create-job-grid{
+@media (max-width: 960px) {
+  .create-job-grid {
     grid-template-columns: 1fr;
   }
 }

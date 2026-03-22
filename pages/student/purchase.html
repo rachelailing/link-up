@@ -1,64 +1,61 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Purchase History — Link Up</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Purchase History — Link Up</title>
 
-  <link rel="stylesheet" href="/css/main.css" />
-</head>
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
 
-<body>
-  <div class="app">
-
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="logo">
-        <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up">
-        <div class="logo-title">Link <span>Up</span></div>
-      </div>
-
-      <nav class="nav">
-        <a data-nav href="marketplace.html">🏠 Home Page</a>
-        <a data-nav href="earnings.html">💰 Earning History</a>
-        <a data-nav href="purchase.html" class="active">🛍️ Purchase History</a>
-        <div class="nav-logout">
-          <a href="#" id="logoutBtn">🚪 Logout</a>
-        </div>
-      </nav>
-    </aside>
-
-    <!-- Topbar -->
-    <header class="topbar">
-      <div class="topbar-nav">
-        <a href="job-section.html" class="topbar-nav-link">Job Section</a>
-        <a href="marketplace.html" class="topbar-nav-link active">Marketplace Section</a>
-      </div>
-
-      <div style="display:flex; gap:10px;">
-        <button class="btn btn-outline">🔔</button>
-        <button class="btn btn-blue">My Profile</button>
-      </div>
-    </header>
-
-    <!-- Main -->
-    <main class="main">
-      <div class="container">
-        <div class="section-title">
-          <h2>Purchase History</h2>
+  <body>
+    <div class="app">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">
+          <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up" />
+          <div class="logo-title">Link <span>Up</span></div>
         </div>
 
-        <div id="purchaseList" class="list">
-          <div class="card pad">
-            <p class="muted">Loading your purchase history...</p>
+        <nav class="nav">
+          <a data-nav href="marketplace.html">🏠 Home Page</a>
+          <a data-nav href="earnings.html">💰 Earning History</a>
+          <a data-nav href="purchase.html" class="active">🛍️ Purchase History</a>
+          <div class="nav-logout">
+            <a href="#" id="logoutBtn">🚪 Logout</a>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-nav">
+          <a href="job-section.html" class="topbar-nav-link">Job Section</a>
+          <a href="marketplace.html" class="topbar-nav-link active">Marketplace Section</a>
+        </div>
+
+        <div style="display: flex; gap: 10px">
+          <button class="btn btn-outline">🔔</button>
+          <button class="btn btn-blue">My Profile</button>
+        </div>
+      </header>
+
+      <!-- Main -->
+      <main class="main">
+        <div class="container">
+          <div class="section-title">
+            <h2>Purchase History</h2>
+          </div>
+
+          <div id="purchaseList" class="list">
+            <div class="card pad">
+              <p class="muted">Loading your purchase history...</p>
+            </div>
           </div>
         </div>
+      </main>
+    </div>
 
-      </div>
-    </main>
-
-  </div>
-
-  <script type="module" src="/js/pages/student/purchase.js"></script>
-</body>
+    <script type="module" src="/js/pages/student/purchase.js"></script>
+  </body>
 </html>

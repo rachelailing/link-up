@@ -1,28 +1,28 @@
-:root{
+:root {
   /* Brand */
-  --linkup-blue:  #2E548F;
-  --linkup-green: #73BB3B;
+  --linkup-blue: #2e548f;
+  --linkup-green: #73bb3b;
 
   /* Neutrals */
-  --bg:           #F7FAF8;
-  --surface:      #FFFFFF;
-  --text:         #1F2937;
-  --muted:        #6B7280;
-  --border:       #E5E7EB;
+  --bg: #f7faf8;
+  --surface: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: #e5e7eb;
 
   /* Feedback */
-  --success:      #16A34A;
-  --warning:      #F59E0B;
-  --danger:       #EF4444;
-  --info:         #2563EB;
+  --success: #16a34a;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #2563eb;
 
   /* Layout */
-  --radius:       16px;
-  --shadow:       0 10px 24px rgba(0,0,0,.08);
-  --shadow-sm:    0 6px 14px rgba(0,0,0,.06);
+  --radius: 16px;
+  --shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 6px 14px rgba(0, 0, 0, 0.06);
 
-  --sidebar-w:    260px;
-  --nav-h:        64px;
+  --sidebar-w: 260px;
+  --nav-h: 64px;
 
   /* Spacing */
   --s-1: 8px;

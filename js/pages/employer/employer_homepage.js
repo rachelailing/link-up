@@ -1,23 +1,62 @@
-import { $, $$ } from "../../utils/dom.js";
-import { setActiveNav, wireLogout } from "../../components/navbar.js";
-import { statusToBadgeClass } from "../../components/status-badge.js";
-import { authService } from "../../services/auth.service.js";
+import { $, $$ } from '../../utils/dom.js';
+import { setActiveNav, wireLogout } from '../../components/navbar.js';
+import { statusToBadgeClass } from '../../components/status-badge.js';
+import { authService } from '../../services/auth.service.js';
 
 const JOBS = [
-  { id: 101, title: "Booth Helper (Career Fair)", status: "Open", pay: 80, applicants: 6, location: "UTP Main Hall" },
-  { id: 102, title: "Poster Design (Club Event)", status: "In Progress", pay: 120, applicants: 9, location: "Remote" },
-  { id: 103, title: "Math Tutor (Foundation)", status: "Completed", pay: 150, applicants: 4, location: "Block C" },
+  {
+    id: 101,
+    title: 'Booth Helper (Career Fair)',
+    status: 'Open',
+    pay: 80,
+    applicants: 6,
+    location: 'UTP Main Hall',
+  },
+  {
+    id: 102,
+    title: 'Poster Design (Club Event)',
+    status: 'In Progress',
+    pay: 120,
+    applicants: 9,
+    location: 'Remote',
+  },
+  {
+    id: 103,
+    title: 'Math Tutor (Foundation)',
+    status: 'Completed',
+    pay: 150,
+    applicants: 4,
+    location: 'Block C',
+  },
 ];
 
 const APPLICATIONS = [
-  { id: 201, student: "Aiman Z.", jobTitle: "Booth Helper (Career Fair)", rating: 4.6, status: "Pending" },
-  { id: 202, student: "Siti N.", jobTitle: "Poster Design (Club Event)", rating: 4.9, status: "Pending" },
-  { id: 203, student: "Ken L.", jobTitle: "Booth Helper (Career Fair)", rating: 4.2, status: "Accepted" },
+  {
+    id: 201,
+    student: 'Aiman Z.',
+    jobTitle: 'Booth Helper (Career Fair)',
+    rating: 4.6,
+    status: 'Pending',
+  },
+  {
+    id: 202,
+    student: 'Siti N.',
+    jobTitle: 'Poster Design (Club Event)',
+    rating: 4.9,
+    status: 'Pending',
+  },
+  {
+    id: 203,
+    student: 'Ken L.',
+    jobTitle: 'Booth Helper (Career Fair)',
+    rating: 4.2,
+    status: 'Accepted',
+  },
 ];
 
-function renderRecentJobs(){
-  const el = $("#recentJobs");
-  el.innerHTML = JOBS.map(job => {
+function renderRecentJobs() {
+  const el = $('#recentJobs');
+  el.innerHTML = JOBS.map((job) => {
     const badge = statusToBadgeClass(job.status);
     return `
       <div class="card item-row" style="border:1px solid var(--border); box-shadow:none;">
@@ -39,19 +78,19 @@ function renderRecentJobs(){
         </div>
       </div>
     `;
-  }).join("");
+  }).join('');
 
-  $$("[data-job-view]").forEach(btn => {
-    btn.addEventListener("click", () => {
+  $$('[data-job-view]').forEach((btn) => {
+    btn.addEventListener('click', () => {
       // Later you can redirect to job-manage page with query id
       window.location.href = `job-manage.html?id=${btn.dataset.jobView}`;
     });
   });
 }
 
-function renderRecentApplications(){
-  const el = $("#recentApplications");
-  el.innerHTML = APPLICATIONS.map(app => {
+function renderRecentApplications() {
+  const el = $('#recentApplications');
+  el.innerHTML = APPLICATIONS.map((app) => {
     const badge = statusToBadgeClass(app.status);
     return `
       <div class="card item-row" style="border:1px solid var(--border); box-shadow:none;">
@@ -72,39 +111,40 @@ function renderRecentApplications(){
         </div>
       </div>
     `;
-  }).join("");
+  }).join('');
 
-  $$("[data-app-view]").forEach(btn => {
-    btn.addEventListener("click", () => {
+  $$('[data-app-view]').forEach((btn) => {
+    btn.addEventListener('click', () => {
       window.location.href = `applications.html?id=${btn.dataset.appView}`;
     });
   });
 
-  $$("[data-app-accept]").forEach(btn => {
-    btn.addEventListener("click", () => {
+  $$('[data-app-accept]').forEach((btn) => {
+    btn.addEventListener('click', () => {
       alert("MVP: Accepting will move application to 'Awaiting Commitment Fee'.");
     });
   });
 }
 
-function setStats(){
-  const openJobs = JOBS.filter(j => j.status.toLowerCase() === "open").length;
-  const pendingApps = APPLICATIONS.filter(a => a.status.toLowerCase() === "pending").length;
-  const completed = JOBS.filter(j => j.status.toLowerCase() === "completed").length;
+function setStats() {
+  const openJobs = JOBS.filter((j) => j.status.toLowerCase() === 'open').length;
+  const pendingApps = APPLICATIONS.filter((a) => a.status.toLowerCase() === 'pending').length;
+  const completed = JOBS.filter((j) => j.status.toLowerCase() === 'completed').length;
 
   // Example pending payment total: sum jobs in progress (demo)
-  const pendingPay = JOBS
-    .filter(j => j.status.toLowerCase() === "in progress")
-    .reduce((sum, j) => sum + j.pay, 0);
+  const pendingPay = JOBS.filter((j) => j.status.toLowerCase() === 'in progress').reduce(
+    (sum, j) => sum + j.pay,
+    0
+  );
 
-  $("#statOpenJobs").textContent = String(openJobs);
-  $("#statPendingApps").textContent = String(pendingApps);
-  $("#statCompleted").textContent = String(completed);
-  $("#statPendingPay").textContent = `RM ${pendingPay}`;
+  $('#statOpenJobs').textContent = String(openJobs);
+  $('#statPendingApps').textContent = String(pendingApps);
+  $('#statCompleted').textContent = String(completed);
+  $('#statPendingPay').textContent = `RM ${pendingPay}`;
 }
 
-async function init(){
-  const user = await authService.requireAuth("employer");
+async function init() {
+  const user = await authService.requireAuth('employer');
   if (!user) return;
 
   setActiveNav();
@@ -114,4 +154,4 @@ async function init(){
   renderRecentApplications();
 }
 
-document.addEventListener("DOMContentLoaded", init);
+document.addEventListener('DOMContentLoaded', init);

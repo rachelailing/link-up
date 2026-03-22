@@ -1,209 +1,207 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Student Profile — Link Up</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Profile — Link Up</title>
 
-  <link rel="stylesheet" href="/css/main.css" />
-  <style>
-    .profile-grid {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 30px;
-    }
-    .profile-card-left {
-      text-align: center;
-    }
-    .profile-avatar {
-      width: 120px;
-      height: 120px;
-      border-radius: 999px;
-      background: var(--linkup-blue-light);
-      margin: 0 auto 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 50px;
-      color: var(--linkup-blue);
-      border: 4px solid #fff;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .form-section {
-      margin-bottom: 24px;
-    }
-    .form-section h3 {
-      margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .chip-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
-    }
-    .chip-item {
-      padding: 6px 14px;
-      background: #f0f4f8;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--linkup-blue);
-    }
-  </style>
-</head>
+    <link rel="stylesheet" href="/css/main.css" />
+    <style>
+      .profile-grid {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 30px;
+      }
+      .profile-card-left {
+        text-align: center;
+      }
+      .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 999px;
+        background: var(--linkup-blue-light);
+        margin: 0 auto 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 50px;
+        color: var(--linkup-blue);
+        border: 4px solid #fff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      .form-section {
+        margin-bottom: 24px;
+      }
+      .form-section h3 {
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .chip-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .chip-item {
+        padding: 6px 14px;
+        background: #f0f4f8;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--linkup-blue);
+      }
+    </style>
+  </head>
 
-<body>
-  <div class="app">
+  <body>
+    <div class="app">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <a href="job-section.html" class="logo" style="text-decoration: none; color: inherit">
+          <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up" />
+          <div class="logo-title">Link <span>Up</span></div>
+        </a>
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <a href="job-section.html" class="logo" style="text-decoration: none; color: inherit;">
-        <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up">
-        <div class="logo-title">Link <span>Up</span></div>
-      </a>
+        <nav class="nav">
+          <a data-nav href="job-section.html">🏠 Home Page</a>
+          <a data-nav href="jobs.html">🔍 Find Jobs</a>
+          <a data-nav href="job-earnings.html">💰 My Earnings</a>
 
-      <nav class="nav">
-        <a data-nav href="job-section.html">🏠 Home Page</a>
-        <a data-nav href="jobs.html">🔍 Find Jobs</a>
-        <a data-nav href="job-earnings.html">💰 My Earnings</a>
+          <div class="nav-logout">
+            <a href="#" id="logoutBtn">🚪 Logout</a>
+          </div>
+        </nav>
+      </aside>
 
-        <div class="nav-logout">
-          <a href="#" id="logoutBtn">🚪 Logout</a>
-        </div>
-      </nav>
-    </aside>
-
-    <!-- Topbar -->
-    <header class="topbar">
-      <div class="topbar-nav">
-        <a href="job-section.html" class="topbar-nav-link">Job Section</a>
-        <a href="marketplace.html" class="topbar-nav-link">Marketplace Section</a>
-      </div>
-
-      <div class="topbar-actions">
-        <button class="btn btn-primary" id="saveProfileBtn">Save Changes</button>
-      </div>
-    </header>
-
-    <!-- Main -->
-    <main class="main">
-      <div class="container">
-        
-        <div class="profile-grid">
-          
-          <aside class="profile-card-left">
-            <div class="card pad">
-              <div class="profile-avatar" id="avatarDisplay">🎓</div>
-              <h2 id="displayName" style="margin:0;">Student Name</h2>
-              <p id="displayEmail" class="muted" style="margin:5px 0 15px;">student@email.com</p>
-              
-              <button class="btn btn-outline btn-full">Change Photo</button>
-              
-              <div style="height:20px;"></div>
-              
-              <div class="stat-box" style="text-align:left;">
-                <div class="kv">
-                  <span>Jobs Completed</span>
-                  <b id="statsCompleted">0</b>
-                </div>
-                <div class="kv">
-                  <span>Reliability Rate</span>
-                  <b>100%</b>
-                </div>
-              </div>
-            </div>
-          </aside>
-
-          <section>
-            <form id="studentProfileForm">
-              <!-- Basic Info -->
-              <div class="card pad form-section">
-                <h3>👤 Personal Information</h3>
-                <div class="grid cols-2">
-                  <div class="field">
-                    <label>Full Name</label>
-                    <input type="text" id="fullName" placeholder="Your Name">
-                  </div>
-                  <div class="field">
-                    <label>University / Campus</label>
-                    <input type="text" id="campus" placeholder="e.g. UTP">
-                  </div>
-                  <div class="field">
-                    <label>Contact Email</label>
-                    <input type="email" id="email" readonly>
-                    <small class="muted">Contact support to update email</small>
-                  </div>
-                  <div class="field">
-                    <label>Phone Number</label>
-                    <input type="text" id="phone" placeholder="e.g. 012-3456789">
-                  </div>
-                </div>
-              </div>
-
-              <!-- Professional Info -->
-              <div class="card pad form-section">
-                <h3>🚀 Professional Profile</h3>
-                
-                <div class="field">
-                  <label>Your Bio</label>
-                  <textarea id="bio" rows="3" placeholder="Tell employers about yourself..."></textarea>
-                </div>
-
-                <div class="field">
-                  <label>Portfolio / Social Link</label>
-                  <input type="url" id="portfolio" placeholder="https://linkedin.com/in/...">
-                </div>
-
-                <div class="field">
-                  <label>Availability</label>
-                  <select id="availability">
-                    <option value="weekdays">Weekdays</option>
-                    <option value="weekends">Weekends</option>
-                    <option value="evenings">Evenings</option>
-                    <option value="flexible" selected>Flexible</option>
-                  </select>
-                </div>
-              </div>
-
-              <!-- Skills & Interests (Read-only for now, can be updated in onboarding or settings later) -->
-              <div class="card pad form-section">
-                <h3>🛠 Skills & Interests</h3>
-                
-                <div>
-                  <label class="muted">Selected Skills</label>
-                  <div id="skillsList" class="chip-group">
-                    <!-- Skills will be rendered here -->
-                  </div>
-                </div>
-
-                <div style="height:15px;"></div>
-
-                <div>
-                  <label class="muted">Interests</label>
-                  <div id="interestsList" class="chip-group">
-                    <!-- Interests will be rendered here -->
-                  </div>
-                </div>
-                
-                <p class="small-note" style="margin-top:15px;">
-                  Note: You can re-run onboarding to change these tags.
-                </p>
-              </div>
-            </form>
-          </section>
-
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-nav">
+          <a href="job-section.html" class="topbar-nav-link">Job Section</a>
+          <a href="marketplace.html" class="topbar-nav-link">Marketplace Section</a>
         </div>
 
-      </div>
-    </main>
+        <div class="topbar-actions">
+          <button class="btn btn-primary" id="saveProfileBtn">Save Changes</button>
+        </div>
+      </header>
 
-  </div>
+      <!-- Main -->
+      <main class="main">
+        <div class="container">
+          <div class="profile-grid">
+            <aside class="profile-card-left">
+              <div class="card pad">
+                <div class="profile-avatar" id="avatarDisplay">🎓</div>
+                <h2 id="displayName" style="margin: 0">Student Name</h2>
+                <p id="displayEmail" class="muted" style="margin: 5px 0 15px">student@email.com</p>
 
-  <script type="module" src="/js/pages/student/profile.js"></script>
-</body>
+                <button class="btn btn-outline btn-full">Change Photo</button>
+
+                <div style="height: 20px"></div>
+
+                <div class="stat-box" style="text-align: left">
+                  <div class="kv">
+                    <span>Jobs Completed</span>
+                    <b id="statsCompleted">0</b>
+                  </div>
+                  <div class="kv">
+                    <span>Reliability Rate</span>
+                    <b>100%</b>
+                  </div>
+                </div>
+              </div>
+            </aside>
+
+            <section>
+              <form id="studentProfileForm">
+                <!-- Basic Info -->
+                <div class="card pad form-section">
+                  <h3>👤 Personal Information</h3>
+                  <div class="grid cols-2">
+                    <div class="field">
+                      <label>Full Name</label>
+                      <input type="text" id="fullName" placeholder="Your Name" />
+                    </div>
+                    <div class="field">
+                      <label>University / Campus</label>
+                      <input type="text" id="campus" placeholder="e.g. UTP" />
+                    </div>
+                    <div class="field">
+                      <label>Contact Email</label>
+                      <input type="email" id="email" readonly />
+                      <small class="muted">Contact support to update email</small>
+                    </div>
+                    <div class="field">
+                      <label>Phone Number</label>
+                      <input type="text" id="phone" placeholder="e.g. 012-3456789" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Professional Info -->
+                <div class="card pad form-section">
+                  <h3>🚀 Professional Profile</h3>
+
+                  <div class="field">
+                    <label>Your Bio</label>
+                    <textarea
+                      id="bio"
+                      rows="3"
+                      placeholder="Tell employers about yourself..."
+                    ></textarea>
+                  </div>
+
+                  <div class="field">
+                    <label>Portfolio / Social Link</label>
+                    <input type="url" id="portfolio" placeholder="https://linkedin.com/in/..." />
+                  </div>
+
+                  <div class="field">
+                    <label>Availability</label>
+                    <select id="availability">
+                      <option value="weekdays">Weekdays</option>
+                      <option value="weekends">Weekends</option>
+                      <option value="evenings">Evenings</option>
+                      <option value="flexible" selected>Flexible</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Skills & Interests (Read-only for now, can be updated in onboarding or settings later) -->
+                <div class="card pad form-section">
+                  <h3>🛠 Skills & Interests</h3>
+
+                  <div>
+                    <label class="muted">Selected Skills</label>
+                    <div id="skillsList" class="chip-group">
+                      <!-- Skills will be rendered here -->
+                    </div>
+                  </div>
+
+                  <div style="height: 15px"></div>
+
+                  <div>
+                    <label class="muted">Interests</label>
+                    <div id="interestsList" class="chip-group">
+                      <!-- Interests will be rendered here -->
+                    </div>
+                  </div>
+
+                  <p class="small-note" style="margin-top: 15px">
+                    Note: You can re-run onboarding to change these tags.
+                  </p>
+                </div>
+              </form>
+            </section>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="/js/pages/student/profile.js"></script>
+  </body>
 </html>

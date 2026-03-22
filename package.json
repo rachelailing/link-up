@@ -1,19 +1,41 @@
 {
   "name": "link-up",
   "version": "1.0.0",
-  "type": "module",
+  "packageManager": "pnpm@10.32.1",
   "scripts": {
     "dev:frontend": "vite",
     "dev:backend": "node server.js",
     "dev": "concurrently \"pnpm run dev:frontend\" \"pnpm run dev:backend\"",
-    "build": "vite build",
+    "build": "turbo run build:prod",
+    "build:prod": "vite build",
     "preview": "vite preview",
-    "seed": "node scripts/seed.js"
+    "seed": "node scripts/seed.js",
+    "lint": "turbo run lint:code",
+    "lint:code": "eslint .",
+    "format": "prettier --write \"**/*.{js,css,html,md,json}\"",
+    "test": "turbo run test",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{css,html,md,json}": [
+      "prettier --write"
+    ]
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "concurrently": "^9.2.1",
     "dotenv": "^17.3.1",
+    "eslint": "^10.1.0",
+    "globals": "^17.4.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.8.1",
     "supabase": "^2.83.0",
+    "turbo": "^2.8.20",
     "vite": "^8.0.1"
   },
   "dependencies": {
