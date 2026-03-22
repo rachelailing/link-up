@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Find Jobs — Link Up</title>
+  <title>Job Details — Link Up</title>
 
   <link rel="stylesheet" href="../../css/main.css" />
 </head>
@@ -46,30 +46,76 @@
     <main class="main">
       <div class="container">
 
+        <div class="section-title">
+          <h2>My Jobs</h2>
+        </div>
+
         <!-- Filters -->
         <div class="card pad filter-bar">
-          <input id="searchInput" type="text" placeholder="Search jobs (e.g. design, booth, tutor)" />
+          <input id="searchInput" type="text" placeholder="Search by job title..." />
 
-          <select id="categoryFilter">
-            <option value="all">All Categories</option>
-            <option value="creative">Creative</option>
-            <option value="academic">Academic</option>
-            <option value="event">Event</option>
-            <option value="tech">Tech</option>
+          <select id="statusFilter">
+            <option value="all">All Status</option>
+            <option value="applied">Applied</option>
+            <option value="current">Current</option>
+            <option value="done">Done</option>
+            <option value="cancelled">Cancelled</option>
           </select>
 
-          <select id="payFilter">
-            <option value="all">All Pay</option>
-            <option value="50">RM 50+</option>
-            <option value="100">RM 100+</option>
-            <option value="200">RM 200+</option>
+          <select id="dateFilter">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
           </select>
         </div>
 
         <div style="height:20px;"></div>
 
-        <!-- Jobs List -->
-        <div id="jobsList" class="list"></div>
+        <div class="list" id="jobsList">
+          <!-- Sample entry for design demonstration -->
+          <div class="card active-row">
+            <div class="active-image">
+              <img src="../../assets/images/link_up_icon.jpeg" alt="job icon" />
+            </div>
+
+            <div class="active-content">
+              <div class="active-main-info">
+                <div class="active-title-row">
+                  <h3 style="margin:0;">Senior Graphic Designer</h3>
+                  <span class="badge inprogress">In Progress</span>
+                </div>
+                
+                <div class="active-details-row">
+                  <div class="active-col">
+                    <span class="label">Location</span>
+                    <span class="value">📍 Remote / Kuala Lumpur</span>
+                  </div>
+                  <div class="active-col">
+                    <span class="label">Payment</span>
+                    <span class="value">💰 RM 1,200.00</span>
+                  </div>
+                  <div class="active-col">
+                    <span class="label">Deadline</span>
+                    <span class="value">📅 2026-03-25</span>
+                  </div>
+                  <div class="active-col">
+                    <span class="label">Time Left</span>
+                    <span class="countdown">⏳ 21d 4h left</span>
+                  </div>
+                </div>
+              </div>
+
+              <p class="active-desc">
+                Responsible for creating high-quality visual assets for the upcoming spring marketing campaign. Includes social media banners, email templates, and landing page graphics.
+              </p>
+            </div>
+
+            <div class="active-actions">
+              <button class="btn btn-outline">View Details</button>
+              <button class="btn btn-primary">Mark Submitted</button>
+              <button class="btn btn-outline">Report Issue</button>
+            </div>
+          </div>
+        </div>
 
       </div>
     </main>
