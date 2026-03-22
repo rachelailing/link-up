@@ -61,15 +61,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
       - name: Link & Push Supabase Migrations
         run: |
-          supabase link --project-ref $SUPABASE_PROJECT_ID --password $DB_PASSWORD
-          supabase db push --password $DB_PASSWORD
+          npx supabase@latest link --project-ref $SUPABASE_PROJECT_ID --password $DB_PASSWORD
+          npx supabase@latest db push --password $DB_PASSWORD
         env:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
