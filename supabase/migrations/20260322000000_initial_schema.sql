@@ -123,6 +123,30 @@ CREATE TRIGGER on_auth_user_created
 
 -- 7. RLS POLICIES (Security)
 
+-- Ensure critical columns exist for idempotency (if tables existed without them)
+DO $$ 
+BEGIN 
+  -- profiles.onboarding_done
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='profiles' AND column_name='onboarding_done') THEN
+    ALTER TABLE public.profiles ADD COLUMN onboarding_done BOOLEAN DEFAULT FALSE;
+  END IF;
+
+  -- marketplace_items.owner_id
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='marketplace_items' AND column_name='owner_id') THEN
+    ALTER TABLE public.marketplace_items ADD COLUMN owner_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE;
+  END IF;
+
+  -- jobs.employer_id
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='jobs' AND column_name='employer_id') THEN
+    ALTER TABLE public.jobs ADD COLUMN employer_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE;
+  END IF;
+
+  -- applications.student_id
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='applications' AND column_name='student_id') THEN
+    ALTER TABLE public.applications ADD COLUMN student_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+
 -- Enable RLS on all tables
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.jobs ENABLE ROW LEVEL SECURITY;
