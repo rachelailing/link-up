@@ -64,7 +64,7 @@ jobs:
       - name: Link & Push Supabase Migrations
         run: |
           npx supabase@latest link --project-ref $SUPABASE_PROJECT_ID --password $DB_PASSWORD
-          npx supabase@latest db push --password $DB_PASSWORD
+          npx supabase@latest db push --include-all --password $DB_PASSWORD
         env:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
