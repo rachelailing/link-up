@@ -58,7 +58,7 @@ class Marketplace {
   async renderRecommended(user) {
     if (!this.recommendedEl) return;
     const profile = user.user_metadata || {};
-    const items = await marketplaceService.getRecommended(profile);
+    const items = await marketplaceService.getRecommended(profile, user.id);
     this.recommendedEl.innerHTML = items.map(item => this.createCard(item)).join("");
   }
 

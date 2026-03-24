@@ -52,6 +52,32 @@
 
   </div>
 
+  <!-- Manage Job Modal -->
+  <div class="modal-backdrop" id="manageJobModal">
+    <div class="modal">
+      <h3>Manage Job: <span id="modalJobTitle">Job Title</span></h3>
+      <p>Select a new status for this job or delete the listing.</p>
+
+      <div style="margin-bottom:20px;">
+        <label style="display:block; margin-bottom:8px; font-weight:600;">Update Status:</label>
+        <select id="modalStatusSelect" class="input" style="width:100%;">
+          <option value="Draft">Draft</option>
+          <option value="Open">Open</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        </select>
+      </div>
+
+      <div class="modal-actions" style="justify-content:space-between;">
+        <button class="btn btn-outline" id="modalDeleteBtn" style="color:var(--red); border-color:var(--red);">🗑️ Delete Job</button>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-outline" data-modal-close="manageJobModal">Cancel</button>
+          <button class="btn btn-primary" id="modalUpdateStatusBtn">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="../../js/pages/employer/job-manage.js"></script>
 </body>
 </html>

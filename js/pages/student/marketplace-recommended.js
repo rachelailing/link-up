@@ -17,8 +17,8 @@ class RecommendedMarketplace {
     setActiveNav();
     wireLogout();
 
-    const products = await marketplaceService.getProducts();
-    const services = await marketplaceService.getServices();
+    const products = await marketplaceService.getProducts(user.id);
+    const services = await marketplaceService.getServices(user.id);
 
     this.renderItems(products, this.productsGrid);
     this.renderItems(services, this.servicesGrid);
@@ -34,10 +34,10 @@ class RecommendedMarketplace {
         <img src="${item.image || placeholderImg}" alt="${item.title}" class="market-card-image">
         <div class="market-card-content">
           <h3>${item.title}</h3>
-          <div class="rating">⭐ ${item.rating} <span class="meta">(${item.reviews} reviews)</span></div>
+          <div class="rating">⭐ ${item.rating || 0} <span class="meta">(${item.reviews || 0} reviews)</span></div>
           <div class="price">${displayPrice}</div>
           <div class="meta">📍 ${item.location}</div>
-          <div class="meta">📅 Posted: ${item.date}</div>
+          <div class="meta">📅 Posted: ${item.date || "N/A"}</div>
         </div>
       </a>
     `;

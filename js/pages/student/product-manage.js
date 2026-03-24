@@ -9,25 +9,57 @@ class ProductManage {
     this.form = $("#listingForm");
     this.imageUpload = $("#imageUpload");
     this.fileInput = $("#fileInput");
+    this.imagePreview = $("#imagePreview");
+    this.uploadIcon = $("#uploadIcon");
+    this.uploadText = $("#uploadText");
     this.tagsContainer = $("#productTags");
+    this.customTagsContainer = $("#customTagsContainer");
+    this.customTagsInput = $("#customTags");
     this.toggleEditBtn = $("#toggleEditBtn");
-    this.submitBtn = $("button[type='submit']");
+    this.submitBtn = $("#submitBtn");
     this.selectedFile = null;
     this.selectedImageData = null;
     this.selectedTags = new Set();
     this.editId = null;
-    this.isEditMode = false;
+    this.isEditMode = true; // Default to true for new items
   }
 
   async init() {
+    const user = await authService.requireAuth("student");
+    if (!user) return;
+
     setActiveNav();
     wireLogout();
     await this.checkEditMode();
     this.wireEvents();
-    if (!this.editId) {
-      this.setDefaultDate();
-      this.isEditMode = true;
-    }
+    
+    // Set up chip interaction
+    this.setupChips();
+  }
+
+  setupChips() {
+    const chips = this.tagsContainer.querySelectorAll(".chip");
+    chips.forEach(chip => {
+      chip.addEventListener("click", () => {
+        if (!this.isEditMode) return;
+        const val = chip.dataset.value;
+
+        if (val === "others") {
+          chip.classList.toggle("active");
+          const isOthersActive = chip.classList.contains("active");
+          this.customTagsContainer.style.display = isOthersActive ? "block" : "none";
+          return;
+        }
+
+        if (this.selectedTags.has(val)) {
+          this.selectedTags.delete(val);
+          chip.classList.remove("active");
+        } else {
+          this.selectedTags.add(val);
+          chip.classList.add("active");
+        }
+      });
+    });
   }
 
   async checkEditMode() {
@@ -48,7 +80,7 @@ class ProductManage {
   setFormDisabled(disabled) {
     const inputs = this.form.querySelectorAll("input, textarea, select");
     inputs.forEach(input => {
-      if (input.id !== "toggleEditBtn") input.disabled = disabled;
+      input.disabled = disabled;
     });
     
     const chips = this.tagsContainer.querySelectorAll(".chip");
@@ -71,19 +103,34 @@ class ProductManage {
         $("#status").value = item.status;
         $("#location").value = item.location;
         $("#description").value = item.description || "";
-        $("#date").value = item.date;
         
         if (item.image) {
           this.selectedImageData = item.image;
-          this.imageUpload.innerHTML = `<img src="${item.image}" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">`;
+          this.imagePreview.src = item.image;
+          this.imagePreview.style.display = "block";
+          this.uploadIcon.style.display = "none";
+          this.uploadText.style.display = "none";
         }
 
         if (item.tags) {
+          const predefined = ["creative", "tech", "academic", "events", "food", "admin"];
+          const manual = [];
+
           item.tags.forEach(tag => {
-            this.selectedTags.add(tag);
-            const chip = this.tagsContainer.querySelector(`[data-value="${tag}"]`);
-            if (chip) chip.classList.add("active");
+            if (predefined.includes(tag)) {
+              this.selectedTags.add(tag);
+              const chip = this.tagsContainer.querySelector(`[data-value="${tag}"]`);
+              if (chip) chip.classList.add("active");
+            } else {
+              manual.push(tag);
+            }
           });
+
+          if (manual.length > 0) {
+            $("#othersChip").classList.add("active");
+            this.customTagsContainer.style.display = "block";
+            this.customTagsInput.value = manual.join(", ");
+          }
         }
         
         $("#terms").checked = true;
@@ -91,11 +138,6 @@ class ProductManage {
     } catch (err) {
       console.error("Error loading data:", err);
     }
-  }
-
-  setDefaultDate() {
-    const today = new Date().toISOString().split('T')[0];
-    $("#date").value = today;
   }
 
   wireEvents() {
@@ -117,27 +159,14 @@ class ProductManage {
         const reader = new FileReader();
         reader.onload = (event) => {
           this.selectedImageData = event.target.result;
-          this.imageUpload.innerHTML = `<img src="${this.selectedImageData}" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">`;
+          this.imagePreview.src = this.selectedImageData;
+          this.imagePreview.style.display = "block";
+          this.uploadIcon.style.display = "none";
+          this.uploadText.style.display = "none";
         };
         reader.readAsDataURL(file);
       }
     });
-
-    if (this.tagsContainer) {
-      this.tagsContainer.addEventListener("click", (e) => {
-        if (!this.isEditMode) return;
-        const chip = e.target.closest(".chip");
-        if (!chip) return;
-        const val = chip.dataset.value;
-        if (this.selectedTags.has(val)) {
-          this.selectedTags.delete(val);
-          chip.classList.remove("active");
-        } else {
-          this.selectedTags.add(val);
-          chip.classList.add("active");
-        }
-      });
-    }
 
     this.form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -152,7 +181,18 @@ class ProductManage {
       return;
     }
 
-    if (this.selectedTags.size === 0) {
+    const finalTags = Array.from(this.selectedTags);
+    
+    // Add custom tags if active
+    if ($("#othersChip").classList.contains("active")) {
+      const customVal = this.customTagsInput.value.trim();
+      if (customVal) {
+        const manualTags = customVal.split(",").map(t => t.trim().toLowerCase()).filter(t => t !== "");
+        finalTags.push(...manualTags);
+      }
+    }
+
+    if (finalTags.length === 0) {
       alert("Please select at least one category tag.");
       return;
     }
@@ -164,7 +204,7 @@ class ProductManage {
       let imageUrl = this.selectedImageData;
 
       if (this.selectedFile) {
-        imageUrl = await marketplaceService.uploadImage(this.selectedFile);
+        imageUrl = this.selectedImageData; 
       }
 
       const listingData = {
@@ -174,11 +214,11 @@ class ProductManage {
         status: $("#status").value,
         location: $("#location").value,
         description: $("#description").value,
-        date: $("#date").value,
-        tags: Array.from(this.selectedTags),
+        tags: finalTags,
         image: imageUrl,
         type: "Product",
-        //user_id: user.id
+        user_id: user.id,
+        date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
       };
 
       if (this.editId) {
@@ -195,7 +235,7 @@ class ProductManage {
       alert("Error: " + err.message);
     } finally {
       this.submitBtn.disabled = false;
-      this.submitBtn.textContent = this.editId ? "Update Product" : "Post Product";
+      this.submitBtn.textContent = this.editId ? "Update Product" : "Post Product Now";
     }
   }
 }

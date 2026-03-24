@@ -39,9 +39,38 @@
       cursor: pointer;
       color: #666;
       margin-bottom: 10px;
+      position: relative;
+      overflow: hidden;
     }
     .image-upload-placeholder:hover {
       background: #f1f3f5;
+    }
+    .image-upload-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .chip {
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .chip.active {
+      background: var(--blue);
+      color: white;
+      border-color: var(--blue);
     }
   </style>
 </head>
@@ -75,7 +104,7 @@
 
       <div style="display:flex; gap:10px;">
         <button class="btn btn-outline">🔔</button>
-        <button class="btn btn-blue">My Profile</button>
+        <button class="btn btn-blue" onclick="window.location.href='profile.html'">My Profile</button>
       </div>
     </header>
 
@@ -89,81 +118,79 @@
         <div class="manage-container card pad">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <h2 id="pageTitle" style="margin:0;">Add New Product</h2>
-            <button id="toggleEditBtn" class="btn btn-outline" style="display:none;">Edit Product</button>
+            <button id="toggleEditBtn" class="btn btn-outline" style="display:none;">Edit Mode</button>
           </div>
 
           <form id="listingForm">
             <div class="form-group">
               <label>Product Photo</label>
               <div class="image-upload-placeholder" id="imageUpload">
-                <span>📷</span>
-                <span>Click to upload photo</span>
+                <span id="uploadIcon">📷</span>
+                <span id="uploadText">Click to upload photo</span>
+                <img id="imagePreview" src="" style="display:none;">
               </div>
               <input type="file" id="fileInput" style="display:none;" accept="image/*">
             </div>
 
             <div class="form-group">
-              <label for="title">Title</label>
-              <input type="text" id="title" placeholder="e.g. Calculus Textbook" required>
+              <label for="title">Product Title</label>
+              <input type="text" id="title" placeholder="e.g. Thomas Calculus Textbook" required>
             </div>
 
             <div class="grid cols-3 gap-16">
               <div class="form-group">
                 <label for="price">Price (RM)</label>
-                <input type="text" id="price" placeholder="e.g. 30" required>
+                <input type="number" id="price" placeholder="e.g. 30" min="0" step="0.01" required>
               </div>
               <div class="form-group">
                 <label for="quantity">Quantity</label>
                 <input type="number" id="quantity" value="1" min="1" required>
               </div>
               <div class="form-group">
-                <label for="status">Status</label>
+                <label for="status">Listing Status</label>
                 <select id="status" required>
-                  <option value="Ongoing">Ongoing</option>
-                  <option value="Preorder">Preorder</option>
-                  <option value="NA">NA</option>
+                  <option value="Ongoing">Available (Ongoing)</option>
+                  <option value="Preorder">Open for Preorder</option>
+                  <option value="NA">Currently Unavailable</option>
                 </select>
               </div>
             </div>
 
             <div class="form-group">
-              <label for="location">Location</label>
-              <input type="text" id="location" placeholder="e.g. V2, Block A" required>
+              <label for="location">Pickup Location</label>
+              <input type="text" id="location" placeholder="e.g. V2, Block A / UTP Cafeteria" required>
             </div>
 
             <div class="form-group">
-              <label>Product Categories (Select tags)</label>
+              <label>Product Category</label>
               <div class="chip-grid" id="productTags">
-                <div class="chip" data-value="textbooks">Textbooks</div>
-                <div class="chip" data-value="electronics">Electronics</div>
-                <div class="chip" data-value="stationery">Stationery</div>
-                <div class="chip" data-value="clothing">Clothing</div>
-                <div class="chip" data-value="household">Household</div>
-                <div class="chip" data-value="food">Food & Snacks</div>
-                <div class="chip" data-value="sports">Sports Gear</div>
-                <div class="chip" data-value="others">Others</div>
+                <div class="chip" data-value="creative">Creative Work (Art/Media)</div>
+                <div class="chip" data-value="tech">Tech Tasks (Gadgets/IT)</div>
+                <div class="chip" data-value="academic">Academic Help (Books/Notes)</div>
+                <div class="chip" data-value="events">Events & Booth Gear</div>
+                <div class="chip" data-value="food">Food & Drinks</div>
+                <div class="chip" data-value="admin">Admin & Stationary</div>
+                <div class="chip" data-value="others" id="othersChip">Others...</div>
               </div>
-              <small class="muted">Tags help buyers find your products more easily.</small>
+              <div id="customTagsContainer" style="display: none; margin-top: 12px;">
+                <input type="text" id="customTags" placeholder="Enter custom tags (e.g. gadgets, stationary), comma separated">
+              </div>
+              <small class="muted">Matching categories help interested students find your product.</small>
             </div>
 
             <div class="form-group">
-              <label for="description">Description</label>
-              <textarea id="description" rows="4" placeholder="Describe your product condition, features, etc..." required></textarea>
-            </div>
-
-            <div class="form-group">
-              <label for="date">Date Posted</label>
-              <input type="date" id="date" required>
+              <label for="description">Detailed Description</label>
+              <textarea id="description" rows="5" placeholder="Describe condition, reason for selling, or special features..." required></textarea>
             </div>
 
             <div class="form-group" style="display: flex; align-items: flex-start; gap: 10px;">
               <input type="checkbox" id="terms" style="width: auto; margin-top: 4px;" required>
-              <label for="terms" style="font-weight: 400; font-size: 0.9rem;">I agree to the <a href="#" style="color: #007bff;">Terms and Conditions</a> and ensure that this listing complies with campus trade policies.</label>
+              <label for="terms" style="font-weight: 400; font-size: 0.9rem;">I confirm that this product is safe to sell and complies with campus trading policies.</label>
             </div>
 
             <div style="height:20px;"></div>
 
-            <button type="submit" class="btn btn-primary" style="width:100%; padding:14px; font-size:1.1rem;">Post Now</button>
+            <button type="submit" class="btn btn-primary" style="width:100%; padding:14px; font-size:1.1rem;" id="submitBtn">Post Product Now</button>
           </form>
         </div>
       </div>
