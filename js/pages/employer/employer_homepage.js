@@ -2,23 +2,42 @@ import { $, $$ } from "../../utils/dom.js";
 import { setActiveNav, wireLogout } from "../../components/navbar.js";
 import { statusToBadgeClass } from "../../components/status-badge.js";
 import { authService } from "../../services/auth.service.js";
+import { jobsService } from "../../services/jobs.service.js";
 
-const JOBS = [
-  { id: 101, title: "Booth Helper (Career Fair)", status: "Open", pay: 80, applicants: 6, location: "UTP Main Hall" },
-  { id: 102, title: "Poster Design (Club Event)", status: "In Progress", pay: 120, applicants: 9, location: "Remote" },
-  { id: 103, title: "Math Tutor (Foundation)", status: "Completed", pay: 150, applicants: 4, location: "Block C" },
-];
+function getLocalJobs(){
+  return JSON.parse(localStorage.getItem("linkup_employer_jobs") || "[]");
+}
 
-const APPLICATIONS = [
-  { id: 201, student: "Aiman Z.", jobTitle: "Booth Helper (Career Fair)", rating: 4.6, status: "Pending" },
-  { id: 202, student: "Siti N.", jobTitle: "Poster Design (Club Event)", rating: 4.9, status: "Pending" },
-  { id: 203, student: "Ken L.", jobTitle: "Booth Helper (Career Fair)", rating: 4.2, status: "Accepted" },
-];
-
-function renderRecentJobs(){
+async function renderRecentJobs(){
   const el = $("#recentJobs");
-  el.innerHTML = JOBS.map(job => {
+  
+  // Try fetching from service first
+  let jobs = await jobsService.getMyJobs();
+  
+  // If no jobs in Supabase, check localStorage (for backward compatibility during migration)
+  if (jobs.length === 0) {
+    jobs = getLocalJobs();
+  }
+
+  if (jobs.length === 0) {
+    el.innerHTML = `
+      <div class="card pad" style="text-align:center; color:var(--text-light);">
+        <p>No recent jobs found.</p>
+        <a href="create-job.html" class="btn btn-outline" style="margin-top:10px;">Create your first job</a>
+      </div>
+    `;
+    return;
+  }
+
+  // Show only 3 recent jobs
+  const recentJobs = jobs.slice(0, 3);
+
+  el.innerHTML = recentJobs.map(job => {
     const badge = statusToBadgeClass(job.status);
+    const pay = job.salary || job.pay || 0;
+    const location = job.location || "N/A";
+    const applicants = job.applications ? job.applications.length : 0;
+
     return `
       <div class="card item-row" style="border:1px solid var(--border); box-shadow:none;">
         <div class="item-left">
@@ -28,9 +47,9 @@ function renderRecentJobs(){
           </div>
 
           <div class="item-meta">
-            <span class="kv">📍 ${job.location}</span>
-            <span class="kv">💰 RM ${job.pay}</span>
-            <span class="kv">👥 ${job.applicants} applicants</span>
+            <span class="kv">📍 ${location}</span>
+            <span class="kv">💰 RM ${pay}</span>
+            <span class="kv">👥 ${applicants} applicants</span>
           </div>
         </div>
 
@@ -43,7 +62,6 @@ function renderRecentJobs(){
 
   $$("[data-job-view]").forEach(btn => {
     btn.addEventListener("click", () => {
-      // Later you can redirect to job-manage page with query id
       window.location.href = `job-manage.html?id=${btn.dataset.jobView}`;
     });
   });
@@ -51,51 +69,76 @@ function renderRecentJobs(){
 
 function renderRecentApplications(){
   const el = $("#recentApplications");
-  el.innerHTML = APPLICATIONS.map(app => {
+  
+  // For now, applications are nested in localJobs
+  const jobs = getLocalJobs();
+  const allApps = [];
+  
+  jobs.forEach(job => {
+    if (job.applications) {
+      job.applications.forEach(app => {
+        allApps.push({ ...app, jobId: job.id, jobTitle: job.title });
+      });
+    }
+  });
+
+  if (allApps.length === 0) {
+    el.innerHTML = `
+      <div class="card pad" style="text-align:center; color:var(--text-light);">
+        <p>No recent applications.</p>
+      </div>
+    `;
+    return;
+  }
+
+  // Show only 3 recent applications
+  const recentApps = allApps.slice(0, 3);
+
+  el.innerHTML = recentApps.map(app => {
     const badge = statusToBadgeClass(app.status);
     return `
       <div class="card item-row" style="border:1px solid var(--border); box-shadow:none;">
         <div class="item-left">
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-            <h3 style="margin:0;">${app.student}</h3>
+            <h3 style="margin:0;">${app.studentName || app.student}</h3>
             <span class="badge ${badge}">${app.status}</span>
           </div>
           <div class="item-meta">
             <span class="kv">🧰 ${app.jobTitle}</span>
-            <span class="kv">⭐ ${app.rating}</span>
+            <span class="kv">⭐ ${app.rating || "N/A"}</span>
           </div>
         </div>
 
         <div class="item-actions">
-          <button class="btn btn-outline" data-app-view="${app.id}">Review</button>
-          <button class="btn btn-primary" data-app-accept="${app.id}">Accept</button>
+          <button class="btn btn-outline" data-job-id="${app.jobId}">Review</button>
         </div>
       </div>
     `;
   }).join("");
 
-  $$("[data-app-view]").forEach(btn => {
+  $$("[data-job-id]").forEach(btn => {
     btn.addEventListener("click", () => {
-      window.location.href = `applications.html?id=${btn.dataset.appView}`;
-    });
-  });
-
-  $$("[data-app-accept]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      alert("MVP: Accepting will move application to 'Awaiting Commitment Fee'.");
+      window.location.href = `applications.html?job=${btn.dataset.jobId}`;
     });
   });
 }
 
-function setStats(){
-  const openJobs = JOBS.filter(j => j.status.toLowerCase() === "open").length;
-  const pendingApps = APPLICATIONS.filter(a => a.status.toLowerCase() === "pending").length;
-  const completed = JOBS.filter(j => j.status.toLowerCase() === "completed").length;
+async function setStats(){
+  let jobs = await jobsService.getMyJobs();
+  if (jobs.length === 0) jobs = getLocalJobs();
 
-  // Example pending payment total: sum jobs in progress (demo)
-  const pendingPay = JOBS
+  const allApps = [];
+  jobs.forEach(j => {
+    if (j.applications) allApps.push(...j.applications);
+  });
+
+  const openJobs = jobs.filter(j => j.status.toLowerCase() === "open").length;
+  const pendingApps = allApps.filter(a => a.status.toLowerCase() === "pending").length;
+  const completed = jobs.filter(j => j.status.toLowerCase() === "completed").length;
+
+  const pendingPay = jobs
     .filter(j => j.status.toLowerCase() === "in progress")
-    .reduce((sum, j) => sum + j.pay, 0);
+    .reduce((sum, j) => sum + (j.salary || j.pay || 0), 0);
 
   $("#statOpenJobs").textContent = String(openJobs);
   $("#statPendingApps").textContent = String(pendingApps);
@@ -109,9 +152,11 @@ async function init(){
 
   setActiveNav();
   wireLogout();
-  setStats();
-  renderRecentJobs();
+  
+  await setStats();
+  await renderRecentJobs();
   renderRecentApplications();
 }
 
 document.addEventListener("DOMContentLoaded", init);
+

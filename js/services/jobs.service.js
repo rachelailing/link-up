@@ -1,74 +1,22 @@
 // js/services/jobs.service.js
+import { supabase } from "../config/supabase.js";
 
 export class JobService {
-  constructor() {
-    // Initial mock data with more metadata for recommendation
-    this._jobs = [
-      { 
-        id: 1, 
-        title: "Freelance Video Editor", 
-        employer: "Campus Media Club", 
-        location: "UTP, Block A", 
-        pay: 150, 
-        status: "Open",
-        category: "Creative",
-        tags: ["video", "editing", "media", "creative"],
-        description: "Looking for someone to edit 3-5 minute event videos. Familiarity with Premiere Pro or Final Cut is a plus."
-      },
-      { 
-        id: 2, 
-        title: "Booth Helper (Weekend)", 
-        employer: "Student Biz Society", 
-        location: "UTP, Main Hall", 
-        pay: 80, 
-        status: "Open",
-        category: "Event",
-        tags: ["event", "helper", "booth", "customer service"],
-        description: "Assist with setup and managing the registration booth for the upcoming Entrepreneurship Day."
-      },
-      { 
-        id: 3, 
-        title: "Poster Design", 
-        employer: "Event Committee", 
-        location: "Remote", 
-        pay: 60, 
-        status: "Open", // Changed to Open for demo
-        category: "Design",
-        tags: ["design", "poster", "graphics", "creative"],
-        description: "Need a minimalist poster for a tech talk event. Deadline: 3 days."
-      },
-      { 
-        id: 4, 
-        title: "Python Tutor", 
-        employer: "IT Department", 
-        location: "Online", 
-        pay: 40, 
-        status: "Open",
-        category: "Education",
-        tags: ["python", "coding", "tutoring", "tech"],
-        description: "Help first-year students with basic Python syntax and logic."
-      },
-      { 
-        id: 5, 
-        title: "Social Media Manager", 
-        employer: "Startup Hub", 
-        location: "Remote", 
-        pay: 200, 
-        status: "Open",
-        category: "Marketing",
-        tags: ["social media", "marketing", "content creation", "writing"],
-        description: "Manage Instagram and LinkedIn accounts for our student-led startup hub."
-      }
-    ];
-  }
-
   /**
-   * Fetches all available jobs. 
-   * (In the future, this will use fetch() to an API)
-   * @returns {Promise<Array>}
+   * Fetches all available jobs from Supabase.
    */
   async getJobs() {
-    return [...this._jobs];
+    const { data, error } = await supabase
+      .from('jobs')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error("[JobService] Error fetching jobs:", error);
+      return [];
+    }
+
+    return data;
   }
 
   /**
@@ -104,12 +52,12 @@ export class JobService {
       });
 
       // 3. Location/Campus Match (Bonus)
-      if (profile.campus && job.location.includes(profile.campus)) {
+      if (profile.campus && job.location && job.location.includes(profile.campus)) {
         score += 5;
       }
 
       // 4. Remote Preference (Small bonus if no campus set)
-      if (!profile.campus && job.location.toLowerCase().includes("remote")) {
+      if (!profile.campus && job.location && job.location.toLowerCase().includes("remote")) {
         score += 2;
       }
 
@@ -117,34 +65,73 @@ export class JobService {
     });
 
     // Sort by score (descending) and return top matches
-    // Only return jobs with a score > 0 if there are any, otherwise return default top 3
     const recommendations = scoredJobs
       .filter(j => j.status === "Open")
       .sort((a, b) => b.matchScore - a.matchScore);
 
-    console.log("[JobService] Recommended Jobs Scores:", recommendations.map(j => ({ title: j.title, score: j.matchScore })));
-    
     return recommendations.slice(0, 3);
   }
 
   /**
    * Gets a job by its unique ID.
-   * @param {number} id 
-   * @returns {Promise<Object|null>}
    */
   async getJobById(id) {
-    return this._jobs.find(j => j.id === id) || null;
+    const { data, error } = await supabase
+      .from('jobs')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error("[JobService] Error fetching job by id:", error);
+      return null;
+    }
+
+    return data;
+  }
+
+  /**
+   * Creates a new job posting in Supabase.
+   * @param {Object} jobData 
+   */
+  async createJob(jobData) {
+    const { data, error } = await supabase
+      .from('jobs')
+      .insert([jobData])
+      .select();
+
+    if (error) throw error;
+    return data[0];
+  }
+
+  /**
+   * Fetches jobs posted by the current employer.
+   */
+  async getMyJobs() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+
+    const { data, error } = await supabase
+      .from('jobs')
+      .select('*')
+      .eq('employer_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error("[JobService] Error fetching my jobs:", error);
+      return [];
+    }
+
+    return data;
   }
 
   /**
    * Mock implementation of applying for a job.
-   * @param {number} jobId 
-   * @returns {Promise<boolean>}
    */
   async applyForJob(jobId) {
     const job = await this.getJobById(jobId);
     if (job) {
-      job.status = "Pending";
+      console.log(`[JobService] Applying for job ${jobId}`);
       return true;
     }
     return false;

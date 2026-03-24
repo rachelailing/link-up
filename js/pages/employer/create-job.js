@@ -1,7 +1,12 @@
 import { $, $$ } from "../../utils/dom.js";
 import { setActiveNav } from "../../components/navbar.js";
+import { jobsService } from "../../services/jobs.service.js";
+import { authService } from "../../services/auth.service.js";
 
-function getFormData(){
+async function getFormData(){
+  const user = await authService.getCurrentUser();
+  const employerName = user?.user_metadata?.fullName || user?.user_metadata?.businessName || "Employer";
+
   const selectedTags = [];
   $$("#tagsSelection input[type='checkbox']:checked").forEach(cb => {
     if (cb.value !== "others") {
@@ -20,7 +25,8 @@ function getFormData(){
   }
 
   return {
-    id: Date.now(),
+    employer_id: user.id,
+    employer_name: employerName,
     title: $("#jobTitle").value.trim(),
     category: $("#jobCategory").value,
     location: $("#jobLocation").value.trim(),
@@ -30,15 +36,8 @@ function getFormData(){
     deposit: Number($("#jobDeposit").value),
     deadline: $("#jobDeadline").value,
     slots: Number($("#jobSlots").value),
-    status: "Draft",
-    createdAt: new Date().toISOString()
+    status: "Draft", // Default to Draft
   };
-}
-
-function saveJob(job){
-  const existing = JSON.parse(localStorage.getItem("linkup_employer_jobs") || "[]");
-  existing.push(job);
-  localStorage.setItem("linkup_employer_jobs", JSON.stringify(existing));
 }
 
 function setStatusBadge(status){
@@ -47,7 +46,38 @@ function setStatusBadge(status){
   badge.className = "badge " + (status === "Open" ? "accepted" : "pending");
 }
 
-function init(){
+async function handleJobSubmission(status) {
+  try {
+    const jobData = await getFormData();
+    jobData.status = status;
+
+    if (status === "Open") {
+      if (!jobData.title || !jobData.category || !jobData.salary || !jobData.deposit){
+        alert("Please complete required fields.");
+        return;
+      }
+    }
+
+    console.log(`[CreateJob] Submitting job with status: ${status}`, jobData);
+    
+    await jobsService.createJob(jobData);
+    
+    setStatusBadge(status);
+    alert(status === "Open" ? "Job published successfully!" : "Job saved as Draft.");
+
+    if (status === "Open") {
+      window.location.href = "./job-manage.html";
+    }
+  } catch (error) {
+    console.error("[CreateJob] Error submitting job:", error);
+    alert("Failed to save job. Please try again.");
+  }
+}
+
+async function init(){
+  const user = await authService.requireAuth("employer");
+  if (!user) return;
+
   setActiveNav();
 
   const form = $("#createJobForm");
@@ -60,35 +90,14 @@ function init(){
   });
 
   // Save as Draft
-  $("#saveDraftBtn").addEventListener("click", () => {
-    const job = getFormData();
-    job.status = "Draft";
-
-    saveJob(job);
-    setStatusBadge("Draft");
-
-    alert("Job saved as Draft.");
+  $("#saveDraftBtn").addEventListener("click", async () => {
+    await handleJobSubmission("Draft");
   });
 
   // Publish
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
-
-    const job = getFormData();
-    job.status = "Open";
-
-    if (!job.title || !job.category || !job.salary || !job.deposit){
-      alert("Please complete required fields.");
-      return;
-    }
-
-    saveJob(job);
-    setStatusBadge("Open");
-
-    alert("Job published successfully!");
-
-    // redirect to job-manage page later
-    window.location.href = "./job-manage.html";
+    await handleJobSubmission("Open");
   });
 }
 

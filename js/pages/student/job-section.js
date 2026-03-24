@@ -52,7 +52,7 @@ class StudentDashboard {
   async handleViewJob(jobId) {
     const job = await jobsService.getJobById(jobId);
     if (job) {
-      alert(`Job Details:\n${job.title}\n${job.employer}\n${job.location}\nRM ${job.pay}`);
+      alert(`Job Details:\nTitle: ${job.title}\nEmployer: ${job.employer_name || job.employer}\nLocation: ${job.location}\nSalary: RM ${job.salary || job.pay}`);
     }
   }
 
