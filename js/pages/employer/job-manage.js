@@ -18,7 +18,6 @@ function renderJobs(){
     container.innerHTML = `
       <div class="card pad">
         <p>No jobs created yet.</p>
-        <a class="btn btn-primary" href="create-job.html">Create your first job</a>
       </div>
     `;
     return;
