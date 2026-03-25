@@ -78,6 +78,29 @@
     </div>
   </div>
 
+  <div class="modal-backdrop" id="jobDetailsModal">
+    <div class="modal">
+      <h2 id="modalJobTitle">Job Title</h2>
+      <p id="modalEmployer" class="muted">Employer Name</p>
+      
+      <div style="margin: 16px 0; border-top: 1px solid var(--border); padding-top: 16px;">
+        <p><strong>Location:</strong> <span id="modalLocation">Location</span></p>
+        <p><strong>Salary:</strong> RM <span id="modalSalary">0</span></p>
+        <p><strong>Category:</strong> <span id="modalCategory">Category</span></p>
+      </div>
+
+      <div style="margin: 16px 0;">
+        <h3>Description</h3>
+        <p id="modalDescription" style="line-height: 1.6;">Job description goes here...</p>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" data-modal-close="jobDetailsModal">Close</button>
+        <button class="btn btn-primary" id="modalApplyBtn">Apply Now</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="../../js/pages/student/job-section.js"></script>
 </body>
 </html>

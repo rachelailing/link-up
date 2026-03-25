@@ -1,6 +1,6 @@
 // js/pages/student/dashboard.js
 import { setActiveNav, wireLogout } from "../../components/navbar.js";
-import { openModal, wireModalClose } from "../../components/modal.js";
+import { openModal, closeModal, wireModalClose } from "../../components/modal.js";
 import { $ } from "../../utils/dom.js";
 import { jobsService } from "../../services/jobs.service.js";
 import { renderJobCard, wireJobCardEvents } from "../../components/job-card.js";
@@ -47,12 +47,30 @@ class StudentDashboard {
       onView: (id) => this.handleViewJob(id),
       onApply: (id) => this.handleApplyJob(id),
     });
+
+    // Wire the Apply button inside the Job Details modal
+    const modalApplyBtn = $("#modalApplyBtn");
+    if (modalApplyBtn) {
+      modalApplyBtn.addEventListener("click", () => {
+        const jobId = $("#jobDetailsModal").dataset.activeJobId;
+        closeModal("jobDetailsModal");
+        this.handleApplyJob(jobId);
+      });
+    }
   }
 
   async handleViewJob(jobId) {
     const job = await jobsService.getJobById(jobId);
     if (job) {
-      alert(`Job Details:\nTitle: ${job.title}\nEmployer: ${job.employer_name || job.employer}\nLocation: ${job.location}\nSalary: RM ${job.salary || job.pay}`);
+      $("#modalJobTitle").textContent = job.title;
+      $("#modalEmployer").textContent = job.employer_name || job.employer || 'Employer';
+      $("#modalLocation").textContent = job.location;
+      $("#modalSalary").textContent = job.salary || job.pay || '0';
+      $("#modalCategory").textContent = job.category || 'N/A';
+      $("#modalDescription").textContent = job.description || "No description provided.";
+      
+      $("#jobDetailsModal").dataset.activeJobId = jobId;
+      openModal("jobDetailsModal");
     }
   }
 

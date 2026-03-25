@@ -19,7 +19,7 @@ export function renderJobCard(job, { onView, onApply }) {
   return `
     <div class="card job" data-job-id="${job.id}">
       <div class="job-left">
-        <div style="display:flex; justify-content:space-between; gap:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
           <div>
             <div style="display:flex; align-items:center;">
               ${matchBadge}
