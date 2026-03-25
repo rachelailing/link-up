@@ -2,41 +2,53 @@
   display:inline-flex;
   align-items:center;
   gap: 8px;
-  padding: 6px 10px;
+  padding: 6px 12px;
   border-radius: 999px;
   font-size: 12px;
+  font-weight: 600;
   border: 1px solid transparent;
-  font-weight: 500;
+  line-height: 1;
 }
+
+/* Base dot for .status class */
 .status::before{
   content:"";
-  width:8px;height:8px;border-radius:999px;
+  width:6px; height:6px; border-radius:999px;
   background: currentColor;
 }
 
-.status.pending, .badge.pending{
+/* 🟠 Pending / Unpaid / Awaiting (Orange - Neutral/Warning) */
+.badge.pending, .badge.unpaid, .badge.awaiting, .status.pending {
   color: #B45309;
-  background: rgba(245,158,11,.16);
-  border-color: rgba(245,158,11,.28);
-}
-.status.accepted, .badge.accepted, .status.completed, .badge.completed{
-  color: #166534;
-  background: rgba(22,163,74,.14);
-  border-color: rgba(22,163,74,.25);
-}
-.status.rejected, .badge.rejected, .status.failed, .badge.failed, .status.cancelled, .badge.cancelled{
-  color: #991B1B;
-  background: rgba(239,68,68,.14);
-  border-color: rgba(239,68,68,.25);
-}
-.status.inprogress, .badge.inprogress{
-  color: #1D4ED8;
-  background: rgba(37,99,235,.12);
-  border-color: rgba(37,99,235,.22);
+  background: #FFFBEB;
+  border-color: #FDE68A;
 }
 
+/* 🔵 Applied / In Progress / Current / Held (Blue - Info/Active) */
+.badge.applied, .badge.inprogress, .badge.current, .badge.held, .status.inprogress {
+  color: #1D4ED8;
+  background: #EFF6FF;
+  border-color: #BFDBFE;
+}
+
+/* 🟢 Done / Completed / Accepted / Refunded (Green - Success) */
+.badge.done, .badge.completed, .badge.accepted, .badge.refunded, .status.accepted, .status.completed {
+  color: #15803D;
+  background: #F0FDF4;
+  border-color: #BBF7D0;
+}
+
+/* 🔴 Cancelled / Rejected / Failed (Red - Error/Stop) */
+.badge.cancelled, .badge.rejected, .badge.failed, .status.rejected, .status.failed {
+  color: #B91C1C;
+  background: #FEF2F2;
+  border-color: #FECACA;
+}
+
+/* ⚪ Outline / Neutral */
 .badge.outline {
   background: transparent;
   border-color: var(--border);
   color: var(--muted);
+  font-weight: 500;
 }

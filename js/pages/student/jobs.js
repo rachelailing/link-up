@@ -1,7 +1,9 @@
 import { $, $$ } from "../../utils/dom.js";
 import { setActiveNav, wireLogout } from "../../components/navbar.js";
+import { openModal, wireModalClose } from "../../components/modal.js";
 import { authService } from "../../services/auth.service.js";
 import { jobsService } from "../../services/jobs.service.js";
+import { statusToBadgeClass } from "../../components/status-badge.js";
 
 async function renderJobs(list){
   const listEl = $("#jobsList");
@@ -12,12 +14,8 @@ async function renderJobs(list){
   }
 
   listEl.innerHTML = list.map(job => {
-    let badgeClass = "inprogress";
-    if (job.status === "Done") badgeClass = "completed";
-    if (job.status === "Cancelled") badgeClass = "cancelled";
-    if (job.status === "Applied") badgeClass = "pending";
-    if (job.status === "Open") badgeClass = "accepted";
-
+    let badgeClass = statusToBadgeClass(job.status);
+    
     return `
       <div class="card active-row">
         <div class="active-image">
@@ -58,7 +56,6 @@ async function renderJobs(list){
 
         <div class="active-actions">
           <button class="btn btn-outline" data-view="${job.id}">View Details</button>
-          <button class="btn btn-primary" data-apply="${job.id}">Apply Now</button>
         </div>
       </div>
     `;
@@ -68,38 +65,69 @@ async function renderJobs(list){
   $$("[data-view]").forEach(btn => {
     btn.addEventListener("click", handleView);
   });
-
-  // Apply button
-  $$("[data-apply]").forEach(btn => {
-    btn.addEventListener("click", handleApply);
-  });
 }
 
-function handleView(e) {
+async function handleView(e) {
   const id = e.currentTarget.dataset.view;
-  window.location.href = `job-details.html?id=${id}`;
-}
+  const job = await jobsService.getJobById(id);
+  
+  // Also check hardcoded demo jobs if not found in DB
+  const allJobs = await jobsService.getJobs();
+  const foundJob = job || allJobs.find(j => j.id === id);
 
-function handleApply(e) {
-  const id = e.currentTarget.dataset.apply;
-  window.location.href = `apply-job.html?id=${id}`;
+  if (foundJob) {
+    $("#modalJobTitle").textContent = foundJob.title;
+    $("#modalEmployer").textContent = foundJob.employer_name || foundJob.employer || 'Employer';
+    $("#modalLocation").textContent = foundJob.location;
+    $("#modalSalary").textContent = foundJob.salary || foundJob.pay || '0';
+    $("#modalCategory").textContent = foundJob.category || 'N/A';
+    $("#modalDescription").textContent = foundJob.description || "No description provided.";
+    
+    const badgeEl = $("#modalStatusBadge");
+    badgeEl.textContent = foundJob.status;
+    badgeEl.className = "badge " + statusToBadgeClass(foundJob.status);
+
+    // Feedback logic
+    const feedbackSection = $("#modalFeedbackSection");
+    if (foundJob.status.toLowerCase() === "done" && foundJob.rating) {
+      feedbackSection.style.display = "block";
+      $("#modalRating").textContent = "⭐".repeat(foundJob.rating);
+      $("#modalComment").textContent = foundJob.employer_comment ? `"${foundJob.employer_comment}"` : "No comment provided.";
+    } else {
+      feedbackSection.style.display = "none";
+    }
+
+    openModal("jobDetailsModal");
+  }
 }
 
 async function filterJobs(){
   const search = $("#searchInput").value.toLowerCase();
   const status = $("#statusFilter").value;
+  const dateSort = $("#dateFilter").value;
 
   const allJobs = await jobsService.getJobs();
   
-  let filtered = allJobs.filter(job =>
+  // Base filter: Only show Applied, Current, Done, Cancelled
+  const myJobs = allJobs.filter(job => 
+    ["applied", "current", "done", "cancelled", "completed", "inprogress", "pending", "rejected"].includes(job.status.toLowerCase())
+  );
+
+  let filtered = myJobs.filter(job =>
     job.title.toLowerCase().includes(search) ||
     job.employer_name?.toLowerCase().includes(search)
   );
 
   if (status !== "all") {
-    // Note: status mapping depends on your business logic
     filtered = filtered.filter(job => job.status.toLowerCase() === status.toLowerCase());
   }
+
+  // Date Sorting
+  filtered.sort((a, b) => {
+    const dateA = new Date(a.created_at || 0);
+    const dateB = new Date(b.created_at || 0);
+    return dateSort === "newest" ? dateB - dateA : dateA - dateB;
+  });
 
   renderJobs(filtered);
 }
@@ -110,9 +138,9 @@ async function init(){
 
   setActiveNav();
   wireLogout();
+  wireModalClose();
   
-  const allJobs = await jobsService.getJobs();
-  renderJobs(allJobs);
+  await filterJobs(); // Use the filter function to load initial state
 
   $("#searchInput").addEventListener("input", filterJobs);
   $("#statusFilter")?.addEventListener("change", filterJobs);

@@ -3,7 +3,8 @@ import { supabase } from "../config/supabase.js";
 
 export class JobService {
   /**
-   * Fetches all available jobs from Supabase.
+   * Fetches all jobs from Supabase.
+   * Includes hardcoded examples for pitch/demo purposes.
    */
   async getJobs() {
     const { data, error } = await supabase
@@ -12,11 +13,71 @@ export class JobService {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error("[JobService] Error fetching jobs:", error);
-      return [];
+      console.error("[JobsService] Error fetching jobs:", error);
     }
 
-    return data;
+    const dbJobs = data || [];
+
+    // Pitch/Demo Examples
+    const demoJobs = [
+      {
+        id: "demo-1",
+        title: "Library Assistant",
+        employer_name: "UTP Main Library",
+        location: "UTP IRC",
+        salary: 450,
+        status: "Done",
+        deadline: "2026-03-20",
+        created_at: "2026-03-01T10:00:00Z",
+        description: "Assisted in cataloging new arrivals and managing the circulation desk during the mid-semester peak. Received 5-star rating for reliability.",
+        category: "Administration",
+        tags: ["Library", "Admin", "Customer Service"],
+        rating: 5,
+        employer_comment: "Excellent work! Nafiesa was very punctual and handled the cataloging with great attention to detail. Highly recommended for any administrative tasks."
+      },
+      {
+        id: "demo-2",
+        title: "Event Crew: Career Fair 2026",
+        employer_name: "Career Services",
+        location: "Chancellor Hall",
+        salary: 120,
+        status: "Current",
+        deadline: "2026-04-05",
+        created_at: "2026-03-15T09:30:00Z",
+        description: "Setting up booth layouts, managing visitor registration, and providing technical support for visiting company representatives.",
+        category: "Event",
+        tags: ["Event", "Crew", "Management"]
+      },
+      {
+        id: "demo-3",
+        title: "Social Media Content Creator",
+        employer_name: "Link Up Marketing Team",
+        location: "Remote",
+        salary: 300,
+        status: "Applied",
+        deadline: "2026-04-15",
+        created_at: "2026-03-20T14:00:00Z",
+        description: "Develop weekly TikTok and Instagram reels to promote platform features to new students on campus.",
+        category: "Creative",
+        tags: ["Social Media", "Video", "Editing"]
+      },
+      {
+        id: "demo-4",
+        title: "Graphic Designer for Tech Conf",
+        employer_name: "Computer Science Society",
+        location: "Block 1",
+        salary: 200,
+        status: "Cancelled",
+        deadline: "2026-02-10",
+        created_at: "2026-01-10T11:00:00Z",
+        description: "Project was cancelled due to conference rescheduling. No commitment fee was charged.",
+        category: "Design",
+        tags: ["Design", "Poster", "UI"]
+      }
+    ];
+
+    // Combine real DB jobs with demo jobs
+    return [...demoJobs, ...dbJobs];
   }
 
   /**

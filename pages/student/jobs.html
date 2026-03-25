@@ -79,6 +79,36 @@
 
   </div>
 
+  <!-- Job Details Modal -->
+  <div class="modal-backdrop" id="jobDetailsModal">
+    <div class="modal">
+      <h2 id="modalJobTitle">Job Title</h2>
+      <p id="modalEmployer" class="muted">Employer Name</p>
+      
+      <div style="margin: 16px 0; border-top: 1px solid var(--border); padding-top: 16px;">
+        <p><strong>Location:</strong> <span id="modalLocation">Location</span></p>
+        <p><strong>Salary:</strong> RM <span id="modalSalary">0</span></p>
+        <p><strong>Category:</strong> <span id="modalCategory">Category</span></p>
+        <p><strong>Status:</strong> <span id="modalStatusBadge" class="badge">Status</span></p>
+      </div>
+
+      <div style="margin: 16px 0;">
+        <h3>Description</h3>
+        <p id="modalDescription" style="line-height: 1.6;">Job description goes here...</p>
+      </div>
+
+      <div id="modalFeedbackSection" style="margin: 16px 0; padding: 16px; background: rgba(115,187,59,.08); border-radius: 12px; display: none;">
+        <h3 style="margin-top: 0; color: #166534;">Employer Feedback</h3>
+        <p><strong>Rating:</strong> <span id="modalRating" style="color: #f59e0b; font-size: 1.2rem;">⭐⭐⭐⭐⭐</span></p>
+        <p id="modalComment" style="font-style: italic; color: #374151; margin-top: 8px;">"Great job!"</p>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" data-modal-close="jobDetailsModal">Close</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="../../js/pages/student/jobs.js"></script>
 </body>
 </html>

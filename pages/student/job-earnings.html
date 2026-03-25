@@ -51,15 +51,15 @@
         <div class="grid cols-3">
           <div class="card pad">
             <h3>Total Earned</h3>
-            <p id="totalEarned" style="font-size: 1.5rem; font-weight: bold; color: var(--primary-color);">RM 320.00</p>
+            <p id="totalEarned" style="font-size: 1.5rem; font-weight: bold; color: var(--primary-color);">RM 350.00</p>
           </div>
           <div class="card pad">
             <h3>Pending Release</h3>
-            <p id="pendingRelease" style="font-size: 1.5rem; font-weight: bold; color: orange;">RM 150.00</p>
+            <p id="pendingRelease" style="font-size: 1.5rem; font-weight: bold; color: #B45309;">RM 365.00</p>
           </div>
           <div class="card pad">
             <h3>Completed Gigs</h3>
-            <p id="completedGigs" style="font-size: 1.5rem; font-weight: bold;">4</p>
+            <p id="completedGigs" style="font-size: 1.5rem; font-weight: bold;">3</p>
           </div>
         </div>
 
@@ -83,44 +83,19 @@
             <option value="unpaid">Unpaid</option>
             <option value="refund">Refund</option>
             <option value="pending">Pending</option>
+            <option value="released">Released</option>
             <option value="cancel">Cancel</option>
           </select>
         </div>
 
         <div class="list" id="earningsList">
-          <!-- Mock Job Earnings -->
-          <div class="card pad" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <div>
-              <h3 style="margin:0;">Event Crew - Convocation Week</h3>
-              <p class="muted" style="margin:4px 0 0 0;">Date: 2026-03-15</p>
-            </div>
-            <div style="text-align: right;">
-              <div style="font-weight: bold; color: green;">+ RM 120.00</div>
-              <span class="badge completed">Released</span>
-            </div>
-          </div>
-
-          <div class="card pad" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <div>
-              <h3 style="margin:0;">Library Assistant (Part-time)</h3>
-              <p class="muted" style="margin:4px 0 0 0;">Date: 2026-03-10</p>
-            </div>
-            <div style="text-align: right;">
-              <div style="font-weight: bold; color: green;">+ RM 200.00</div>
-              <span class="badge completed">Released</span>
-            </div>
-          </div>
+          <!-- Dynamic transactions populated by earnings.js -->
         </div>
 
       </div>
     </main>
   </div>
 
-  <script type="module">
-    import { setActiveNav } from "../../components/navbar.js";
-    document.addEventListener("DOMContentLoaded", () => {
-      setActiveNav();
-    });
-  </script>
+  <script type="module" src="../../js/pages/student/earnings.js"></script>
 </body>
 </html>
