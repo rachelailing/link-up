@@ -24,6 +24,9 @@ function validate(){
   const phone = $("#phone").value.trim();
   const pass = $("#password").value;
   const confirm = $("#confirmPassword").value;
+  const studyStart = $("#studyStart").value;
+  const studyEnd = $("#studyEnd").value;
+  const verificationFile = $("#verificationFile").files[0];
   const agree = $("#agree").checked;
 
   let ok = true;
@@ -34,26 +37,48 @@ function validate(){
   if (phone.length < 8) { setError("phone", "Please enter a valid phone number."); ok = false; }
   if (pass.length < 8) { setError("password", "Password must be at least 8 characters."); ok = false; }
   if (confirm !== pass) { setError("confirmPassword", "Passwords do not match."); ok = false; }
+  if (!studyStart) { setError("studyStart", "Please select your start date."); ok = false; }
+  if (!studyEnd) { setError("studyEnd", "Please select your expected graduation date."); ok = false; }
+  if (!verificationFile) { setError("verificationFile", "Please upload a verification document."); ok = false; }
   if (!agree) { setError("agree", "You must agree before continuing."); ok = false; }
 
   return ok;
 }
 
 async function registerStudent(){
-  const userData = {
-    email: $("#studentEmail").value.trim(),
-    password: $("#password").value,
-    fullName: $("#fullName").value.trim(),
-    university: $("#university").value,
-    phone: $("#phone").value.trim(),
-  };
-
+  const submitBtn = $("#studentRegisterForm button[type='submit']");
+  
   try {
+    const file = $("#verificationFile").files[0];
+    
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Uploading verification...";
+    
+    // 1. Upload verification file
+    const verificationUrl = await authService.uploadVerificationDocument(file);
+
+    submitBtn.textContent = "Creating Account...";
+
+    // 2. Register user with all metadata
+    const userData = {
+      email: $("#studentEmail").value.trim(),
+      password: $("#password").value,
+      fullName: $("#fullName").value.trim(),
+      university: $("#university").value,
+      phone: $("#phone").value.trim(),
+      studyStart: $("#studyStart").value,
+      studyEnd: $("#studyEnd").value,
+      verificationUrl: verificationUrl
+    };
+
     await authService.register(userData, "student");
+    
     // Next step: tell user to verify email
     window.location.href = "./verify-email.html";
   } catch (err) {
     alert("Registration failed: " + err.message);
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Create Account";
   }
 }
 
@@ -64,15 +89,7 @@ function init(){
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!validate()) return;
-
-    const submitBtn = form.querySelector('button[type="submit"]');
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Creating Account...";
-
     await registerStudent();
-
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Create Account";
   });
 }
 

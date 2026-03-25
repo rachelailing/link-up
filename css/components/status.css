@@ -1,4 +1,4 @@
-.status{
+.status, .badge{
   display:inline-flex;
   align-items:center;
   gap: 8px;
@@ -6,6 +6,7 @@
   border-radius: 999px;
   font-size: 12px;
   border: 1px solid transparent;
+  font-weight: 500;
 }
 .status::before{
   content:"";
@@ -13,23 +14,29 @@
   background: currentColor;
 }
 
-.status.pending{
+.status.pending, .badge.pending{
   color: #B45309;
   background: rgba(245,158,11,.16);
   border-color: rgba(245,158,11,.28);
 }
-.status.accepted, .status.completed{
+.status.accepted, .badge.accepted, .status.completed, .badge.completed{
   color: #166534;
   background: rgba(22,163,74,.14);
   border-color: rgba(22,163,74,.25);
 }
-.status.rejected, .status.failed{
+.status.rejected, .badge.rejected, .status.failed, .badge.failed, .status.cancelled, .badge.cancelled{
   color: #991B1B;
   background: rgba(239,68,68,.14);
   border-color: rgba(239,68,68,.25);
 }
-.status.inprogress{
+.status.inprogress, .badge.inprogress{
   color: #1D4ED8;
   background: rgba(37,99,235,.12);
   border-color: rgba(37,99,235,.22);
+}
+
+.badge.outline {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--muted);
 }
