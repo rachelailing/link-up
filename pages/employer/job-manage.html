@@ -45,6 +45,28 @@
           <a href="create-job.html" class="btn btn-primary">+ Create Job</a>
         </div>
 
+        <!-- Filter Bar -->
+        <div class="filter-bar" style="margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+          <div class="filter-group" style="display: flex; align-items: center; gap: 8px;">
+            <label for="statusFilter" style="font-weight: 600; font-size: 14px;">Filter by Status:</label>
+            <select id="statusFilter" class="input" style="width: 150px; padding: 6px 10px; margin:0;">
+              <option value="All">All Statuses</option>
+              <option value="Open">Open</option>
+              <option value="Ongoing">Ongoing</option>
+              <option value="Cancelled">Cancelled</option>
+              <option value="Done">Done</option>
+              <option value="On hold">On hold</option>
+            </select>
+          </div>
+          <div class="filter-group" style="display: flex; align-items: center; gap: 8px;">
+            <label for="dateSort" style="font-weight: 600; font-size: 14px;">Sort by Date:</label>
+            <select id="dateSort" class="input" style="width: 160px; padding: 6px 10px; margin:0;">
+              <option value="Newest-Oldest">Newest-Oldest</option>
+              <option value="Oldest-Newest">Oldest-Newest</option>
+            </select>
+          </div>
+        </div>
+
         <div id="jobManageList" class="list"></div>
 
       </div>
@@ -61,10 +83,11 @@
       <div style="margin-bottom:20px;">
         <label style="display:block; margin-bottom:8px; font-weight:600;">Update Status:</label>
         <select id="modalStatusSelect" class="input" style="width:100%;">
-          <option value="Draft">Draft</option>
           <option value="Open">Open</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Completed">Completed</option>
+          <option value="Ongoing">Ongoing</option>
+          <option value="Cancelled">Cancelled</option>
+          <option value="Done">Done</option>
+          <option value="On hold">On hold</option>
         </select>
       </div>
 

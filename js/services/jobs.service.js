@@ -170,20 +170,71 @@ export class JobService {
    */
   async getMyJobs() {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return [];
+    
+    let dbJobs = [];
+    if (user) {
+      const { data, error } = await supabase
+        .from('jobs')
+        .select('*')
+        .eq('employer_id', user.id)
+        .order('created_at', { ascending: false });
 
-    const { data, error } = await supabase
-      .from('jobs')
-      .select('*')
-      .eq('employer_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error("[JobService] Error fetching my jobs:", error);
-      return [];
+      if (error) {
+        console.error("[JobService] Error fetching my jobs:", error);
+      } else {
+        dbJobs = data || [];
+      }
     }
 
-    return data;
+    // Mock jobs for Demo/Testing filters
+    const mockJobs = [
+      {
+        id: "mock-ongoing",
+        title: "Campus Delivery Rider",
+        location: "UTP Campus",
+        salary: 150,
+        deposit: 15,
+        slots: 2,
+        deadline: "2026-04-10",
+        status: "Ongoing",
+        created_at: "2026-03-24T10:00:00Z"
+      },
+      {
+        id: "mock-done",
+        title: "Programming Tutor",
+        location: "Block 1, UTP",
+        salary: 400,
+        deposit: 40,
+        slots: 1,
+        deadline: "2026-03-15",
+        status: "Done",
+        created_at: "2026-03-01T08:30:00Z"
+      },
+      {
+        id: "mock-cancelled",
+        title: "Booth Assistant (Cancelled)",
+        location: "Pocket C",
+        salary: 100,
+        deposit: 10,
+        slots: 3,
+        deadline: "2026-03-20",
+        status: "Cancelled",
+        created_at: "2026-02-15T14:00:00Z"
+      },
+      {
+        id: "mock-onhold",
+        title: "Library Digitization Asst",
+        location: "UTP Library",
+        salary: 300,
+        deposit: 30,
+        slots: 2,
+        deadline: "2026-05-01",
+        status: "On hold",
+        created_at: "2026-03-22T09:15:00Z"
+      }
+    ];
+
+    return [...dbJobs, ...mockJobs];
   }
 
   /**

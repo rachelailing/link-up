@@ -5,7 +5,7 @@ export function statusToBadgeClass(status){
   if (["open", "pending", "awaitingcommitmentfee", "awaitingpayment", "unpaid", "awaiting"].includes(s)) return "pending";
   
   // 🔵 Blue (Active/Info)
-  if (["applied", "current", "inprogress", "submitted", "held"].includes(s)) return "applied";
+  if (["applied", "current", "inprogress", "ongoing", "submitted", "held", "onhold"].includes(s)) return "applied";
   
   // 🟢 Green (Success)
   if (["done", "completed", "accepted", "confirmed", "refunded"].includes(s)) return "done";

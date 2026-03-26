@@ -29,10 +29,39 @@ async function renderJobs(){
     jobs = [...jobs, ...uniqueLocal];
   }
 
+  // --- FILTERING ---
+  const statusFilter = $("#statusFilter").value;
+  if (statusFilter !== "All") {
+    jobs = jobs.filter(j => {
+      const s = (j.status || "").toLowerCase().replace(/\s+/g, "");
+      const f = statusFilter.toLowerCase().replace(/\s+/g, "");
+      
+      // Mapping for backward compatibility
+      if (f === "ongoing" && (s === "inprogress" || s === "ongoing")) return true;
+      if (f === "done" && (s === "completed" || s === "done")) return true;
+      if (f === "onhold" && (s === "held" || s === "onhold")) return true;
+      
+      return s === f;
+    });
+  }
+
+  // --- SORTING ---
+  const dateSort = $("#dateSort").value;
+  jobs.sort((a, b) => {
+    const valA = a.created_at || a.id;
+    const valB = b.created_at || b.id;
+    
+    if (dateSort === "Newest-Oldest") {
+      return valB > valA ? 1 : -1;
+    } else {
+      return valA > valB ? 1 : -1;
+    }
+  });
+
   if (!jobs.length){
     container.innerHTML = `
       <div class="card pad">
-        <p>No jobs created yet.</p>
+        <p>No jobs found with the selected criteria.</p>
       </div>
     `;
     return;
@@ -41,6 +70,8 @@ async function renderJobs(){
   container.innerHTML = jobs.map(job => {
     const badgeClass = statusToBadgeClass(job.status);
     const salary = job.salary || job.pay || 0;
+    const lowerStatus = (job.status || "").toLowerCase().replace(/\s+/g, "");
+    const isWorking = ["open", "inprogress", "ongoing"].includes(lowerStatus);
 
     return `
       <div class="card manage-card">
@@ -60,7 +91,7 @@ async function renderJobs(){
         </div>
 
         <div class="manage-actions" style="display:flex; gap:10px; align-items:center;">
-          ${job.status === "Open" || job.status === "In Progress" ? `
+          ${isWorking ? `
             <button class="btn btn-outline" data-apps="${job.id}">View Applications</button>
           ` : ""}
           <button class="btn btn-primary" data-manage-btn="${job.id}" data-title="${job.title}" data-status="${job.status}">Manage</button>
@@ -143,6 +174,11 @@ async function init(){
   setActiveNav();
   wireModalClose();
   setupModalLogic();
+  
+  // Add Filter listeners
+  $("#statusFilter").addEventListener("change", renderJobs);
+  $("#dateSort").addEventListener("change", renderJobs);
+
   renderJobs();
 }
 

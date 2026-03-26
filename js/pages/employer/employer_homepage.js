@@ -4,6 +4,61 @@ import { statusToBadgeClass } from "../../components/status-badge.js";
 import { authService } from "../../services/auth.service.js";
 import { jobsService } from "../../services/jobs.service.js";
 
+// Mock Data for Pitch
+const MOCK_JOBS = [
+  {
+    id: "mock-1",
+    title: "Event Crew: Tech Showcase",
+    status: "Open",
+    location: "Block 1, UTP",
+    salary: 150,
+    applications: [{}, {}, {}] // 3 applicants
+  },
+  {
+    id: "mock-2",
+    title: "Lab Assistant - Physics",
+    status: "In Progress",
+    location: "Block P",
+    salary: 200,
+    applications: [{}]
+  },
+  {
+    id: "mock-3",
+    title: "Library Data Entry",
+    status: "Completed",
+    location: "IRC",
+    salary: 100,
+    applications: [{}]
+  }
+];
+
+const MOCK_APPS = [
+  {
+    id: "app-1",
+    studentName: "Rachel Ng",
+    status: "Pending",
+    jobTitle: "Event Crew: Tech Showcase",
+    jobId: "mock-1",
+    rating: 4.8
+  },
+  {
+    id: "app-2",
+    studentName: "Ahmad Danish",
+    status: "Accepted",
+    jobTitle: "Lab Assistant - Physics",
+    jobId: "mock-2",
+    rating: 4.5
+  },
+  {
+    id: "app-3",
+    studentName: "Sarah Lim",
+    status: "Pending",
+    jobTitle: "Event Crew: Tech Showcase",
+    jobId: "mock-1",
+    rating: 4.9
+  }
+];
+
 function getLocalJobs(){
   return JSON.parse(localStorage.getItem("linkup_employer_jobs") || "[]");
 }
@@ -12,12 +67,8 @@ async function renderRecentJobs(){
   const el = $("#recentJobs");
   
   // Try fetching from service first
-  let jobs = await jobsService.getMyJobs();
-  
-  // If no jobs in Supabase, check localStorage (for backward compatibility during migration)
-  if (jobs.length === 0) {
-    jobs = getLocalJobs();
-  }
+  let dbJobs = await jobsService.getMyJobs();
+  let jobs = [...MOCK_JOBS, ...dbJobs];
 
   if (jobs.length === 0) {
     el.innerHTML = `
@@ -39,22 +90,22 @@ async function renderRecentJobs(){
     const applicants = job.applications ? job.applications.length : 0;
 
     return `
-      <div class="card item-row" style="border:1px solid var(--border); box-shadow:none;">
+      <div class="card item-row" style="border:1px solid var(--border); box-shadow:none; margin-bottom: 10px; padding: 16px;">
         <div class="item-left">
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-            <h3 style="margin:0;">${job.title}</h3>
+            <h3 style="margin:0; font-size: 1rem;">${job.title}</h3>
             <span class="badge ${badge}">${job.status}</span>
           </div>
 
-          <div class="item-meta">
-            <span class="kv">📍 ${location}</span>
-            <span class="kv">💰 RM ${pay}</span>
-            <span class="kv">👥 ${applicants} applicants</span>
+          <div class="item-meta" style="margin-top: 8px; display: flex; gap: 12px; font-size: 0.85rem; color: var(--muted);">
+            <span>📍 ${location}</span>
+            <span>💰 RM ${pay}</span>
+            <span>👥 ${applicants} applicants</span>
           </div>
         </div>
 
-        <div class="item-actions">
-          <button class="btn btn-outline" data-job-view="${job.id}">Manage</button>
+        <div class="item-actions" style="margin-top: 12px;">
+          <button class="btn btn-outline btn-sm" data-job-view="${job.id}">Manage</button>
         </div>
       </div>
     `;
@@ -70,19 +121,7 @@ async function renderRecentJobs(){
 function renderRecentApplications(){
   const el = $("#recentApplications");
   
-  // For now, applications are nested in localJobs
-  const jobs = getLocalJobs();
-  const allApps = [];
-  
-  jobs.forEach(job => {
-    if (job.applications) {
-      job.applications.forEach(app => {
-        allApps.push({ ...app, jobId: job.id, jobTitle: job.title });
-      });
-    }
-  });
-
-  if (allApps.length === 0) {
+  if (MOCK_APPS.length === 0) {
     el.innerHTML = `
       <div class="card pad" style="text-align:center; color:var(--text-light);">
         <p>No recent applications.</p>
@@ -92,25 +131,25 @@ function renderRecentApplications(){
   }
 
   // Show only 3 recent applications
-  const recentApps = allApps.slice(0, 3);
+  const recentApps = MOCK_APPS.slice(0, 3);
 
   el.innerHTML = recentApps.map(app => {
     const badge = statusToBadgeClass(app.status);
     return `
-      <div class="card item-row" style="border:1px solid var(--border); box-shadow:none;">
+      <div class="card item-row" style="border:1px solid var(--border); box-shadow:none; margin-bottom: 10px; padding: 16px;">
         <div class="item-left">
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-            <h3 style="margin:0;">${app.studentName || app.student}</h3>
+            <h3 style="margin:0; font-size: 1rem;">${app.studentName}</h3>
             <span class="badge ${badge}">${app.status}</span>
           </div>
-          <div class="item-meta">
-            <span class="kv">🧰 ${app.jobTitle}</span>
-            <span class="kv">⭐ ${app.rating || "N/A"}</span>
+          <div class="item-meta" style="margin-top: 8px; display: flex; gap: 12px; font-size: 0.85rem; color: var(--muted);">
+            <span>🧰 ${app.jobTitle}</span>
+            <span>⭐ ${app.rating}</span>
           </div>
         </div>
 
-        <div class="item-actions">
-          <button class="btn btn-outline" data-job-id="${app.jobId}">Review</button>
+        <div class="item-actions" style="margin-top: 12px;">
+          <button class="btn btn-outline btn-sm" data-job-id="${app.jobId}">Review</button>
         </div>
       </div>
     `;
@@ -124,21 +163,15 @@ function renderRecentApplications(){
 }
 
 async function setStats(){
-  let jobs = await jobsService.getMyJobs();
-  if (jobs.length === 0) jobs = getLocalJobs();
-
-  const allApps = [];
-  jobs.forEach(j => {
-    if (j.applications) allApps.push(...j.applications);
-  });
+  let dbJobs = await jobsService.getMyJobs();
+  let jobs = [...MOCK_JOBS, ...dbJobs];
 
   const openJobs = jobs.filter(j => j.status.toLowerCase() === "open").length;
-  const pendingApps = allApps.filter(a => a.status.toLowerCase() === "pending").length;
-  const completed = jobs.filter(j => j.status.toLowerCase() === "completed").length;
+  const pendingApps = MOCK_APPS.filter(a => a.status.toLowerCase() === "pending").length;
+  const completed = jobs.filter(j => j.status.toLowerCase() === "completed" || j.status.toLowerCase() === "done").length;
 
-  const pendingPay = jobs
-    .filter(j => j.status.toLowerCase() === "in progress")
-    .reduce((sum, j) => sum + (j.salary || j.pay || 0), 0);
+  // Mock pending payments logic
+  const pendingPay = 350; 
 
   $("#statOpenJobs").textContent = String(openJobs);
   $("#statPendingApps").textContent = String(pendingApps);
