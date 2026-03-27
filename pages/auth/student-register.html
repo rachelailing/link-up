@@ -101,6 +101,33 @@
                 />
                 <small class="error" data-error-for="confirmPassword"></small>
               </div>
+
+              <div class="field">
+                <label for="studyStart">Start of study</label>
+                <input id="studyStart" name="studyStart" type="month" required />
+                <small class="error" data-error-for="studyStart"></small>
+              </div>
+
+              <div class="field">
+                <label for="studyEnd">Expected graduation</label>
+                <input id="studyEnd" name="studyEnd" type="month" required />
+                <small class="error" data-error-for="studyEnd"></small>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="verificationFile">Student verification (ID or Enrollment Letter)</label>
+              <input
+                id="verificationFile"
+                name="verificationFile"
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                required
+              />
+              <small class="muted"
+                >Upload a clear copy of your student ID or official enrollment letter.</small
+              >
+              <small class="error" data-error-for="verificationFile"></small>
             </div>
 
             <div class="field">
@@ -122,7 +149,7 @@
             </div>
 
             <div class="hint">
-              After registration, you’ll be redirected to onboarding (skills & interests).
+              After registration, you'll be redirected to onboarding (skills & interests).
             </div>
           </form>
         </div>
@@ -146,7 +173,7 @@
               <span class="step-dot"></span>
               <div>
                 <b>Choose interests</b>
-                <p>We’ll suggest relevant gigs & marketplace listings.</p>
+                <p>We'll suggest relevant gigs & marketplace listings.</p>
               </div>
             </div>
 

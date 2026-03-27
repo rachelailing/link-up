@@ -1,12 +1,17 @@
-.status {
+.status,
+.badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 10px;
+  padding: 6px 12px;
   border-radius: 999px;
   font-size: 12px;
+  font-weight: 600;
   border: 1px solid transparent;
+  line-height: 1;
 }
+
+/* Base dot for .status class */
 .status::before {
   content: '';
   width: 8px;
@@ -15,25 +20,54 @@
   background: currentColor;
 }
 
+/* Pending / Unpaid / Awaiting (Orange - Neutral/Warning) */
+.badge.pending,
+.badge.unpaid,
+.badge.awaiting,
 .status.pending {
   color: #b45309;
-  background: rgba(245, 158, 11, 0.16);
-  border-color: rgba(245, 158, 11, 0.28);
+  background: #fffbeb;
+  border-color: #fde68a;
 }
-.status.accepted,
-.status.completed {
-  color: #166534;
-  background: rgba(22, 163, 74, 0.14);
-  border-color: rgba(22, 163, 74, 0.25);
-}
-.status.rejected,
-.status.failed {
-  color: #991b1b;
-  background: rgba(239, 68, 68, 0.14);
-  border-color: rgba(239, 68, 68, 0.25);
-}
+
+/* Applied / In Progress / Current / Held (Blue - Info/Active) */
+.badge.applied,
+.badge.inprogress,
+.badge.current,
+.badge.held,
 .status.inprogress {
   color: #1d4ed8;
-  background: rgba(37, 99, 235, 0.12);
-  border-color: rgba(37, 99, 235, 0.22);
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+/* Done / Completed / Accepted / Refunded (Green - Success) */
+.badge.done,
+.badge.completed,
+.badge.accepted,
+.badge.refunded,
+.status.accepted,
+.status.completed {
+  color: #15803d;
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+/* Cancelled / Rejected / Failed (Red - Error/Stop) */
+.badge.cancelled,
+.badge.rejected,
+.badge.failed,
+.status.rejected,
+.status.failed {
+  color: #b91c1c;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+/* Outline / Neutral */
+.badge.outline {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--muted);
+  font-weight: 500;
 }

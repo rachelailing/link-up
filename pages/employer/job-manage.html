@@ -45,9 +45,87 @@
             <h2>Your Job Listings</h2>
           </div>
 
+          <!-- Filter Bar -->
+          <div
+            class="filter-bar"
+            style="
+              margin-bottom: 20px;
+              display: flex;
+              gap: 15px;
+              flex-wrap: wrap;
+              align-items: center;
+              background: #fff;
+              padding: 15px;
+              border-radius: 8px;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            "
+          >
+            <div class="filter-group" style="display: flex; align-items: center; gap: 8px">
+              <label for="statusFilter" style="font-weight: 600; font-size: 14px"
+                >Filter by Status:</label
+              >
+              <select
+                id="statusFilter"
+                class="input"
+                style="width: 150px; padding: 6px 10px; margin: 0"
+              >
+                <option value="All">All Statuses</option>
+                <option value="Open">Open</option>
+                <option value="Ongoing">Ongoing</option>
+                <option value="Cancelled">Cancelled</option>
+                <option value="Done">Done</option>
+                <option value="On hold">On hold</option>
+              </select>
+            </div>
+            <div class="filter-group" style="display: flex; align-items: center; gap: 8px">
+              <label for="dateSort" style="font-weight: 600; font-size: 14px">Sort by Date:</label>
+              <select
+                id="dateSort"
+                class="input"
+                style="width: 160px; padding: 6px 10px; margin: 0"
+              >
+                <option value="Newest-Oldest">Newest-Oldest</option>
+                <option value="Oldest-Newest">Oldest-Newest</option>
+              </select>
+            </div>
+          </div>
+
           <div id="jobManageList" class="list"></div>
         </div>
       </main>
+    </div>
+
+    <!-- Manage Job Modal -->
+    <div class="modal-backdrop" id="manageJobModal">
+      <div class="modal">
+        <h3>Manage Job: <span id="modalJobTitle">Job Title</span></h3>
+        <p>Select a new status for this job or delete the listing.</p>
+
+        <div style="margin-bottom: 20px">
+          <label style="display: block; margin-bottom: 8px; font-weight: 600">Update Status:</label>
+          <select id="modalStatusSelect" class="input" style="width: 100%">
+            <option value="Open">Open</option>
+            <option value="Ongoing">Ongoing</option>
+            <option value="Cancelled">Cancelled</option>
+            <option value="Done">Done</option>
+            <option value="On hold">On hold</option>
+          </select>
+        </div>
+
+        <div class="modal-actions" style="justify-content: space-between">
+          <button
+            class="btn btn-outline"
+            id="modalDeleteBtn"
+            style="color: var(--red); border-color: var(--red)"
+          >
+            🗑️ Delete Job
+          </button>
+          <div style="display: flex; gap: 10px">
+            <button class="btn btn-outline" data-modal-close="manageJobModal">Cancel</button>
+            <button class="btn btn-primary" id="modalUpdateStatusBtn">Save Changes</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script type="module" src="../../js/pages/employer/job-manage.js"></script>

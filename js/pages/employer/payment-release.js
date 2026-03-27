@@ -3,17 +3,75 @@ import { setActiveNav } from '../../components/navbar.js';
 import { statusToBadgeClass } from '../../components/status-badge.js';
 import { supabase } from '../../config/supabase.js';
 import { authService } from '../../services/auth.service.js';
+import { jobsService } from '../../services/jobs.service.js';
+
+/**
+ * Mock Data for Pitch
+ */
+const MOCK_PENDING = [
+  {
+    id: 'mock-pay-1',
+    title: 'Event Crew: Tech Showcase',
+    status: 'Submitted',
+    salary: 150,
+    deposit: 15,
+    deadline: '2026-03-25',
+    applications: [{ studentName: 'Rachel Ng', status: 'Submitted' }],
+  },
+  {
+    id: 'mock-pay-2',
+    title: 'Campus Delivery Rider',
+    status: 'Ongoing',
+    salary: 150,
+    deposit: 15,
+    deadline: '2026-04-10',
+    applications: [{ studentName: 'Wei Kang', status: 'Accepted' }],
+  },
+];
+
+const MOCK_HISTORY = [
+  {
+    id: 501,
+    jobTitle: 'Library Assistant',
+    salary: 450,
+    depositRefunded: 45,
+    releasedAt: '2026-03-20T14:30:00Z',
+    status: 'Released',
+  },
+  {
+    id: 502,
+    jobTitle: 'Programming Tutor',
+    salary: 400,
+    depositRefunded: 40,
+    releasedAt: '2026-03-15T10:00:00Z',
+    status: 'Released',
+  },
+];
+
+function getLocalJobs() {
+  return JSON.parse(localStorage.getItem('linkup_employer_jobs') || '[]');
+}
+function saveLocalJobs(jobs) {
+  localStorage.setItem('linkup_employer_jobs', JSON.stringify(jobs));
+}
+
+function getLocalPayments() {
+  return JSON.parse(localStorage.getItem('linkup_payments') || '[]');
+}
+function saveLocalPayments(payments) {
+  localStorage.setItem('linkup_payments', JSON.stringify(payments));
+}
 
 function normalizeStatus(s) {
-  return (s || '').toLowerCase().replace(/\s+/g, '_');
+  return (s || '').toLowerCase().replace(/\s+/g, '');
 }
 
 function jobIsPendingApproval(job) {
   const s = normalizeStatus(job.status);
-  return ['submitted', 'awaiting_approval', 'awaiting_payment', 'in_progress'].includes(s);
+  return ['submitted', 'awaitingapproval', 'awaitingpayment', 'inprogress', 'ongoing'].includes(s);
 }
 
-async function renderPendingList(list) {
+function renderPendingList(list) {
   const el = $('#paymentList');
 
   if (!list.length) {
@@ -26,49 +84,46 @@ async function renderPendingList(list) {
     return;
   }
 
-  // Fetch student info for each job (from confirmed application)
-  const jobsWithStudent = await Promise.all(
-    list.map(async (job) => {
-      const { data: app } = await supabase
-        .from('applications')
-        .select('*, profiles(full_name)')
-        .eq('job_id', job.id)
-        .in('status', ['confirmed', 'submitted', 'completed'])
-        .maybeSingle();
-
-      return { ...job, student_name: app?.profiles?.full_name || '—', app_id: app?.id };
-    })
-  );
-
-  el.innerHTML = jobsWithStudent
+  el.innerHTML = list
     .map((job) => {
       const badgeClass = statusToBadgeClass(job.status);
       const deposit = Number(job.deposit || 0);
       const salary = Number(job.salary || 0);
 
+      const accepted = (job.applications || []).find((a) =>
+        [
+          'awaitingcommitmentfee',
+          'accepted',
+          'confirmed',
+          'inprogress',
+          'ongoing',
+          'submitted',
+          'completed',
+        ].includes(normalizeStatus(a.status))
+      );
+      const studentName = accepted?.studentName || accepted?.profiles?.full_name || '—';
+
       return `
-      <div class="card pay-row">
+      <div class="card pay-row" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; margin-bottom: 15px;">
         <div class="pay-left">
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
             <h3 style="margin:0;">${job.title}</h3>
             <span class="badge ${badgeClass}">${job.status}</span>
           </div>
 
-          <div class="pay-meta">
-            <span class="kv">👤 Student: ${job.student_name}</span>
-            <span class="kv">💰 Salary: RM ${salary}</span>
-            <span class="kv">💳 Refund Fee: RM ${deposit}</span>
-            <span class="kv">📅 Deadline: ${job.deadline || '-'}</span>
+          <div class="pay-meta" style="margin-top: 10px; display: flex; gap: 15px; font-size: 14px; color: var(--muted);">
+            <span>👤 Student: <strong>${studentName}</strong></span>
+            <span>💰 Salary: <strong>RM ${salary}</strong></span>
+            <span>💳 Refund Fee: <strong>RM ${deposit}</strong></span>
           </div>
 
-          <div class="small-note">
-            Approve completion to release salary (and refund commitment fee if applicable).
+          <div class="small-note" style="margin-top: 8px; font-size: 12px; color: #888;">
+            Approve completion to release salary and refund the commitment fee.
           </div>
         </div>
 
-        <div class="pay-actions">
-          <button class="btn btn-outline" onclick="window.location.href='job-manage.html'">View</button>
-          <button class="btn btn-primary" data-approve-job="${job.id}" data-app-id="${job.app_id}">
+        <div class="pay-actions" style="display: flex; gap: 10px;">
+          <button class="btn btn-primary" data-approve="${job.id}">
             Approve & Release
           </button>
           <button class="btn btn-outline">Report Issue</button>
@@ -78,85 +133,101 @@ async function renderPendingList(list) {
     })
     .join('');
 
-  // Wire actions
-  $$('[data-approve-job]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const jobId = btn.dataset.approveJob;
-      const appId = btn.dataset.appId;
-      approveAndRelease(jobId, appId);
-    });
+  $$('[data-approve]').forEach((btn) => {
+    btn.addEventListener('click', () => approveAndRelease(btn.dataset.approve));
   });
 }
 
-async function approveAndRelease(jobId, appId) {
-  if (!confirm('Are you sure you want to approve this work and release payment?')) return;
+async function approveAndRelease(jobId) {
+  const localJobs = getLocalJobs();
+  const localPayments = getLocalPayments();
 
-  try {
-    // 1. Update job status
-    const { error: jobErr } = await supabase
-      .from('jobs')
-      .update({ status: 'Completed' })
-      .eq('id', jobId);
+  // Try to find in local storage first
+  let job = localJobs.find((j) => String(j.id) === String(jobId));
 
-    if (jobErr) throw jobErr;
+  if (!job) {
+    // Try Supabase
+    try {
+      const { error: jobErr } = await supabase
+        .from('jobs')
+        .update({ status: 'Completed' })
+        .eq('id', jobId);
 
-    // 2. Update application status
-    if (appId) {
-      const { error: appErr } = await supabase
-        .from('applications')
-        .update({ status: 'completed' })
-        .eq('id', appId);
-      if (appErr) throw appErr;
+      if (!jobErr) {
+        alert('Payment released. Job marked as Completed.');
+        await loadAndRender();
+        return;
+      }
+    } catch (e) {
+      // fall through to mock
     }
 
-    // 3. Update commitment fee status (Refunded)
-    await supabase
-      .from('commitment_fees')
-      .update({ status: 'Refunded', refunded_at: new Date().toISOString() })
-      .eq('job_id', jobId);
-
-    alert('Payment released ✅ Job marked as Completed.');
-    await loadAndRender();
-  } catch (err) {
-    alert('Error releasing payment: ' + err.message);
+    // Fallback to mock data
+    job = MOCK_PENDING.find((j) => String(j.id) === String(jobId));
+    if (!job) return;
+    alert('Demo: Approval for mock job processed.');
+  } else {
+    // Update real job status
+    job.status = 'Completed';
+    if (job.applications && job.applications.length) {
+      const chosen = job.applications.find((a) =>
+        [
+          'awaitingcommitmentfee',
+          'accepted',
+          'confirmed',
+          'inprogress',
+          'ongoing',
+          'submitted',
+        ].includes(normalizeStatus(a.status))
+      );
+      if (chosen) chosen.status = 'Completed';
+    }
+    saveLocalJobs(localJobs);
   }
+
+  // Create payment record
+  const newPayment = {
+    id: Date.now(),
+    jobId: job.id,
+    jobTitle: job.title,
+    salary: Number(job.salary || 0),
+    depositRefunded: Number(job.deposit || 0),
+    releasedAt: new Date().toISOString(),
+    status: 'Released',
+  };
+
+  localPayments.unshift(newPayment);
+  saveLocalPayments(localPayments);
+
+  await loadAndRender();
+  alert('Payment released. Salary transferred to student.');
 }
 
-async function renderPaymentHistory() {
-  const user = await authService.getCurrentUser();
-  if (!user) return;
-
-  // Fetch completed jobs for history
-  const { data: jobs, error } = await supabase
-    .from('jobs')
-    .select('*')
-    .eq('employer_id', user.id)
-    .eq('status', 'Completed')
-    .order('created_at', { ascending: false });
-
+function renderPaymentHistory(payments) {
   const el = $('#paymentHistory');
 
-  if (error || !jobs || !jobs.length) {
+  if (!payments || !payments.length) {
     el.innerHTML = `
       <div class="card pad">
-        <p>No completed payments yet.</p>
+        <p>No payouts released yet.</p>
       </div>
     `;
     return;
   }
 
-  el.innerHTML = jobs
+  el.innerHTML = payments
+    .slice(0, 10)
     .map(
       (p) => `
-    <div class="card pad" style="display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap;">
+    <div class="card pad" style="display:flex; justify-content:space-between; align-items: center; gap:14px; margin-bottom: 10px;">
       <div>
-        <h3 style="margin:0;">${p.title}</h3>
-        <p class="muted" style="margin:6px 0 0;">Location: ${p.location}</p>
+        <h3 style="margin:0; font-size: 1rem;">${p.jobTitle || p.title}</h3>
+        <p style="margin:6px 0 0; font-size: 13px; color: var(--muted);">Released: ${p.releasedAt ? new Date(p.releasedAt).toLocaleString() : 'N/A'}</p>
       </div>
       <div style="text-align:right;">
-        <div class="kv">💰 RM ${p.salary}</div>
-        <div class="kv">💳 Fee Refund RM ${p.deposit}</div>
-        <span class="badge accepted">Completed</span>
+        <div style="font-weight: 700; color: var(--green);">RM ${p.salary || p.salary || 0}</div>
+        <div style="font-size: 12px; color: var(--muted);">+ RM ${p.depositRefunded || p.deposit || 0} Refund</div>
+        <span class="badge accepted" style="margin-top: 5px;">${p.status || 'Released'}</span>
       </div>
     </div>
   `
@@ -165,46 +236,58 @@ async function renderPaymentHistory() {
 }
 
 async function loadAndRender() {
-  const user = await authService.getCurrentUser();
-  if (!user) return;
+  const localJobs = getLocalJobs();
+  const dbJobs = await jobsService.getMyJobs();
 
-  // fetch my jobs that are not completed yet
-  const { data: jobs, error } = await supabase
-    .from('jobs')
-    .select('*')
-    .eq('employer_id', user.id)
-    .neq('status', 'Completed');
+  // Combine all jobs
+  const remoteIds = new Set(dbJobs.map((j) => String(j.id)));
+  const uniqueLocal = localJobs.filter((j) => !remoteIds.has(String(j.id)));
+  const allJobs = [...dbJobs, ...uniqueLocal, ...MOCK_PENDING];
 
-  if (error) {
-    console.error('Error loading pending approvals:', error);
-    return;
-  }
+  // Combine payments (local + mock history)
+  const localPayments = getLocalPayments();
+  const allPayments = [...localPayments, ...MOCK_HISTORY];
 
   // pending jobs list
-  let pending = jobs.filter(jobIsPendingApproval);
+  let pending = allJobs.filter(jobIsPendingApproval);
 
-  // Apply filters (UI side for simplicity)
+  // Apply filters
+  const statusFilter = $('#payStatusFilter')?.value || 'all';
   const search = ($('#paySearch')?.value || '').toLowerCase();
+
   if (search) {
     pending = pending.filter((j) => (j.title || '').toLowerCase().includes(search));
   }
 
+  if (statusFilter !== 'all') {
+    pending = pending.filter((j) => {
+      const s = normalizeStatus(j.status);
+      if (statusFilter === 'awaiting_approval')
+        return ['submitted', 'awaitingapproval', 'awaitingpayment'].includes(s);
+      if (statusFilter === 'in_progress') return s === 'inprogress' || s === 'ongoing';
+      return true;
+    });
+  }
+
   // pending count badge
-  const pendingCount = pending.filter((j) => normalizeStatus(j.status) === 'submitted').length;
-  $('#pendingCountBadge').textContent = `${pendingCount} New Submission(s)`;
+  const pendingCount = pending.length;
+  $('#pendingCountBadge').textContent = `${pendingCount} Pending`;
   $('#pendingCountBadge').className = 'badge ' + (pendingCount ? 'pending' : 'accepted');
 
-  await renderPendingList(pending);
-  await renderPaymentHistory();
+  renderPendingList(pending);
+  renderPaymentHistory(allPayments);
 }
 
 async function init() {
-  setActiveNav();
-  await authService.requireAuth('employer');
-  await loadAndRender();
+  const user = await authService.requireAuth('employer');
+  if (!user) return;
 
-  $('#payStatusFilter')?.addEventListener('change', loadAndRender);
-  $('#paySearch')?.addEventListener('input', loadAndRender);
+  setActiveNav();
+
+  $('#payStatusFilter').addEventListener('change', loadAndRender);
+  $('#paySearch').addEventListener('input', loadAndRender);
+
+  await loadAndRender();
 }
 
 document.addEventListener('DOMContentLoaded', init);

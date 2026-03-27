@@ -1,43 +1,80 @@
 // js/pages/student/service-manage.js
-import { $ } from '../../utils/dom.js';
+import { $, $$ } from '../../utils/dom.js';
 import { setActiveNav, wireLogout } from '../../components/navbar.js';
+import { marketplaceService } from '../../services/marketplace.service.js';
+import { authService } from '../../services/auth.service.js';
 
 class ServiceManage {
   constructor() {
     this.form = $('#serviceForm');
     this.imageUpload = $('#imageUpload');
     this.fileInput = $('#fileInput');
+    this.imagePreview = $('#imagePreview');
+    this.uploadIcon = $('#uploadIcon');
+    this.uploadText = $('#uploadText');
     this.tagsContainer = $('#serviceTags');
+    this.customTagsContainer = $('#customTagsContainer');
+    this.customTagsInput = $('#customTags');
     this.toggleEditBtn = $('#toggleEditBtn');
-    this.submitBtn = $('button[type="submit"]');
+    this.submitBtn = $('#submitBtn');
+    this.selectedFile = null;
     this.selectedImageData = null;
     this.selectedTags = new Set();
     this.editId = null;
-    this.isEditMode = false;
+    this.isEditMode = true; // Default to true for new items
   }
 
-  init() {
+  async init() {
+    const user = await authService.requireAuth('student');
+    if (!user) return;
+
     setActiveNav();
     wireLogout();
-    this.checkEditMode();
+    await this.checkEditMode();
     this.wireEvents();
-    if (!this.editId) {
-      this.setDefaultDate();
-      this.isEditMode = true; // New listing is always in edit mode
-    }
+
+    // Set up chip interaction
+    this.setupChips();
   }
 
-  checkEditMode() {
+  setupChips() {
+    const chips = this.tagsContainer.querySelectorAll('.chip');
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        if (!this.isEditMode) return;
+        const val = chip.dataset.value;
+
+        if (val === 'others') {
+          chip.classList.toggle('active');
+          const isOthersActive = chip.classList.contains('active');
+          if (this.customTagsContainer) {
+            this.customTagsContainer.style.display = isOthersActive ? 'block' : 'none';
+          }
+          return;
+        }
+
+        if (this.selectedTags.has(val)) {
+          this.selectedTags.delete(val);
+          chip.classList.remove('active');
+        } else {
+          this.selectedTags.add(val);
+          chip.classList.add('active');
+        }
+      });
+    });
+  }
+
+  async checkEditMode() {
     const params = new URLSearchParams(window.location.search);
-    const id = parseInt(params.get('id'));
+    const id = params.get('id');
     if (id) {
       this.editId = id;
-      this.isEditMode = false; // Start in View mode
+      this.isEditMode = false;
       $('#pageTitle').textContent = 'Service Details';
       this.toggleEditBtn.style.display = 'block';
       this.submitBtn.style.display = 'none';
 
-      this.loadExistingData(id);
+      await this.loadExistingData(id);
       this.setFormDisabled(true);
     }
   }
@@ -60,42 +97,56 @@ class ServiceManage {
     this.imageUpload.style.opacity = disabled ? '0.8' : '1';
   }
 
-  loadExistingData(id) {
-    const myListings = JSON.parse(localStorage.getItem('linkup_my_market_listings') || '[]');
-    const item = myListings.find((i) => i.id === id);
+  async loadExistingData(id) {
+    try {
+      const item = await marketplaceService.getItemById(id);
+      if (item) {
+        $('#title').value = item.title;
+        $('#price').value = item.price;
+        $('#status').value = item.status;
+        $('#location').value = item.location;
+        $('#description').value = item.description || '';
 
-    if (item) {
-      $('#title').value = item.title;
-      $('#price').value = (item.price || '').replace('RM ', '');
-      $('#status').value = item.status || 'Ongoing';
-      $('#location').value = item.location;
-      $('#description').value = item.description || '';
-      $('#date').value = item.date;
+        if (item.image) {
+          this.selectedImageData = item.image;
+          if (this.imagePreview) {
+            this.imagePreview.src = item.image;
+            this.imagePreview.style.display = 'block';
+          }
+          if (this.uploadIcon) this.uploadIcon.style.display = 'none';
+          if (this.uploadText) this.uploadText.style.display = 'none';
+        }
 
-      if (item.image) {
-        this.selectedImageData = item.image;
-        this.imageUpload.innerHTML = `<img src="${item.image}" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">`;
+        if (item.tags) {
+          const predefined = ['creative', 'tech', 'academic', 'events', 'food', 'admin'];
+          const manual = [];
+
+          item.tags.forEach((tag) => {
+            if (predefined.includes(tag)) {
+              this.selectedTags.add(tag);
+              const chip = this.tagsContainer.querySelector(`[data-value="${tag}"]`);
+              if (chip) chip.classList.add('active');
+            } else {
+              manual.push(tag);
+            }
+          });
+
+          if (manual.length > 0) {
+            const othersChip = $('#othersChip');
+            if (othersChip) othersChip.classList.add('active');
+            if (this.customTagsContainer) this.customTagsContainer.style.display = 'block';
+            if (this.customTagsInput) this.customTagsInput.value = manual.join(', ');
+          }
+        }
+
+        $('#terms').checked = true;
       }
-
-      if (item.tags) {
-        item.tags.forEach((tag) => {
-          this.selectedTags.add(tag);
-          const chip = this.tagsContainer.querySelector(`[data-value="${tag}"]`);
-          if (chip) chip.classList.add('active');
-        });
-      }
-
-      $('#terms').checked = true;
+    } catch (err) {
+      console.error('Error loading data:', err);
     }
   }
 
-  setDefaultDate() {
-    const today = new Date().toISOString().split('T')[0];
-    $('#date').value = today;
-  }
-
   wireEvents() {
-    // Toggle Edit Mode
     this.toggleEditBtn.addEventListener('click', () => {
       this.isEditMode = true;
       this.setFormDisabled(false);
@@ -110,74 +161,96 @@ class ServiceManage {
     this.fileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
+        this.selectedFile = file;
         const reader = new FileReader();
         reader.onload = (event) => {
           this.selectedImageData = event.target.result;
-          this.imageUpload.innerHTML = `<img src="${this.selectedImageData}" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">`;
+          if (this.imagePreview) {
+            this.imagePreview.src = this.selectedImageData;
+            this.imagePreview.style.display = 'block';
+          }
+          if (this.uploadIcon) this.uploadIcon.style.display = 'none';
+          if (this.uploadText) this.uploadText.style.display = 'none';
         };
         reader.readAsDataURL(file);
       }
     });
 
-    if (this.tagsContainer) {
-      this.tagsContainer.addEventListener('click', (e) => {
-        if (!this.isEditMode) return;
-        const chip = e.target.closest('.chip');
-        if (!chip) return;
-        const val = chip.dataset.value;
-        if (this.selectedTags.has(val)) {
-          this.selectedTags.delete(val);
-          chip.classList.remove('active');
-        } else {
-          this.selectedTags.add(val);
-          chip.classList.add('active');
-        }
-      });
-    }
-
-    this.form.addEventListener('submit', (e) => {
+    this.form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      this.handlePost();
+      await this.handlePost();
     });
   }
 
-  handlePost() {
-    const title = $('#title').value;
-    const priceValue = $('#price').value;
-    const status = $('#status').value;
-    const location = $('#location').value;
-    const description = $('#description').value;
-    const date = $('#date').value;
+  async handlePost() {
+    const user = await authService.getCurrentUser();
+    if (!user) {
+      alert('Please log in to post items.');
+      return;
+    }
 
-    if (this.selectedTags.size === 0) {
+    const finalTags = Array.from(this.selectedTags);
+
+    // Add custom tags if active
+    const othersChip = $('#othersChip');
+    if (othersChip && othersChip.classList.contains('active') && this.customTagsInput) {
+      const customVal = this.customTagsInput.value.trim();
+      if (customVal) {
+        const manualTags = customVal
+          .split(',')
+          .map((t) => t.trim().toLowerCase())
+          .filter((t) => t !== '');
+        finalTags.push(...manualTags);
+      }
+    }
+
+    if (finalTags.length === 0) {
       alert('Please select at least one category tag.');
       return;
     }
 
-    const listingData = {
-      id: this.editId || Date.now(),
-      title,
-      price: `RM ${priceValue}`,
-      status,
-      location,
-      description,
-      date,
-      tags: Array.from(this.selectedTags),
-      image: this.selectedImageData,
-      type: 'Service',
-    };
+    this.submitBtn.disabled = true;
+    this.submitBtn.textContent = 'Processing...';
 
-    let existingListings = JSON.parse(localStorage.getItem('linkup_my_market_listings') || '[]');
+    try {
+      let imageUrl = this.selectedImageData;
 
-    if (this.editId) {
-      existingListings = existingListings.map((i) => (i.id === this.editId ? listingData : i));
-    } else {
-      existingListings.unshift(listingData);
+      if (this.selectedFile) {
+        imageUrl = this.selectedImageData; // Using base64 for demo
+      }
+
+      const listingData = {
+        title: $('#title').value,
+        price: parseFloat($('#price').value),
+        status: $('#status').value,
+        location: $('#location').value,
+        description: $('#description').value,
+        tags: finalTags,
+        image: imageUrl,
+        type: 'Service',
+        user_id: user.id,
+        date: new Date().toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+        }),
+      };
+
+      if (this.editId) {
+        await marketplaceService.updateItem(this.editId, listingData);
+        alert('Service updated successfully!');
+      } else {
+        await marketplaceService.createItem(listingData);
+        alert('Success! Your service has been posted.');
+      }
+
+      window.location.href = 'marketplace-listings.html';
+    } catch (err) {
+      alert('Error: ' + err.message);
+    } finally {
+      this.submitBtn.disabled = false;
+      this.submitBtn.textContent = this.editId ? 'Update Service' : 'Post Service Now';
     }
-
-    localStorage.setItem('linkup_my_market_listings', JSON.stringify(existingListings));
-    alert(this.editId ? 'Service updated successfully!' : 'Success! Your service has been posted.');
-    window.location.href = 'marketplace-listings.html';
   }
 }
 

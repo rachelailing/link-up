@@ -7,12 +7,15 @@ const SKILLS = [
   { key: 'design', name: 'Graphic Design', desc: 'Poster, slides, banners' },
   { key: 'video', name: 'Video Editing', desc: 'Reels, short videos, TikTok' },
   { key: 'photo', name: 'Photography', desc: 'Event, product photos' },
-  { key: 'writing', name: 'Writing', desc: 'Copywriting, reports' },
-  { key: 'tutor', name: 'Tutoring', desc: 'Math, English, subjects' },
-  { key: 'booth', name: 'Booth Helper', desc: 'Events, selling, setup' },
-  { key: 'social', name: 'Social Media', desc: 'Content & posting' },
-  { key: 'coding', name: 'Web Dev', desc: 'HTML/CSS/JS basics' },
+  { key: 'writing', name: 'Writing', desc: 'Copywriting, reports, content' },
+  { key: 'tutoring', name: 'Tutoring', desc: 'Math, English, subjects' },
+  { key: 'booth', name: 'Booth Management', desc: 'Events, selling, setup' },
+  { key: 'event', name: 'Event Support', desc: 'Ushering, logistics, helper' },
+  { key: 'social', name: 'Social Media', desc: 'Content, posting, marketing' },
+  { key: 'coding', name: 'Coding / Web Dev', desc: 'Python, HTML/CSS/JS' },
   { key: 'delivery', name: 'Runner/Delivery', desc: 'Campus errands' },
+  { key: 'customer_service', name: 'Customer Service', desc: 'Greeting, handling guests' },
+  { key: 'tech', name: 'Technical Support', desc: 'Troubleshooting, IT' },
 ];
 
 const INTERESTS = [

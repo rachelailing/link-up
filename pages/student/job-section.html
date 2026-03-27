@@ -16,8 +16,8 @@
 
         <nav class="nav">
           <a data-nav href="job-section.html">🏠 Home Page</a>
-          <a data-nav href="jobs.html">🔍 Find Jobs</a>
-          <a data-nav href="job-earnings.html">💰 My Earnings</a>
+          <a data-nav href="jobs.html">🔍 Job Details</a>
+          <a data-nav href="job-earnings.html">💰 Transaction Details</a>
 
           <div class="nav-logout">
             <a href="#" id="logoutBtn">🚪 Logout</a>
@@ -76,7 +76,7 @@
       </main>
     </div>
 
-    <!-- Modal -->
+    <!-- Apply Modal -->
     <div class="modal-backdrop" id="applyModal">
       <div class="modal">
         <h3>Apply for <span id="applyJobTitle">Job</span></h3>
@@ -85,6 +85,30 @@
         <div class="modal-actions">
           <button class="btn btn-outline" data-modal-close="applyModal">Cancel</button>
           <button class="btn btn-primary" data-modal-close="applyModal">Submit</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Details Modal -->
+    <div class="modal-backdrop" id="jobDetailsModal">
+      <div class="modal">
+        <h2 id="modalJobTitle">Job Title</h2>
+        <p id="modalEmployer" class="muted">Employer Name</p>
+
+        <div style="margin: 16px 0; border-top: 1px solid var(--border); padding-top: 16px">
+          <p><strong>Location:</strong> <span id="modalLocation">Location</span></p>
+          <p><strong>Salary:</strong> RM <span id="modalSalary">0</span></p>
+          <p><strong>Category:</strong> <span id="modalCategory">Category</span></p>
+        </div>
+
+        <div style="margin: 16px 0">
+          <h3>Description</h3>
+          <p id="modalDescription" style="line-height: 1.6">Job description goes here...</p>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-outline" data-modal-close="jobDetailsModal">Close</button>
+          <button class="btn btn-primary" id="modalApplyBtn">Apply Now</button>
         </div>
       </div>
     </div>

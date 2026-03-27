@@ -1,5 +1,6 @@
 // js/pages/student/job-section.js
 import { setActiveNav, wireLogout } from '../../components/navbar.js';
+import { openModal, closeModal, wireModalClose } from '../../components/modal.js';
 import { $ } from '../../utils/dom.js';
 import { jobsService } from '../../services/jobs.service.js';
 import { renderJobCard, wireJobCardEvents } from '../../components/job-card.js';
@@ -19,6 +20,7 @@ class StudentDashboard {
 
     setActiveNav();
     wireLogout();
+    wireModalClose();
 
     await this.renderJobs();
     this.wireEvents();
@@ -41,12 +43,37 @@ class StudentDashboard {
   wireEvents() {
     wireJobCardEvents(this.listEl, {
       onView: (id) => {
-        window.location.href = `job-details.html?id=${id}`;
+        this.handleViewJob(id);
       },
       onApply: (id) => {
         window.location.href = `apply-job.html?id=${id}`;
       },
     });
+
+    // Wire the Apply button inside the Job Details modal
+    const modalApplyBtn = $('#modalApplyBtn');
+    if (modalApplyBtn) {
+      modalApplyBtn.addEventListener('click', () => {
+        const jobId = $('#jobDetailsModal').dataset.activeJobId;
+        closeModal('jobDetailsModal');
+        window.location.href = `apply-job.html?id=${jobId}`;
+      });
+    }
+  }
+
+  async handleViewJob(jobId) {
+    const job = await jobsService.getJobById(jobId);
+    if (job) {
+      $('#modalJobTitle').textContent = job.title;
+      $('#modalEmployer').textContent = job.employer_name || job.employer || 'Employer';
+      $('#modalLocation').textContent = job.location;
+      $('#modalSalary').textContent = job.salary || job.pay || '0';
+      $('#modalCategory').textContent = job.category || 'N/A';
+      $('#modalDescription').textContent = job.description || 'No description provided.';
+
+      $('#jobDetailsModal').dataset.activeJobId = jobId;
+      openModal('jobDetailsModal');
+    }
   }
 
   async loadStats(userId) {

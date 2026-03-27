@@ -19,20 +19,20 @@ export function renderJobCard(job) {
   return `
     <div class="card job" data-job-id="${job.id}">
       <div class="job-left">
-        <div style="display:flex; justify-content:space-between; gap:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
           <div>
             <div style="display:flex; align-items:center;">
               ${matchBadge}
               <h3 style="margin:0;">${job.title}</h3>
             </div>
-            <p style="margin:6px 0 0;">${job.employer}</p>
+            <p style="margin:6px 0 0;">${job.employer_name || job.employer || 'Employer'}</p>
           </div>
           <span class="badge ${badgeClass}">${job.status}</span>
         </div>
 
         <div class="job-meta">
           <span class="kv">📍 ${job.location}</span>
-          <span class="kv">💰 RM ${job.pay}</span>
+          <span class="kv">💰 RM ${job.salary || job.pay || '0'}</span>
           ${job.category ? `<span class="kv">🏷️ ${job.category}</span>` : ''}
         </div>
       </div>
@@ -57,7 +57,7 @@ export function wireJobCardEvents(container, { onView, onApply }) {
 
     const action = btn.dataset.action;
     const card = btn.closest('.card.job');
-    const jobId = Number(card.dataset.jobId);
+    const jobId = card.dataset.jobId; // Keep as string for UUID compatibility
 
     if (action === 'view' && onView) onView(jobId);
     if (action === 'apply' && onApply) onApply(jobId);

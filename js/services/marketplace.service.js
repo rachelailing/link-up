@@ -7,8 +7,8 @@ import { supabase } from '../config/supabase.js';
  */
 class MarketplaceService {
   /**
-   * Fetches items from the 'marketplace_items' table with pagination.
-   * @param {Object} pagination
+   * Fetches all items from the 'marketplace_items' table.
+   * @param {Object} pagination - optional page/pageSize
    * @returns {Promise<Array>}
    */
   async getAllItems({ page = 0, pageSize = 12 } = {}) {
@@ -31,10 +31,12 @@ class MarketplaceService {
   /**
    * Smart recommendation algorithm for marketplace items.
    * Optimizes performance by fetching a subset first based on tags.
+   * Filters out items owned by the current user.
    * @param {Object} profile - Student profile metadata
+   * @param {string|null} userId - current user id to exclude own items
    * @returns {Promise<Array>}
    */
-  async getRecommended(profile = {}) {
+  async getRecommended(profile = {}, userId = null) {
     const studentInterests = (profile.interests || []).map((i) => i.toLowerCase());
 
     let query = supabase.from('marketplace_items').select('*');
@@ -47,8 +49,14 @@ class MarketplaceService {
 
     if (error || !items) return [];
 
+    // Filter out user's own items
+    let filtered = items;
+    if (userId) {
+      filtered = items.filter((item) => item.user_id !== userId);
+    }
+
     // Scoring Algorithm
-    const scoredItems = items.map((item) => {
+    const scoredItems = filtered.map((item) => {
       let score = 0;
 
       const itemTags = (item.tags || []).map((t) => t.toLowerCase());
@@ -76,7 +84,7 @@ class MarketplaceService {
     // Sort by score and rating
     const recommendations = scoredItems.sort((a, b) => {
       if (b.matchScore !== a.matchScore) return b.matchScore - a.matchScore;
-      return Number(b.rating) - Number(a.rating);
+      return (Number(b.rating) || 0) - (Number(a.rating) || 0);
     });
 
     return recommendations.slice(0, 4);
@@ -84,27 +92,31 @@ class MarketplaceService {
 
   /**
    * Filters items by type: 'Product'.
+   * @param {string|null} userId - optional: exclude own items
    */
-  async getProducts() {
+  async getProducts(userId = null) {
     const { data, error } = await supabase
       .from('marketplace_items')
       .select('*')
       .eq('type', 'Product');
 
     if (error) return [];
+    if (userId) return data.filter((i) => i.user_id !== userId);
     return data;
   }
 
   /**
    * Filters items by type: 'Service'.
+   * @param {string|null} userId - optional: exclude own items
    */
-  async getServices() {
+  async getServices(userId = null) {
     const { data, error } = await supabase
       .from('marketplace_items')
       .select('*')
       .eq('type', 'Service');
 
     if (error) return [];
+    if (userId) return data.filter((i) => i.user_id !== userId);
     return data;
   }
 
@@ -128,13 +140,17 @@ class MarketplaceService {
 
   /**
    * Fetches listings created by the current user.
-   * @param {string} userId
    */
-  async getMyListings(userId) {
+  async getMyListings() {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return [];
+
     const { data, error } = await supabase
       .from('marketplace_items')
       .select('*')
-      .eq('owner_id', userId)
+      .or(`owner_id.eq.${user.id},user_id.eq.${user.id}`)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -156,6 +172,55 @@ class MarketplaceService {
       throw error;
     }
     return data[0];
+  }
+
+  /**
+   * Update an existing marketplace item.
+   * @param {string|number} id
+   * @param {Object} itemData
+   */
+  async updateItem(id, itemData) {
+    const { data, error } = await supabase
+      .from('marketplace_items')
+      .update(itemData)
+      .eq('id', id)
+      .select();
+
+    if (error) throw error;
+    return data[0];
+  }
+
+  /**
+   * Delete an item.
+   * @param {string|number} id
+   */
+  async deleteItem(id) {
+    const { error } = await supabase.from('marketplace_items').delete().eq('id', id);
+
+    if (error) throw error;
+    return true;
+  }
+
+  /**
+   * Upload an image to Supabase storage.
+   * @param {File} file
+   */
+  async uploadImage(file) {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `marketplace/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('marketplace_images')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('marketplace_images').getPublicUrl(filePath);
+
+    return publicUrl;
   }
 }
 

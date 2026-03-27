@@ -75,6 +75,32 @@ export class AuthService {
   }
 
   /**
+   * Upload student verification document to Supabase storage.
+   * @param {File} file
+   * @returns {Promise<string>} Public URL of the uploaded file
+   */
+  async uploadVerificationDocument(file) {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+    const filePath = `verifications/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('student_verifications')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      console.error('[AuthService] Error uploading verification:', uploadError);
+      throw uploadError;
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('student_verifications').getPublicUrl(filePath);
+
+    return publicUrl;
+  }
+
+  /**
    * Update the current user's metadata
    * @param {Object} metadata
    */

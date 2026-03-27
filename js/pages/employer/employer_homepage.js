@@ -2,87 +2,115 @@ import { $, $$ } from '../../utils/dom.js';
 import { setActiveNav, wireLogout } from '../../components/navbar.js';
 import { statusToBadgeClass } from '../../components/status-badge.js';
 import { authService } from '../../services/auth.service.js';
+import { jobsService } from '../../services/jobs.service.js';
 
-const JOBS = [
+// Mock Data for Pitch
+const MOCK_JOBS = [
   {
-    id: 101,
-    title: 'Booth Helper (Career Fair)',
+    id: 'mock-1',
+    title: 'Event Crew: Tech Showcase',
     status: 'Open',
-    pay: 80,
-    applicants: 6,
-    location: 'UTP Main Hall',
+    location: 'Block 1, UTP',
+    salary: 150,
+    applications: [{}, {}, {}], // 3 applicants
   },
   {
-    id: 102,
-    title: 'Poster Design (Club Event)',
+    id: 'mock-2',
+    title: 'Lab Assistant - Physics',
     status: 'In Progress',
-    pay: 120,
-    applicants: 9,
-    location: 'Remote',
+    location: 'Block P',
+    salary: 200,
+    applications: [{}],
   },
   {
-    id: 103,
-    title: 'Math Tutor (Foundation)',
+    id: 'mock-3',
+    title: 'Library Data Entry',
     status: 'Completed',
-    pay: 150,
-    applicants: 4,
-    location: 'Block C',
+    location: 'IRC',
+    salary: 100,
+    applications: [{}],
   },
 ];
 
-const APPLICATIONS = [
+const MOCK_APPS = [
   {
-    id: 201,
-    student: 'Aiman Z.',
-    jobTitle: 'Booth Helper (Career Fair)',
-    rating: 4.6,
+    id: 'app-1',
+    studentName: 'Rachel Ng',
     status: 'Pending',
+    jobTitle: 'Event Crew: Tech Showcase',
+    jobId: 'mock-1',
+    rating: 4.8,
   },
   {
-    id: 202,
-    student: 'Siti N.',
-    jobTitle: 'Poster Design (Club Event)',
-    rating: 4.9,
-    status: 'Pending',
-  },
-  {
-    id: 203,
-    student: 'Ken L.',
-    jobTitle: 'Booth Helper (Career Fair)',
-    rating: 4.2,
+    id: 'app-2',
+    studentName: 'Ahmad Danish',
     status: 'Accepted',
+    jobTitle: 'Lab Assistant - Physics',
+    jobId: 'mock-2',
+    rating: 4.5,
+  },
+  {
+    id: 'app-3',
+    studentName: 'Sarah Lim',
+    status: 'Pending',
+    jobTitle: 'Event Crew: Tech Showcase',
+    jobId: 'mock-1',
+    rating: 4.9,
   },
 ];
 
-function renderRecentJobs() {
+async function renderRecentJobs() {
   const el = $('#recentJobs');
-  el.innerHTML = JOBS.map((job) => {
-    const badge = statusToBadgeClass(job.status);
-    return `
-      <div class="card item-row" style="border:1px solid var(--border); box-shadow:none;">
+
+  // Try fetching from service first
+  const dbJobs = await jobsService.getMyJobs();
+  const jobs = [...MOCK_JOBS, ...dbJobs];
+
+  if (jobs.length === 0) {
+    el.innerHTML = `
+      <div class="card pad" style="text-align:center; color:var(--text-light);">
+        <p>No recent jobs found.</p>
+        <a href="create-job.html" class="btn btn-outline" style="margin-top:10px;">Create your first job</a>
+      </div>
+    `;
+    return;
+  }
+
+  // Show only 3 recent jobs
+  const recentJobs = jobs.slice(0, 3);
+
+  el.innerHTML = recentJobs
+    .map((job) => {
+      const badge = statusToBadgeClass(job.status);
+      const pay = job.salary || job.pay || 0;
+      const location = job.location || 'N/A';
+      const applicants = job.applications ? job.applications.length : 0;
+
+      return `
+      <div class="card item-row" style="border:1px solid var(--border); box-shadow:none; margin-bottom: 10px; padding: 16px;">
         <div class="item-left">
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-            <h3 style="margin:0;">${job.title}</h3>
+            <h3 style="margin:0; font-size: 1rem;">${job.title}</h3>
             <span class="badge ${badge}">${job.status}</span>
           </div>
 
-          <div class="item-meta">
-            <span class="kv">📍 ${job.location}</span>
-            <span class="kv">💰 RM ${job.pay}</span>
-            <span class="kv">👥 ${job.applicants} applicants</span>
+          <div class="item-meta" style="margin-top: 8px; display: flex; gap: 12px; font-size: 0.85rem; color: var(--muted);">
+            <span>📍 ${location}</span>
+            <span>💰 RM ${pay}</span>
+            <span>👥 ${applicants} applicants</span>
           </div>
         </div>
 
-        <div class="item-actions">
-          <button class="btn btn-outline" data-job-view="${job.id}">Manage</button>
+        <div class="item-actions" style="margin-top: 12px;">
+          <button class="btn btn-outline btn-sm" data-job-view="${job.id}">Manage</button>
         </div>
       </div>
     `;
-  }).join('');
+    })
+    .join('');
 
   $$('[data-job-view]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      // Later you can redirect to job-manage page with query id
       window.location.href = `job-manage.html?id=${btn.dataset.jobView}`;
     });
   });
@@ -90,52 +118,62 @@ function renderRecentJobs() {
 
 function renderRecentApplications() {
   const el = $('#recentApplications');
-  el.innerHTML = APPLICATIONS.map((app) => {
-    const badge = statusToBadgeClass(app.status);
-    return `
-      <div class="card item-row" style="border:1px solid var(--border); box-shadow:none;">
+
+  if (MOCK_APPS.length === 0) {
+    el.innerHTML = `
+      <div class="card pad" style="text-align:center; color:var(--text-light);">
+        <p>No recent applications.</p>
+      </div>
+    `;
+    return;
+  }
+
+  // Show only 3 recent applications
+  const recentApps = MOCK_APPS.slice(0, 3);
+
+  el.innerHTML = recentApps
+    .map((app) => {
+      const badge = statusToBadgeClass(app.status);
+      return `
+      <div class="card item-row" style="border:1px solid var(--border); box-shadow:none; margin-bottom: 10px; padding: 16px;">
         <div class="item-left">
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-            <h3 style="margin:0;">${app.student}</h3>
+            <h3 style="margin:0; font-size: 1rem;">${app.studentName}</h3>
             <span class="badge ${badge}">${app.status}</span>
           </div>
-          <div class="item-meta">
-            <span class="kv">🧰 ${app.jobTitle}</span>
-            <span class="kv">⭐ ${app.rating}</span>
+          <div class="item-meta" style="margin-top: 8px; display: flex; gap: 12px; font-size: 0.85rem; color: var(--muted);">
+            <span>🧰 ${app.jobTitle}</span>
+            <span>⭐ ${app.rating}</span>
           </div>
         </div>
 
-        <div class="item-actions">
-          <button class="btn btn-outline" data-app-view="${app.id}">Review</button>
-          <button class="btn btn-primary" data-app-accept="${app.id}">Accept</button>
+        <div class="item-actions" style="margin-top: 12px;">
+          <button class="btn btn-outline btn-sm" data-job-id="${app.jobId}">Review</button>
         </div>
       </div>
     `;
-  }).join('');
+    })
+    .join('');
 
-  $$('[data-app-view]').forEach((btn) => {
+  $$('[data-job-id]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      window.location.href = `applications.html?id=${btn.dataset.appView}`;
-    });
-  });
-
-  $$('[data-app-accept]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      alert('MVP: Accepting will move application to Awaiting Commitment Fee.');
+      window.location.href = `applications.html?job=${btn.dataset.jobId}`;
     });
   });
 }
 
-function setStats() {
-  const openJobs = JOBS.filter((j) => j.status.toLowerCase() === 'open').length;
-  const pendingApps = APPLICATIONS.filter((a) => a.status.toLowerCase() === 'pending').length;
-  const completed = JOBS.filter((j) => j.status.toLowerCase() === 'completed').length;
+async function setStats() {
+  const dbJobs = await jobsService.getMyJobs();
+  const jobs = [...MOCK_JOBS, ...dbJobs];
 
-  // Example pending payment total: sum jobs in progress (demo)
-  const pendingPay = JOBS.filter((j) => j.status.toLowerCase() === 'in progress').reduce(
-    (sum, j) => sum + j.pay,
-    0
-  );
+  const openJobs = jobs.filter((j) => j.status.toLowerCase() === 'open').length;
+  const pendingApps = MOCK_APPS.filter((a) => a.status.toLowerCase() === 'pending').length;
+  const completed = jobs.filter(
+    (j) => j.status.toLowerCase() === 'completed' || j.status.toLowerCase() === 'done'
+  ).length;
+
+  // Mock pending payments logic
+  const pendingPay = 350;
 
   $('#statOpenJobs').textContent = String(openJobs);
   $('#statPendingApps').textContent = String(pendingApps);
@@ -149,8 +187,9 @@ async function init() {
 
   setActiveNav();
   wireLogout();
-  setStats();
-  renderRecentJobs();
+
+  await setStats();
+  await renderRecentJobs();
   renderRecentApplications();
 }
 

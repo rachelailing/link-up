@@ -41,9 +41,38 @@
         cursor: pointer;
         color: #666;
         margin-bottom: 10px;
+        position: relative;
+        overflow: hidden;
       }
       .image-upload-placeholder:hover {
         background: #f1f3f5;
+      }
+      .image-upload-placeholder img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      .chip-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 8px;
+      }
+      .chip {
+        padding: 8px 16px;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+      }
+      .chip.active {
+        background: var(--linkup-blue);
+        color: white;
+        border-color: var(--linkup-blue);
       }
     </style>
   </head>
@@ -76,7 +105,9 @@
 
         <div style="display: flex; gap: 10px">
           <button class="btn btn-outline">🔔</button>
-          <button class="btn btn-blue">My Profile</button>
+          <button class="btn btn-blue" onclick="window.location.href = 'profile.html'">
+            My Profile
+          </button>
         </div>
       </header>
 
@@ -108,28 +139,41 @@
               <div class="form-group">
                 <label>Service Cover Photo</label>
                 <div class="image-upload-placeholder" id="imageUpload">
-                  <span>📷</span>
-                  <span>Click to upload photo</span>
+                  <span id="uploadIcon">📷</span>
+                  <span id="uploadText">Click to upload photo</span>
+                  <img id="imagePreview" src="" style="display: none" />
                 </div>
                 <input type="file" id="fileInput" style="display: none" accept="image/*" />
               </div>
 
               <div class="form-group">
                 <label for="title">Service Title</label>
-                <input type="text" id="title" placeholder="e.g. Video Editing Service" required />
+                <input
+                  type="text"
+                  id="title"
+                  placeholder="e.g. Professional Video Editing"
+                  required
+                />
               </div>
 
               <div class="grid cols-2 gap-16">
                 <div class="form-group">
                   <label for="price">Starting Price (RM)</label>
-                  <input type="text" id="price" placeholder="e.g. 50" required />
+                  <input
+                    type="number"
+                    id="price"
+                    placeholder="e.g. 50"
+                    min="0"
+                    step="0.01"
+                    required
+                  />
                 </div>
                 <div class="form-group">
-                  <label for="status">Status</label>
+                  <label for="status">Service Availability</label>
                   <select id="status" required>
-                    <option value="Ongoing">Ongoing</option>
-                    <option value="Preorder">Preorder</option>
-                    <option value="NA">NA</option>
+                    <option value="Ongoing">Available (Ongoing)</option>
+                    <option value="Preorder">Open for Preorder</option>
+                    <option value="NA">Currently Unavailable</option>
                   </select>
                 </div>
               </div>
@@ -140,42 +184,43 @@
               </div>
 
               <div class="form-group">
-                <label>Service Categories (Select tags)</label>
+                <label>Service Category</label>
                 <div class="chip-grid" id="serviceTags">
-                  <div class="chip" data-value="creative">Creative</div>
-                  <div class="chip" data-value="video">Video Editing</div>
-                  <div class="chip" data-value="design">Graphic Design</div>
-                  <div class="chip" data-value="academic">Academic / Tutoring</div>
-                  <div class="chip" data-value="food">Food & Beverage</div>
-                  <div class="chip" data-value="tech">Tech / IT</div>
-                  <div class="chip" data-value="laundry">Laundry / Cleaning</div>
-                  <div class="chip" data-value="event">Event Support</div>
+                  <div class="chip" data-value="creative">Creative Work</div>
+                  <div class="chip" data-value="tech">Tech Tasks</div>
+                  <div class="chip" data-value="academic">Academic Help</div>
+                  <div class="chip" data-value="events">Events &amp; Booth</div>
+                  <div class="chip" data-value="food">Food &amp; Drinks</div>
+                  <div class="chip" data-value="admin">Admin Support</div>
+                  <div class="chip" data-value="others" id="othersChip">Others...</div>
+                </div>
+                <div id="customTagsContainer" style="display: none; margin-top: 12px">
+                  <input
+                    type="text"
+                    id="customTags"
+                    placeholder="Enter custom tags (e.g. laundry, repair), comma separated"
+                  />
                 </div>
                 <small class="muted"
-                  >These tags help us recommend your service to interested students.</small
+                  >Matching categories help interested students find your service.</small
                 >
               </div>
 
               <div class="form-group">
-                <label for="description">Description</label>
+                <label for="description">Detailed Description</label>
                 <textarea
                   id="description"
-                  rows="4"
-                  placeholder="Describe your service in detail..."
+                  rows="5"
+                  placeholder="Describe what you offer, tools used, and turnaround time..."
                   required
                 ></textarea>
-              </div>
-
-              <div class="form-group">
-                <label for="date">Date Posted</label>
-                <input type="date" id="date" required />
               </div>
 
               <div class="form-group" style="display: flex; align-items: flex-start; gap: 10px">
                 <input type="checkbox" id="terms" style="width: auto; margin-top: 4px" required />
                 <label for="terms" style="font-weight: 400; font-size: 0.9rem"
-                  >I agree to the <a href="#" style="color: #007bff">Terms and Conditions</a> and
-                  ensure that the service provided follows campus guidelines.</label
+                  >I confirm that this service complies with campus rules and I will deliver
+                  high-quality work to my fellow students.</label
                 >
               </div>
 
@@ -185,6 +230,7 @@
                 type="submit"
                 class="btn btn-primary"
                 style="width: 100%; padding: 14px; font-size: 1.1rem"
+                id="submitBtn"
               >
                 Post Service Now
               </button>

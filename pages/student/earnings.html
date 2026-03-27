@@ -45,17 +45,34 @@
       <main class="main">
         <div class="container">
           <div class="section-title">
-            <h2>Earning History</h2>
+            <h2>Marketplace Earning History</h2>
           </div>
 
-          <div class="card pad">
-            <p class="muted">You haven't earned anything yet.</p>
+          <div class="grid cols-3">
+            <div class="card pad">
+              <h3>Total Sales</h3>
+              <p style="font-size: 1.5rem; font-weight: bold; color: var(--linkup-green)">
+                RM 545.00
+              </p>
+            </div>
+            <div class="card pad">
+              <h3>Pending</h3>
+              <p style="font-size: 1.5rem; font-weight: bold; color: #b45309">RM 45.00</p>
+            </div>
+            <div class="card pad">
+              <h3>Items Sold</h3>
+              <p style="font-size: 1.5rem; font-weight: bold">5</p>
+            </div>
           </div>
 
-          <div style="height: 20px"></div>
+          <div style="height: 32px"></div>
 
-          <!-- Example of how an earning might look -->
+          <div class="section-title">
+            <h2>Recent Sales</h2>
+          </div>
+
           <div class="list">
+            <!-- 1. Service Earning -->
             <div
               class="card pad"
               style="
@@ -67,11 +84,91 @@
             >
               <div>
                 <h3 style="margin: 0">Logo Design for Tech Startup</h3>
-                <p class="muted" style="margin: 4px 0 0 0">Earned on: 2026-03-01</p>
+                <p class="muted" style="margin: 4px 0 0 0">Type: Service • 2026-03-20</p>
               </div>
               <div style="text-align: right">
-                <div style="font-weight: bold; color: green">+ RM 250.00</div>
-                <span class="badge refunded">Received</span>
+                <div style="font-weight: bold; color: #15803d">+ RM 250.00</div>
+                <span class="badge completed">Received</span>
+              </div>
+            </div>
+
+            <!-- 2. Product Earning -->
+            <div
+              class="card pad"
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+              "
+            >
+              <div>
+                <h3 style="margin: 0">Handmade Crochet Bottle Holder</h3>
+                <p class="muted" style="margin: 4px 0 0 0">Type: Product • 2026-03-18</p>
+              </div>
+              <div style="text-align: right">
+                <div style="font-weight: bold; color: #15803d">+ RM 35.00</div>
+                <span class="badge completed">Received</span>
+              </div>
+            </div>
+
+            <!-- 3. Academic Service -->
+            <div
+              class="card pad"
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+              "
+            >
+              <div>
+                <h3 style="margin: 0">Calculus 1 Intensive Tutoring (2 hrs)</h3>
+                <p class="muted" style="margin: 4px 0 0 0">Type: Service • 2026-03-15</p>
+              </div>
+              <div style="text-align: right">
+                <div style="font-weight: bold; color: #15803d">+ RM 60.00</div>
+                <span class="badge completed">Received</span>
+              </div>
+            </div>
+
+            <!-- 4. Second hand item -->
+            <div
+              class="card pad"
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+              "
+            >
+              <div>
+                <h3 style="margin: 0">Engineering Mathematics Textbook</h3>
+                <p class="muted" style="margin: 4px 0 0 0">Type: Product • 2026-03-12</p>
+              </div>
+              <div style="text-align: right">
+                <div style="font-weight: bold; color: #15803d">+ RM 200.00</div>
+                <span class="badge completed">Received</span>
+              </div>
+            </div>
+
+            <!-- 5. Pending Sale -->
+            <div
+              class="card pad"
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+              "
+            >
+              <div>
+                <h3 style="margin: 0">Custom Portrait Illustration</h3>
+                <p class="muted" style="margin: 4px 0 0 0">Type: Service • 2026-03-24</p>
+              </div>
+              <div style="text-align: right">
+                <div style="font-weight: bold; color: #b45309">RM 45.00</div>
+                <span class="badge pending">Awaiting Payment</span>
               </div>
             </div>
           </div>

@@ -17,8 +17,12 @@
 
         <nav class="nav">
           <a data-nav href="job-section.html">🏠 Home Page</a>
-          <a data-nav href="jobs.html">🔍 Find Jobs</a>
-          <a data-nav href="job-earnings.html" class="active">💰 My Earnings</a>
+          <a data-nav href="jobs.html">🔍 Job Details</a>
+          <a data-nav href="job-earnings.html" class="active">💰 Transaction Details</a>
+
+          <div class="nav-logout">
+            <a href="#" id="logoutBtn">🚪 Logout</a>
+          </div>
         </nav>
       </aside>
 
@@ -52,22 +56,41 @@
                 id="totalEarned"
                 style="font-size: 1.5rem; font-weight: bold; color: var(--primary-color)"
               >
-                RM 320.00
+                RM 350.00
               </p>
             </div>
             <div class="card pad">
               <h3>Pending Release</h3>
-              <p id="pendingRelease" style="font-size: 1.5rem; font-weight: bold; color: orange">
-                RM 150.00
+              <p id="pendingRelease" style="font-size: 1.5rem; font-weight: bold; color: #b45309">
+                RM 365.00
               </p>
             </div>
             <div class="card pad">
               <h3>Completed Gigs</h3>
-              <p id="completedGigs" style="font-size: 1.5rem; font-weight: bold">4</p>
+              <p id="completedGigs" style="font-size: 1.5rem; font-weight: bold">3</p>
             </div>
           </div>
 
           <div style="height: 32px"></div>
+
+          <!-- Filters -->
+          <div class="card pad filter-bar" style="display: flex; gap: 10px; margin-bottom: 20px">
+            <select id="typeFilter" class="btn btn-outline" style="text-align: left; flex: 1">
+              <option value="all">All Types</option>
+              <option value="commitment">Commitment Fee</option>
+              <option value="salary">Salary</option>
+              <option value="both">Commitment + Salary</option>
+            </select>
+
+            <select id="statusFilter" class="btn btn-outline" style="text-align: left; flex: 1">
+              <option value="all">All Status</option>
+              <option value="unpaid">Unpaid</option>
+              <option value="refund">Refund</option>
+              <option value="pending">Pending</option>
+              <option value="released">Released</option>
+              <option value="cancel">Cancel</option>
+            </select>
+          </div>
 
           <div class="section-title">
             <h2>Transaction History</h2>
@@ -117,11 +140,6 @@
       </main>
     </div>
 
-    <script type="module">
-      import { setActiveNav } from '/js/components/navbar.js';
-      document.addEventListener('DOMContentLoaded', () => {
-        setActiveNav();
-      });
-    </script>
+    <script type="module" src="../../js/pages/student/earnings.js"></script>
   </body>
 </html>
