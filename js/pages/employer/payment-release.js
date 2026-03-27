@@ -158,7 +158,7 @@ async function approveAndRelease(jobId) {
         await loadAndRender();
         return;
       }
-    } catch (_e) {
+    } catch {
       // fall through to mock
     }
 
