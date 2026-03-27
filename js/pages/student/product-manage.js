@@ -1,5 +1,5 @@
 // js/pages/student/product-manage.js
-import { $, $$ } from '../../utils/dom.js';
+import { $ } from '../../utils/dom.js';
 import { setActiveNav, wireLogout } from '../../components/navbar.js';
 import { supabase } from '../../config/supabase.js';
 import { authService } from '../../services/auth.service.js';
@@ -188,14 +188,14 @@ class ProductManage {
     const filePath = `listings/${fileName}`;
 
     const { data: _data, error } = await supabase.storage
-      .from('marketplace-images')
+      .from('marketplace_images')
       .upload(filePath, file);
 
     if (error) throw error;
 
     const {
       data: { publicUrl },
-    } = supabase.storage.from('marketplace-images').getPublicUrl(filePath);
+    } = supabase.storage.from('marketplace_images').getPublicUrl(filePath);
 
     return publicUrl;
   }

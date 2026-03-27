@@ -103,7 +103,7 @@ async function renderJobs() {
   attachActions(jobs);
 }
 
-function attachActions(jobs) {
+function attachActions(_jobs) {
   // Open Manage Modal
   $$('[data-manage-btn]').forEach((btn) => {
     btn.addEventListener('click', () => {

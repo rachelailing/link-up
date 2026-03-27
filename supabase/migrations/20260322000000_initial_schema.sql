@@ -153,6 +153,7 @@ ALTER TABLE public.jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.commitment_fees ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.marketplace_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.marketplace_orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ratings ENABLE ROW LEVEL SECURITY;
 
 -- Profiles: Users can view their own profile
@@ -188,6 +189,13 @@ CREATE POLICY "Users can manage their own marketplace items" ON public.marketpla
 -- Commitment Fees: Users can view their own.
 DROP POLICY IF EXISTS "Users can view their own transactions" ON public.commitment_fees;
 CREATE POLICY "Users can view their own transactions" ON public.commitment_fees FOR SELECT USING (auth.uid() = student_id);
+
+-- Marketplace Orders: Buyers/sellers can view their own, buyers can insert.
+DROP POLICY IF EXISTS "Users can view their own orders" ON public.marketplace_orders;
+CREATE POLICY "Users can view their own orders" ON public.marketplace_orders FOR SELECT
+  USING (auth.uid() = buyer_id OR auth.uid() = seller_id);
+DROP POLICY IF EXISTS "Buyers can place orders" ON public.marketplace_orders;
+CREATE POLICY "Buyers can place orders" ON public.marketplace_orders FOR INSERT WITH CHECK (auth.uid() = buyer_id);
 
 -- Ratings: Everyone can view, anyone can insert if they are the reviewer.
 DROP POLICY IF EXISTS "Anyone can view ratings" ON public.ratings;
