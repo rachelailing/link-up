@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Purchase History — Link Up</title>
+
+    <link rel="stylesheet" href="../../css/main.css" />
+  </head>
+
+  <body>
+    <div class="app">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">
+          <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up" />
+          <div class="logo-title">Link <span>Up</span></div>
+        </div>
+
+        <nav class="nav">
+          <a data-nav href="marketplace.html">🏠 Home Page</a>
+          <a data-nav href="earnings.html">💰 Earning History</a>
+          <a data-nav href="purchase.html" class="active">🛍️ Purchase History</a>
+          <div class="nav-logout">
+            <a href="#" id="logoutBtn">🚪 Logout</a>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-nav">
+          <a href="job-section.html" class="topbar-nav-link">Job Section</a>
+          <a href="marketplace.html" class="topbar-nav-link active">Marketplace Section</a>
+        </div>
+
+        <div style="display: flex; gap: 10px">
+          <button class="btn btn-outline">🔔</button>
+          <button class="btn btn-blue" onclick="window.location.href = 'profile.html'">
+            My Profile
+          </button>
+        </div>
+      </header>
+
+      <!-- Main -->
+      <main class="main">
+        <div class="container">
+          <div class="section-title">
+            <h2>Purchase History</h2>
+          </div>
+
+          <!-- Summary Cards -->
+          <div class="grid cols-3">
+            <div class="card pad">
+              <h3>Total Spent</h3>
+              <p
+                id="totalSpent"
+                style="font-size: 1.5rem; font-weight: bold; color: var(--linkup-blue)"
+              >
+                RM 185.00
+              </p>
+            </div>
+            <div class="card pad">
+              <h3>Active Orders</h3>
+              <p id="activeOrders" style="font-size: 1.5rem; font-weight: bold; color: #1d4ed8">
+                1
+              </p>
+            </div>
+            <div class="card pad">
+              <h3>Savings</h3>
+              <p
+                id="totalSavings"
+                style="font-size: 1.5rem; font-weight: bold; color: var(--linkup-green)"
+              >
+                RM 40.00
+              </p>
+            </div>
+          </div>
+
+          <div style="height: 32px"></div>
+
+          <div class="section-title">
+            <h2>Recent Purchases</h2>
+          </div>
+
+          <div id="purchaseList" class="list">
+            <!-- Dynamic content will be loaded here -->
+            <!-- Fallback mock entries -->
+            <div
+              class="card pad"
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+              "
+            >
+              <div>
+                <h3 style="margin: 0">UI Design Component Pack</h3>
+                <p class="muted" style="margin: 4px 0 0 0">Seller: Nafiesa • 2026-03-20</p>
+                <span class="badge outline" style="font-size: 10px; margin-top: 4px">Service</span>
+              </div>
+              <div style="text-align: right">
+                <div style="font-weight: bold">RM 45.00</div>
+                <span class="badge done">Completed</span>
+              </div>
+            </div>
+
+            <div
+              class="card pad"
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+              "
+            >
+              <div>
+                <h3 style="margin: 0">UTP Logo Hoodie (Limited Edition)</h3>
+                <p class="muted" style="margin: 4px 0 0 0">Seller: Campus Store • 2026-03-24</p>
+                <span class="badge outline" style="font-size: 10px; margin-top: 4px">Product</span>
+              </div>
+              <div style="text-align: right">
+                <div style="font-weight: bold">RM 85.00</div>
+                <span class="badge applied">To Collect</span>
+              </div>
+            </div>
+
+            <div
+              class="card pad"
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+              "
+            >
+              <div>
+                <h3 style="margin: 0">Lab Coat &amp; Safety Goggles (Size M)</h3>
+                <p class="muted" style="margin: 4px 0 0 0">Seller: Alumni Resale • 2026-03-15</p>
+                <span class="badge outline" style="font-size: 10px; margin-top: 4px">Product</span>
+              </div>
+              <div style="text-align: right">
+                <div style="font-weight: bold">RM 55.00</div>
+                <span class="badge done">Completed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="../../js/pages/student/purchase.js"></script>
+  </body>
+</html>

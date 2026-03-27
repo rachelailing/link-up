@@ -7,40 +7,41 @@
 /* =========================
    Page Background
 ========================= */
-.auth-body{
+.auth-body {
   min-height: 100vh;
   background:
-    radial-gradient(900px 400px at 10% 0%, rgba(46,84,143,.14), transparent 60%),
-    radial-gradient(900px 400px at 90% 10%, rgba(115,187,59,.14), transparent 60%),
-    var(--bg);
+    radial-gradient(900px 400px at 10% 0%, rgba(46, 84, 143, 0.14), transparent 60%),
+    radial-gradient(900px 400px at 90% 10%, rgba(115, 187, 59, 0.14), transparent 60%), var(--bg);
 }
 
 /* =========================
    Top Bar / Brand Row
 ========================= */
-.auth-top{
+.auth-top {
   max-width: 1100px;
   margin: 0 auto;
   padding: 18px 24px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
 }
 
 /* Brand block: logo + name */
-.auth-brand{
-  display:flex;
-  align-items:center;
+.auth-brand {
+  display: flex;
+  align-items: center;
   gap: 10px;
   font-weight: 900;
 }
 
 /* Highlight brand keyword */
-.auth-brand__text b{ color: var(--linkup-green); }
+.auth-brand__text b {
+  color: var(--linkup-green);
+}
 
 /* Logo image */
-.auth-logo{
+.auth-logo {
   width: 42px;
   height: 42px;
   border-radius: 12px;
@@ -50,33 +51,33 @@
 /* =========================
    Main Layout (Card + Side)
 ========================= */
-.auth-wrap{
+.auth-wrap {
   max-width: 1100px;
   margin: 0 auto;
   padding: 12px 24px 40px;
-  display:grid;
-  grid-template-columns: 1.1fr .9fr;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
   gap: 18px;
-  align-items:start;
+  align-items: start;
 }
 
 /* Main auth card container */
-.auth-card{
+.auth-card {
   border-radius: 18px;
   box-shadow: var(--shadow);
 }
 
 /* Inner padding for card content */
-.auth-card__inner{
+.auth-card__inner {
   padding: 26px;
 }
 
 /* Title + subtitle */
-.auth-card h1{
+.auth-card h1 {
   font-size: 28px;
   margin-bottom: 6px;
 }
-.auth-subtitle{
+.auth-subtitle {
   margin-top: 0;
   margin-bottom: 18px;
   color: var(--muted);
@@ -85,125 +86,129 @@
 /* =========================
    Form Layout
 ========================= */
-.form{ display:block; }
+.form {
+  display: block;
+}
 
 /* Two-column grid for desktop */
-.form-grid{
-  display:grid;
+.form-grid {
+  display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
 }
 
 /* Field wrapper: label + input + error */
-.field{
-  display:flex;
-  flex-direction:column;
+.field {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 
 /* Label styling */
-.field label{
+.field label {
   font-size: 13px;
   color: var(--muted);
 }
 
 /* Inputs/select styling */
 .field input,
-.field select{
+.field select {
   padding: 12px 12px;
   border: 1px solid var(--border);
   background: #fff;
   border-radius: 14px;
   outline: none;
-  transition: .15s ease;
+  transition: 0.15s ease;
 }
 
 /* Focus styles for accessibility */
 .field input:focus,
-.field select:focus{
-  border-color: rgba(46,84,143,.35);
-  box-shadow: 0 0 0 4px rgba(46,84,143,.10);
+.field select:focus {
+  border-color: rgba(46, 84, 143, 0.35);
+  box-shadow: 0 0 0 4px rgba(46, 84, 143, 0.1);
 }
 
 /* ✅ Invalid state (JS adds .is-invalid to .field) */
 .field.is-invalid input,
-.field.is-invalid select{
-  border-color: rgba(239,68,68,.45);
-  box-shadow: 0 0 0 4px rgba(239,68,68,.10);
+.field.is-invalid select {
+  border-color: rgba(239, 68, 68, 0.45);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
 }
 
 /* Checkbox row (terms etc.) */
-.check{
-  display:flex;
+.check {
+  display: flex;
   gap: 10px;
-  align-items:flex-start;
+  align-items: flex-start;
   color: var(--muted);
   font-size: 13px;
 }
 
 /* Error message placeholder under each field */
-.error{
+.error {
   min-height: 14px;
   font-size: 12px;
   color: var(--danger);
 }
 
 /* Full width submit button helper */
-.btn-full{
+.btn-full {
   width: 100%;
   margin-top: 10px;
 }
 
 /* Bottom row (login/register link) */
-.auth-bottom{
+.auth-bottom {
   margin-top: 12px;
-  display:flex;
+  display: flex;
   gap: 8px;
-  justify-content:center;
+  justify-content: center;
   color: var(--muted);
   font-size: 13px;
 }
-.auth-bottom a{ color: var(--linkup-blue); }
+.auth-bottom a {
+  color: var(--linkup-blue);
+}
 
 /* Extra hint box (optional guidance text) */
-.hint{
+.hint {
   margin-top: 14px;
   font-size: 13px;
   color: var(--muted);
   padding: 10px 12px;
   border-radius: 12px;
-  border: 1px dashed rgba(46,84,143,.28);
-  background: rgba(46,84,143,.05);
+  border: 1px dashed rgba(46, 84, 143, 0.28);
+  background: rgba(46, 84, 143, 0.05);
 }
 
 /* =========================
    Side Card (Steps / Tips)
 ========================= */
-.auth-side .card{
+.auth-side .card {
   border-radius: 18px;
 }
 
 /* List of steps on the right */
-.auth-steps{
-  display:flex;
-  flex-direction:column;
+.auth-steps {
+  display: flex;
+  flex-direction: column;
   gap: 12px;
   margin-top: 12px;
 }
-.step{
-  display:flex;
+.step {
+  display: flex;
   gap: 10px;
-  align-items:flex-start;
+  align-items: flex-start;
 }
-.step-dot{
-  width:10px;
-  height:10px;
-  border-radius:999px;
+.step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
   background: var(--linkup-green);
-  box-shadow: 0 0 0 6px rgba(115,187,59,.15);
+  box-shadow: 0 0 0 6px rgba(115, 187, 59, 0.15);
   margin-top: 6px;
 }
-.step p{
+.step p {
   margin: 4px 0 0;
   font-size: 13px;
   color: var(--muted);
@@ -212,9 +217,13 @@
 /* =========================
    Responsive
 ========================= */
-@media (max-width: 960px){
-  .auth-wrap{ grid-template-columns: 1fr; }
-  .form-grid{ grid-template-columns: 1fr; }
+@media (max-width: 960px) {
+  .auth-wrap {
+    grid-template-columns: 1fr;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* =========================
@@ -222,58 +231,81 @@
 ========================= */
 
 /* Row for "Remember me" + "Forgot password" */
-.auth-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+.auth-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
   margin: 8px 0 10px;
 }
 
 /* Small link for auth actions */
-.auth-link{
+.auth-link {
   font-size: 13px;
   color: var(--linkup-blue);
 }
 
 /* Form-level error banner (JS toggles .show) */
-.error-banner{
-  display:none;
+.error-banner {
+  display: none;
   margin: 10px 0;
   padding: 10px 12px;
   border-radius: 12px;
-  border: 1px solid rgba(239,68,68,.28);
-  background: rgba(239,68,68,.10);
-  color: #991B1B;
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  background: rgba(239, 68, 68, 0.1);
+  color: #991b1b;
   font-size: 13px;
 }
-.error-banner.show{ display:block; }
+.error-banner.show {
+  display: block;
+}
 
 /* =========================
    ✅ Added: Password input with "Show" button
    Use this to create a show/hide password toggle UI.
 ========================= */
-.input-with-action{
+.input-with-action {
   position: relative;
+  display: block;
+  width: 100%;
 }
 
-.input-action{
+.input-with-action input {
+  display: block;
+  width: 100%;
+  padding-right: 75px !important; /* Force space for the Show button */
+}
+
+/* Remove default eye icon in Edge/IE */
+.input-with-action input::-ms-reveal,
+.input-with-action input::-ms-clear {
+  display: none;
+}
+
+.input-action {
   position: absolute;
-  right: 10px;
+  right: 6px;
   top: 50%;
   transform: translateY(-50%);
-  padding: 7px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(46,84,143,.22);
-  background: rgba(46,84,143,.06);
+  padding: 0 12px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid rgba(46, 84, 143, 0.22);
+  background: rgba(46, 84, 143, 0.06);
   color: var(--linkup-blue);
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 600;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: 0.15s ease;
 }
 
-.input-action:hover{
-  border-color: rgba(46,84,143,.32);
-  background: rgba(46,84,143,.09);
+.input-action:hover {
+  border-color: rgba(46, 84, 143, 0.32);
+  background: rgba(46, 84, 143, 0.09);
 }
 
 /* =======================================================================
@@ -287,30 +319,30 @@
 ======================================================================== */
 
 /* Main layout wrapper used in your new HTML (<main class="auth">...) */
-.auth{
+.auth {
   max-width: 1100px;
   margin: 0 auto;
   padding: 12px 24px 40px;
   display: grid;
-  grid-template-columns: 1.1fr .9fr;
+  grid-template-columns: 1.1fr 0.9fr;
   gap: 18px;
   align-items: start;
 }
 
 /* Ensure auth card matches your existing style */
-.auth-card{
+.auth-card {
   border-radius: 18px;
   box-shadow: var(--shadow);
   /* Optional: if your .card class usually has background, keep this minimal */
 }
 
 /* Header area inside auth card */
-.auth-header{
+.auth-header {
   padding: 26px 26px 0;
 }
 
 /* Brand row (logo + name) */
-.brand{
+.brand {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -320,40 +352,40 @@
   margin-bottom: 10px;
 }
 
-.brand-logo{
+.brand-logo {
   width: 42px;
   height: 42px;
   border-radius: 12px;
   object-fit: contain;
 }
 
-.brand-name{
+.brand-name {
   font-weight: 900;
 }
 
 /* Title/subtitle */
-.auth-title{
+.auth-title {
   font-size: 28px;
   margin: 0 0 6px;
 }
 
-.auth-subtitle{
+.auth-subtitle {
   margin: 0 0 18px;
   color: var(--muted);
 }
 
 /* Form padding so it matches your previous .auth-card__inner spacing */
-.auth-form{
+.auth-form {
   padding: 0 26px 26px;
 }
 
 /* Sections inside the form */
-.form-section{
+.form-section {
   margin-top: 14px;
 }
 
 /* Section titles: reuse your style tone */
-.section-title{
+.section-title {
   margin: 0 0 10px;
   font-size: 14px;
   color: var(--muted);
@@ -361,50 +393,50 @@
 }
 
 /* Grid and fields (map new classes to old visuals) */
-.form-grid{
-  display:grid;
+.form-grid {
+  display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
 }
 
 /* New field wrapper class */
-.form-field{
-  display:flex;
-  flex-direction:column;
+.form-field {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 
-.form-field label{
+.form-field label {
   font-size: 13px;
   color: var(--muted);
 }
 
 /* Input/select styles match your existing .field input */
 .form-field input,
-.form-field select{
+.form-field select {
   padding: 12px 12px;
   border: 1px solid var(--border);
   background: #fff;
   border-radius: 14px;
   outline: none;
-  transition: .15s ease;
+  transition: 0.15s ease;
 }
 
 .form-field input:focus,
-.form-field select:focus{
-  border-color: rgba(46,84,143,.35);
-  box-shadow: 0 0 0 4px rgba(46,84,143,.10);
+.form-field select:focus {
+  border-color: rgba(46, 84, 143, 0.35);
+  box-shadow: 0 0 0 4px rgba(46, 84, 143, 0.1);
 }
 
 /* Hint + error */
-.field-hint{
+.field-hint {
   font-size: 12px;
   color: var(--muted);
-  opacity: .85;
+  opacity: 0.85;
 }
 
 /* New error class used by your HTML */
-.field-error{
+.field-error {
   min-height: 14px;
   font-size: 12px;
   color: var(--danger);
@@ -412,50 +444,50 @@
 
 /* If JS adds invalid class on wrapper (recommended) */
 .form-field.is-invalid input,
-.form-field.is-invalid select{
-  border-color: rgba(239,68,68,.45);
-  box-shadow: 0 0 0 4px rgba(239,68,68,.10);
+.form-field.is-invalid select {
+  border-color: rgba(239, 68, 68, 0.45);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
 }
 
 /* Checkbox styling (your HTML uses .checkbox; older CSS used .check) */
-.checkbox{
-  display:flex;
+.checkbox {
+  display: flex;
   gap: 10px;
-  align-items:flex-start;
+  align-items: flex-start;
   color: var(--muted);
   font-size: 13px;
   margin-top: 10px;
 }
 
 /* Auth footer row under submit */
-.auth-footer{
+.auth-footer {
   margin-top: 12px;
-  display:flex;
+  display: flex;
   gap: 8px;
-  justify-content:center;
+  justify-content: center;
   color: var(--muted);
   font-size: 13px;
 }
 
 /* Side panel */
-.auth-side{
+.auth-side {
   /* Keep it consistent with your .auth-side .card idea */
 }
 
-.side-content{
+.side-content {
   padding: 26px;
   border-radius: 18px;
   box-shadow: var(--shadow);
-  background: rgba(255,255,255,0.02); /* subtle; adjust if you have .card background */
-  border: 1px solid rgba(46,84,143,.12);
+  background: rgba(255, 255, 255, 0.02); /* subtle; adjust if you have .card background */
+  border: 1px solid rgba(46, 84, 143, 0.12);
 }
 
-.side-content h2{
+.side-content h2 {
   margin: 0 0 12px;
   font-size: 18px;
 }
 
-.side-list{
+.side-list {
   margin: 0;
   padding-left: 18px;
   color: var(--muted);
@@ -465,21 +497,25 @@
 }
 
 /* Alert banner used in your HTML (#formAlert). If you already have alert styles, remove this */
-.alert{
+.alert {
   margin: 10px 26px 0;
   padding: 10px 12px;
   border-radius: 12px;
   font-size: 13px;
 }
 
-.alert--danger{
-  border: 1px solid rgba(239,68,68,.28);
-  background: rgba(239,68,68,.10);
-  color: #991B1B;
+.alert--danger {
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  background: rgba(239, 68, 68, 0.1);
+  color: #991b1b;
 }
 
 /* Responsive: match your existing breakpoint behavior */
-@media (max-width: 960px){
-  .auth{ grid-template-columns: 1fr; }
-  .form-grid{ grid-template-columns: 1fr; }
+@media (max-width: 960px) {
+  .auth {
+    grid-template-columns: 1fr;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 }

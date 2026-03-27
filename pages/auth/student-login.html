@@ -1,84 +1,82 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Student Login — Link Up</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Login — Link Up</title>
 
-  <link rel="stylesheet" href="../../css/main.css" />
-</head>
+    <link rel="stylesheet" href="../../css/main.css" />
+  </head>
 
-<body class="auth-body">
-  <header class="auth-top">
-    <a class="auth-brand" href="../../index.html">
-      <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up icon" class="auth-logo">
-      <span class="auth-brand__text">Link <b>Up</b></span>
-    </a>
+  <body class="auth-body">
+    <header class="auth-top">
+      <a class="auth-brand" href="../../index.html">
+        <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up icon" class="auth-logo" />
+        <span class="auth-brand__text">Link <b>Up</b></span>
+      </a>
 
-    <a class="btn btn-outline" href="./student-register.html">Student Register</a>
-  </header>
+      <a class="btn btn-outline" href="./student-register.html">Student Register</a>
+    </header>
 
-  <main class="auth-wrap">
-    <section class="auth-card card">
-      <div class="auth-card__inner">
-        <h1>Welcome back 👋</h1>
-        <p class="auth-subtitle">Login to find side hustles, track applications, and view earnings.</p>
+    <main class="auth-wrap">
+      <section class="auth-card card">
+        <div class="auth-card__inner">
+          <h1>Welcome back 👋</h1>
+          <p class="auth-subtitle">
+            Login to find side hustles, track applications, and view earnings.
+          </p>
 
-        <form id="studentLoginForm" class="form">
-          <div class="field">
-            <label for="studentEmail">Student email</label>
-            <input id="studentEmail" type="email" placeholder="e.g., user@utp.edu.my" required />
-            <small class="error" data-error-for="studentEmail"></small>
-          </div>
+          <form id="studentLoginForm" class="form">
+            <div class="field">
+              <label for="studentEmail">Student email</label>
+              <input id="studentEmail" type="email" placeholder="e.g., user@utp.edu.my" required />
+              <small class="error" data-error-for="studentEmail"></small>
+            </div>
 
-          <div class="field">
-            <label for="password">Password</label>
-            <input id="password" type="password" placeholder="Your password" required />
-            <small class="error" data-error-for="password"></small>
-          </div>
+            <div class="field">
+              <label for="password">Password</label>
+              <input id="password" type="password" placeholder="Your password" required />
+              <small class="error" data-error-for="password"></small>
+            </div>
 
-          <div class="auth-row">
-            <label class="check">
-              <input id="rememberMe" type="checkbox" />
-              <span>Remember me</span>
-            </label>
+            <div class="auth-row">
+              <label class="check">
+                <input id="rememberMe" type="checkbox" />
+                <span>Remember me</span>
+              </label>
 
-            <a class="auth-link" href="../shared/404.html">Forgot password?</a>
-          </div>
+              <a class="auth-link" href="../shared/404.html">Forgot password?</a>
+            </div>
 
-          <div class="error-banner" id="loginError" role="alert" aria-live="polite"></div>
+            <div class="error-banner" id="loginError" role="alert" aria-live="polite"></div>
 
-          <button class="btn btn-primary btn-full" type="submit">Login</button>
+            <button class="btn btn-primary btn-full" type="submit">Login</button>
 
-          <div class="auth-bottom">
-            <span>Don’t have an account?</span>
-            <a href="./student-register.html">Register</a>
-          </div>
-
-          <div class="hint">
-            MVP note: login uses localStorage (temporary) until backend is connected.
-          </div>
-        </form>
-      </div>
-    </section>
-
-    <aside class="auth-side">
-      <div class="auth-side__box card pad">
-        <h3>Student dashboard includes</h3>
-        <p>Everything you listed in your flow.</p>
-
-        <div class="mini-list">
-          <span class="kv">Recommended jobs</span>
-          <span class="kv">Applied jobs</span>
-          <span class="kv">Job status</span>
-          <span class="kv">Commitment fee status</span>
-          <span class="kv">Earnings summary</span>
-          <span class="kv">Marketplace</span>
+            <div class="auth-bottom">
+              <span>Don’t have an account?</span>
+              <a href="./student-register.html">Register</a>
+            </div>
+          </form>
         </div>
-      </div>
-    </aside>
-  </main>
+      </section>
 
-  <script type="module" src="../../js/pages/auth/student-login.js"></script>
-</body>
+      <aside class="auth-side">
+        <div class="auth-side__box card pad">
+          <h3>Student dashboard includes</h3>
+          <p>Everything you listed in your flow.</p>
+
+          <div class="mini-list">
+            <span class="kv">Recommended jobs</span>
+            <span class="kv">Applied jobs</span>
+            <span class="kv">Job status</span>
+            <span class="kv">Commitment fee status</span>
+            <span class="kv">Earnings summary</span>
+            <span class="kv">Marketplace</span>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <script type="module" src="../../js/pages/auth/student-login.js"></script>
+  </body>
 </html>

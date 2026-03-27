@@ -1,33 +1,33 @@
 /* css/pages/applications.css */
 
-.application-card{
-  display:flex;
-  justify-content:space-between;
+.application-card {
+  display: flex;
+  justify-content: space-between;
   gap: 16px;
   padding: 18px;
 }
 
-.app-left{
-  display:flex;
-  flex-direction:column;
+.app-left {
+  display: flex;
+  flex-direction: column;
   gap: 6px;
 }
 
-.app-meta{
-  display:flex;
-  flex-wrap:wrap;
+.app-meta {
+  display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   font-size: 13px;
   color: var(--muted);
 }
 
-.app-actions{
-  display:flex;
+.app-actions {
+  display: flex;
   gap: 10px;
-  align-items:flex-start;
-  flex-wrap:wrap;
+  align-items: flex-start;
+  flex-wrap: wrap;
 }
 
-.app-actions .btn{
+.app-actions .btn {
   font-size: 13px;
 }

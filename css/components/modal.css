@@ -1,25 +1,30 @@
-.modal-backdrop{
-  position:fixed; inset:0;
-  background: rgba(0,0,0,.45);
-  display:none;
-  align-items:center;
-  justify-content:center;
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
   padding: var(--s-5);
   z-index: 50;
 }
-.modal-backdrop.show{ display:flex; }
+.modal-backdrop.show {
+  display: flex;
+}
 
-.modal{
+.modal {
   width: min(520px, 100%);
   background: var(--surface);
   border-radius: 18px;
-  border: 1px solid rgba(255,255,255,.18);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: var(--shadow);
   padding: var(--s-5);
 }
-.modal p{ margin: 0 0 var(--s-4); }
-.modal-actions{
-  display:flex;
-  justify-content:flex-end;
+.modal p {
+  margin: 0 0 var(--s-4);
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
   gap: 10px;
 }

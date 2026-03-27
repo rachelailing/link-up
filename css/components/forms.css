@@ -6,20 +6,20 @@
    - 2 columns on desktop
    - collapses to 1 column via media query in page css (e.g., auth.css)
 -------------------------------- */
-.form-grid{
+.form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 
 /* Wrapper for each label + input + hint/error */
-.form-field{
+.form-field {
   display: grid;
   gap: 8px;
 }
 
 /* Small, muted labels so forms look clean */
-.form-field label{
+.form-field label {
   font-size: 12px;
   color: var(--muted);
   font-weight: 600;
@@ -27,11 +27,11 @@
 
 /* Base input/select styling (shared across all pages) */
 .form-field input,
-.form-field select{
+.form-field select {
   width: 100%;
   padding: 12px;
   border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.14);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(10, 16, 28, 0.55);
   color: var(--text);
   outline: none;
@@ -39,20 +39,20 @@
 
 /* Focus state for accessibility + clear interaction */
 .form-field input:focus,
-.form-field select:focus{
-  border-color: rgba(94,234,212,0.5);
+.form-field select:focus {
+  border-color: rgba(94, 234, 212, 0.5);
 }
 
 /* Small helper text below inputs (e.g., password min length) */
-.field-hint{
+.field-hint {
   font-size: 12px;
-  color: rgba(255,255,255,0.55);
+  color: rgba(255, 255, 255, 0.55);
 }
 
 /* Error text placeholder:
    - keeps layout stable even when empty
    - JS will write error message here */
-.field-error{
+.field-error {
   min-height: 14px;
   font-size: 12px;
   color: var(--danger);
@@ -61,28 +61,28 @@
 /* When a field is invalid, we add .is-invalid on its .form-field wrapper
    to highlight the input/select border */
 .is-invalid input,
-.is-invalid select{
-  border-color: rgba(251,113,133,0.6);
+.is-invalid select {
+  border-color: rgba(251, 113, 133, 0.6);
 }
 
 /* ------------------------------
    Inputs with an inline action button
    Example: password show/hide toggle
 -------------------------------- */
-.input-with-action{
+.input-with-action {
   position: relative; /* needed for absolute positioned button */
 }
 
 /* The inline action button on the right side of an input */
-.input-action{
+.input-action {
   position: absolute;
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
   padding: 7px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
   color: var(--text);
   font-size: 12px;
   cursor: pointer;
@@ -92,7 +92,7 @@
    Checkbox rows
    Used for "Agree to Terms", etc.
 -------------------------------- */
-.checkbox{
+.checkbox {
   display: flex;
   gap: 10px;
   align-items: flex-start;
@@ -103,6 +103,6 @@
 }
 
 /* Slight vertical alignment so checkbox sits nicely with text */
-.checkbox input{
+.checkbox input {
   margin-top: 2px;
 }

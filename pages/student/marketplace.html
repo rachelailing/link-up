@@ -1,71 +1,140 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Marketplace — Link Up</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Marketplace — Link Up</title>
 
-  <link rel="stylesheet" href="../../css/main.css" />
-</head>
+    <link rel="stylesheet" href="../../css/main.css" />
+    <style>
+      /* Inline styles for section header and grid */
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .market-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+      }
+      .market-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #eee;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.2s ease;
+        cursor: pointer;
+      }
+      .market-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+      }
+      .market-card-image {
+        width: 100%;
+        height: 150px;
+        background: #f0f0f0;
+        object-fit: cover;
+        border-bottom: 1px solid #eee;
+      }
+      .market-card-content {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .market-card h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        color: #333;
+      }
+      .market-card .price {
+        font-weight: 700;
+        color: #007bff;
+        font-size: 1.2rem;
+      }
+      .market-card .meta {
+        font-size: 0.9rem;
+        color: #666;
+      }
+      .empty-state {
+        text-align: center;
+        padding: 40px;
+        background: #f9f9f9;
+        border-radius: 12px;
+        border: 2px dashed #ddd;
+      }
+    </style>
+  </head>
 
-<body>
-  <div class="app">
-
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="logo">
-        <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up">
-        <div class="logo-title">Link <span>Up</span></div>
-      </div>
-
-      <nav class="nav">
-        <a data-nav href="dashboard.html">🏠 Dashboard</a>
-        <a data-nav href="jobs.html">🧰 Find Jobs</a>
-        <a data-nav href="active-job.html">✅ Active Jobs</a>
-        <a data-nav href="earnings.html">💰 Earnings</a>
-        <a data-nav href="marketplace.html" class="active">🛒 Marketplace</a>
-      </nav>
-    </aside>
-
-    <!-- Topbar -->
-    <header class="topbar">
-      <div style="font-weight:700;">Marketplace</div>
-      <button class="btn btn-blue">My Profile</button>
-    </header>
-
-    <!-- Main -->
-    <main class="main">
-      <div class="container">
-
-        <!-- Filters -->
-        <div class="card pad marketplace-filter">
-          <input id="marketSearch" type="text" placeholder="Search services (design, tutoring, food...)" />
-
-          <select id="marketCategory">
-            <option value="all">All Categories</option>
-            <option value="creative">Creative</option>
-            <option value="academic">Academic</option>
-            <option value="food">Food</option>
-            <option value="tech">Tech</option>
-          </select>
-
-          <select id="marketSort">
-            <option value="latest">Latest</option>
-            <option value="priceLow">Price: Low → High</option>
-            <option value="priceHigh">Price: High → Low</option>
-          </select>
+  <body>
+    <div class="app">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">
+          <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up" />
+          <div class="logo-title">Link <span>Up</span></div>
         </div>
 
-        <div style="height:20px;"></div>
+        <nav class="nav">
+          <a data-nav href="marketplace.html" class="active">🏠 Home Page</a>
+          <a data-nav href="earnings.html">💰 Earning History</a>
+          <a data-nav href="purchase.html">🛍️ Purchase History</a>
+          <div class="nav-logout">
+            <a href="#" id="logoutBtn">🚪 Logout</a>
+          </div>
+        </nav>
+      </aside>
 
-        <!-- Product Grid -->
-        <div id="marketList" class="market-grid"></div>
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-nav">
+          <a href="job-section.html" class="topbar-nav-link">Job Section</a>
+          <a href="marketplace.html" class="topbar-nav-link active">Marketplace Section</a>
+        </div>
 
-      </div>
-    </main>
+        <div style="display: flex; gap: 10px">
+          <button class="btn btn-outline">🔔</button>
+          <button class="btn btn-blue" onclick="window.location.href = 'profile.html'">
+            My Profile
+          </button>
+        </div>
+      </header>
 
-  </div>
+      <!-- Main -->
+      <main class="main">
+        <div class="container">
+          <!-- Recommended Section -->
+          <section class="market-section">
+            <div class="section-header">
+              <h2>Recommended for you</h2>
+              <button id="seeMoreRecommended" class="btn btn-outline">See more...</button>
+            </div>
+            <div id="recommendedPreview" class="market-preview-grid">
+              <!-- JS dynamic content -->
+            </div>
+          </section>
 
-  <script type="module" src="../../js/pages/student/marketplace.js"></script>
-</body>
+          <div style="height: 40px"></div>
+
+          <!-- My Listings Section -->
+          <section class="market-section">
+            <div class="section-header">
+              <h2>My Listings</h2>
+              <button id="seeMoreMyListings" class="btn btn-outline">See more...</button>
+            </div>
+            <div id="myListingsPreview" class="market-preview-grid">
+              <!-- JS dynamic content -->
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="../../js/pages/student/marketplace.js"></script>
+  </body>
 </html>

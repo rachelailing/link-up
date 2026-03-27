@@ -1,122 +1,167 @@
-import { $, $$ } from "../../utils/dom.js";
-import { statusToBadgeClass } from "../../components/status-badge.js";
-import { setActiveNav } from "../../components/navbar.js";
+import { $, $$ } from '../../utils/dom.js';
+import { setActiveNav, wireLogout } from '../../components/navbar.js';
+import { openModal, wireModalClose } from '../../components/modal.js';
+import { authService } from '../../services/auth.service.js';
+import { jobsService } from '../../services/jobs.service.js';
+import { statusToBadgeClass } from '../../components/status-badge.js';
 
-const JOBS = [
-  {
-    id: 1,
-    title: "Booth Helper (Weekend Event)",
-    employer: "Student Biz Society",
-    category: "event",
-    pay: 80,
-    location: "UTP Main Hall",
-    status: "Open"
-  },
-  {
-    id: 2,
-    title: "Poster Design for Club",
-    employer: "Robotics Club",
-    category: "creative",
-    pay: 120,
-    location: "Remote",
-    status: "Open"
-  },
-  {
-    id: 3,
-    title: "Math Tutor (Foundation)",
-    employer: "Academic Support Unit",
-    category: "academic",
-    pay: 150,
-    location: "UTP Block C",
-    status: "Open"
-  },
-  {
-    id: 4,
-    title: "Website Fix (HTML/CSS)",
-    employer: "Campus Startup",
-    category: "tech",
-    pay: 200,
-    location: "Remote",
-    status: "Open"
+async function renderJobs(list) {
+  const listEl = $('#jobsList');
+
+  if (!list || list.length === 0) {
+    listEl.innerHTML = '<p class="muted">No jobs found matching your criteria.</p>';
+    return;
   }
-];
 
-function renderJobs(list){
-  const listEl = $("#jobsList");
+  listEl.innerHTML = list
+    .map((job) => {
+      const badgeClass = statusToBadgeClass(job.status);
 
-  listEl.innerHTML = list.map(job => {
-    const badgeClass = statusToBadgeClass(job.status);
-
-    return `
-      <div class="card job">
-        <div class="job-left">
-          <div style="display:flex; justify-content:space-between;">
-            <div>
-              <h3>${job.title}</h3>
-              <p>${job.employer}</p>
-            </div>
-            <span class="badge ${badgeClass}">${job.status}</span>
-          </div>
-
-          <div class="job-meta">
-            <span class="kv">📍 ${job.location}</span>
-            <span class="kv">💰 RM ${job.pay}</span>
-            <span class="kv">🏷 ${job.category}</span>
-          </div>
+      return `
+      <div class="card active-row">
+        <div class="active-image">
+          <img src="../../assets/images/link_up_icon.jpeg" alt="job icon" />
         </div>
 
-        <div class="job-actions">
-          <button class="btn btn-outline" data-view="${job.id}">View</button>
-          <button class="btn btn-primary" data-apply="${job.id}">Apply</button>
+        <div class="active-content">
+          <div class="active-main-info">
+            <div class="active-title-row">
+              <h3 style="margin:0;">${job.title}</h3>
+              <span class="badge ${badgeClass}">${job.status}</span>
+            </div>
+
+            <div class="active-details-row">
+              <div class="active-col">
+                <span class="label">Location</span>
+                <span class="value">📍 ${job.location}</span>
+              </div>
+              <div class="active-col">
+                <span class="label">Payment</span>
+                <span class="value">💰 RM ${job.salary || job.pay}</span>
+              </div>
+              <div class="active-col">
+                <span class="label">Deadline</span>
+                <span class="value">📅 ${job.deadline || 'N/A'}</span>
+              </div>
+              <div class="active-col">
+                <span class="label">Slots</span>
+                <span class="value">👥 ${job.slots || 1} available</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="active-desc">
+            ${job.description || ''}
+          </p>
+        </div>
+
+        <div class="active-actions">
+          <button class="btn btn-outline" data-view="${job.id}">View Details</button>
         </div>
       </div>
     `;
-  }).join("");
+    })
+    .join('');
 
   // View button
-  $$("[data-view]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.view;
-      window.location.href = `job-details.html?id=${id}`;
-    });
+  $$('[data-view]').forEach((btn) => {
+    btn.addEventListener('click', handleView);
   });
+}
 
-  // Apply button
-  $$("[data-apply]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const id = btn.dataset.apply;
-    window.location.href = `apply-job.html?id=${id}`;
-  });
-});
+async function handleView(e) {
+  const id = e.currentTarget.dataset.view;
+  const job = await jobsService.getJobById(id);
 
-function filterJobs(){
-  const search = $("#searchInput").value.toLowerCase();
-  const category = $("#categoryFilter").value;
-  const pay = $("#payFilter").value;
+  // Also check all jobs if not found in DB
+  const allJobs = await jobsService.getJobs();
+  const foundJob = job || allJobs.find((j) => String(j.id) === String(id));
 
-  let filtered = JOBS.filter(job =>
-    job.title.toLowerCase().includes(search) ||
-    job.employer.toLowerCase().includes(search)
+  if (foundJob) {
+    $('#modalJobTitle').textContent = foundJob.title;
+    $('#modalEmployer').textContent = foundJob.employer_name || foundJob.employer || 'Employer';
+    $('#modalLocation').textContent = foundJob.location;
+    $('#modalSalary').textContent = foundJob.salary || foundJob.pay || '0';
+    $('#modalCategory').textContent = foundJob.category || 'N/A';
+    $('#modalDescription').textContent = foundJob.description || 'No description provided.';
+
+    const badgeEl = $('#modalStatusBadge');
+    if (badgeEl) {
+      badgeEl.textContent = foundJob.status;
+      badgeEl.className = 'badge ' + statusToBadgeClass(foundJob.status);
+    }
+
+    // Feedback logic
+    const feedbackSection = $('#modalFeedbackSection');
+    if (feedbackSection) {
+      if (foundJob.status.toLowerCase() === 'done' && foundJob.rating) {
+        feedbackSection.style.display = 'block';
+        $('#modalRating').textContent = '⭐'.repeat(foundJob.rating);
+        $('#modalComment').textContent = foundJob.employer_comment
+          ? `"${foundJob.employer_comment}"`
+          : 'No comment provided.';
+      } else {
+        feedbackSection.style.display = 'none';
+      }
+    }
+
+    openModal('jobDetailsModal');
+  }
+}
+
+async function filterJobs() {
+  const search = ($('#searchInput')?.value || '').toLowerCase();
+  const status = $('#statusFilter')?.value || 'all';
+  const dateSort = $('#dateFilter')?.value || 'newest';
+
+  const allJobs = await jobsService.getJobs();
+
+  // Base filter: Only show Applied, Current, Done, Cancelled
+  const myJobs = allJobs.filter((job) =>
+    [
+      'applied',
+      'current',
+      'done',
+      'cancelled',
+      'completed',
+      'inprogress',
+      'pending',
+      'rejected',
+    ].includes(job.status.toLowerCase())
   );
 
-  if (category !== "all") {
-    filtered = filtered.filter(job => job.category === category);
+  let filtered = myJobs.filter(
+    (job) =>
+      job.title.toLowerCase().includes(search) || job.employer_name?.toLowerCase().includes(search)
+  );
+
+  if (status !== 'all') {
+    filtered = filtered.filter((job) => job.status.toLowerCase() === status.toLowerCase());
   }
 
-  if (pay !== "all") {
-    filtered = filtered.filter(job => job.pay >= Number(pay));
-  }
+  // Date Sorting
+  filtered.sort((a, b) => {
+    const dateA = new Date(a.created_at || 0);
+    const dateB = new Date(b.created_at || 0);
+    return dateSort === 'newest' ? dateB - dateA : dateA - dateB;
+  });
 
   renderJobs(filtered);
 }
 
-function init(){
-  setActiveNav();
-  renderJobs(JOBS);
+async function init() {
+  const user = await authService.requireAuth('student');
+  if (!user) return;
 
-  $("#searchInput").addEventListener("input", filterJobs);
-  $("#categoryFilter").addEventListener("change", filterJobs);
-  $("#payFilter").addEventListener("change", filterJobs);
+  setActiveNav();
+  wireLogout();
+  wireModalClose();
+
+  await filterJobs(); // Use the filter function to load initial state
+
+  $('#searchInput').addEventListener('input', filterJobs);
+  $('#statusFilter')?.addEventListener('change', filterJobs);
+  $('#dateFilter')?.addEventListener('change', filterJobs);
 }
 
-document.addEventListener("DOMContentLoaded", init);}
+document.addEventListener('DOMContentLoaded', init);

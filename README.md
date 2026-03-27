@@ -12,6 +12,7 @@ Link Up is a specialized platform designed to bridge the gap between students se
 ## 🚀 Key Features
 
 ### 🎓 For Students (The Hustlers)
+
 - **Personalized Recommendations:** Get job suggestions based on your skills, interests, and campus location.
 - **Unified Dashboard:** Track active jobs, pending applications, and earnings in one place.
 - **Secure Gigs:** Use the "Commitment Fee" system to lock in jobs and demonstrate your reliability.
@@ -19,6 +20,7 @@ Link Up is a specialized platform designed to bridge the gap between students se
 - **Marketplace:** List your own products or specialized services (Phase 2).
 
 ### 💼 For Employers (The Hirers)
+
 - **Seamless Job Posting:** Create detailed job listings with specific categories, pay rates, and locations.
 - **Applicant Management:** Review student profiles, skills, and portfolios before hiring.
 - **Trust-Based Hiring:** The commitment fee ensures that hired students are serious about the task.
@@ -28,14 +30,14 @@ Link Up is a specialized platform designed to bridge the gap between students se
 
 ## 🛡️ The Commitment Fee System
 
-One of Link Up's core innovations is the **Commitment Fee**. 
+One of Link Up's core innovations is the **Commitment Fee**.
 
 1. **Application:** Student applies for a job.
 2. **Acceptance:** Employer reviews and accepts the student.
 3. **Commitment:** The student pays a small, refundable commitment fee to secure the slot.
 4. **Completion:** Once the job is finished and approved by the employer, the **salary is released** and the **commitment fee is refunded** to the student.
 
-*This system significantly reduces no-shows and ensures both parties are committed to the gig.*
+_This system significantly reduces no-shows and ensures both parties are committed to the gig._
 
 ---
 
@@ -55,18 +57,18 @@ Link Up is built with a focus on performance and simplicity using a modern Vanil
 ```text
 link-up/
 ├── assets/             # Images, fonts, and brand assets
-├── css/                
+├── css/
 │   ├── base/           # Reset, typography, and global variables
 │   ├── components/     # Reusable UI elements (buttons, cards, modals)
 │   └── pages/          # Page-specific styling
-├── js/                 
+├── js/
 │   ├── components/     # UI component logic (modals, navbars)
 │   ├── pages/          # Page-specific application logic
 │   ├── services/       # API and data handling (Mock-based for MVP)
 │   └── utils/          # DOM helpers and formatters
-├── pages/              
+├── pages/
 │   ├── auth/           # Login, Register, and Onboarding flows
-│   ├── employer/       # Employer-specific dashboards and tools
+│   ├── employer/       # Employer-specific home page and tools
 │   └── student/        # Student-specific dashboards and tools
 └── index.html          # Main landing page
 ```
@@ -76,10 +78,12 @@ link-up/
 ## 🛠️ Getting Started
 
 ### Prerequisites
+
 - Any modern web browser (Chrome, Firefox, Safari, Edge).
 - A local development server (optional, but recommended for ES modules).
 
 ### Installation
+
 1. Clone the repository:
    ```bash
    git clone https://github.com/yourusername/link-up.git
@@ -93,6 +97,7 @@ link-up/
 ---
 
 ## 🗺️ Roadmap (Phase 2)
+
 - [ ] **Backend Integration:** Replace mock data with a live Node.js/Firebase backend.
 - [ ] **Real-time Notifications:** Alerts for job status changes and payment releases.
 - [ ] **Marketplace Expansion:** Allow students to open digital "stalls" for products (food, crafts, etc.).
@@ -102,6 +107,7 @@ link-up/
 ---
 
 ## 📄 License
+
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---

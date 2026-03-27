@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Link Up — Student Dashboard</title>
+    <link rel="stylesheet" href="../../css/main.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="logo">
+          <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up" />
+          <div class="logo-title">Link <span>Up</span></div>
+        </div>
+
+        <nav class="nav">
+          <a data-nav href="job-section.html">🏠 Home Page</a>
+          <a data-nav href="jobs.html">🔍 Job Details</a>
+          <a data-nav href="job-earnings.html">💰 Transaction Details</a>
+
+          <div class="nav-logout">
+            <a href="#" id="logoutBtn">🚪 Logout</a>
+          </div>
+        </nav>
+      </aside>
+
+      <header class="topbar">
+        <div class="topbar-nav">
+          <a href="job-section.html" class="topbar-nav-link active">Job Section</a>
+          <a href="marketplace.html" class="topbar-nav-link">Marketplace Section</a>
+        </div>
+
+        <div style="display: flex; gap: 10px">
+          <button class="btn btn-outline">🔔</button>
+          <button class="btn btn-blue" onclick="window.location.href = 'profile.html'">
+            My Profile
+          </button>
+        </div>
+      </header>
+
+      <main class="main">
+        <div class="container">
+          <div class="section-title">
+            <h2>Overview</h2>
+          </div>
+
+          <div class="grid cols-4">
+            <div class="card pad">
+              <h3>Active Jobs</h3>
+              <p id="statActive">0</p>
+            </div>
+            <div class="card pad">
+              <h3>Pending Apps</h3>
+              <p id="statPending">0</p>
+            </div>
+            <div class="card pad">
+              <h3>Earnings</h3>
+              <p id="statEarnings">RM 0</p>
+            </div>
+            <div class="card pad">
+              <h3>Commitment Fee</h3>
+              <p id="statDeposit">Unpaid</p>
+            </div>
+          </div>
+
+          <div style="height: 24px"></div>
+
+          <div class="section-title">
+            <h2>Recommended Jobs</h2>
+            <button class="btn btn-outline">See all</button>
+          </div>
+
+          <div id="recommendedJobs" class="list"></div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Apply Modal -->
+    <div class="modal-backdrop" id="applyModal">
+      <div class="modal">
+        <h3>Apply for <span id="applyJobTitle">Job</span></h3>
+        <p>Submit a short message and availability. (MVP demo modal)</p>
+
+        <div class="modal-actions">
+          <button class="btn btn-outline" data-modal-close="applyModal">Cancel</button>
+          <button class="btn btn-primary" data-modal-close="applyModal">Submit</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Details Modal -->
+    <div class="modal-backdrop" id="jobDetailsModal">
+      <div class="modal">
+        <h2 id="modalJobTitle">Job Title</h2>
+        <p id="modalEmployer" class="muted">Employer Name</p>
+
+        <div style="margin: 16px 0; border-top: 1px solid var(--border); padding-top: 16px">
+          <p><strong>Location:</strong> <span id="modalLocation">Location</span></p>
+          <p><strong>Salary:</strong> RM <span id="modalSalary">0</span></p>
+          <p><strong>Category:</strong> <span id="modalCategory">Category</span></p>
+        </div>
+
+        <div style="margin: 16px 0">
+          <h3>Description</h3>
+          <p id="modalDescription" style="line-height: 1.6">Job description goes here...</p>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-outline" data-modal-close="jobDetailsModal">Close</button>
+          <button class="btn btn-primary" id="modalApplyBtn">Apply Now</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="../../js/pages/student/job-section.js"></script>
+  </body>
+</html>

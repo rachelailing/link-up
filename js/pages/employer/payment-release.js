@@ -1,45 +1,80 @@
-import { $, $$ } from "../../utils/dom.js";
-import { setActiveNav } from "../../components/navbar.js";
-import { statusToBadgeClass } from "../../components/status-badge.js";
+import { $, $$ } from '../../utils/dom.js';
+import { setActiveNav } from '../../components/navbar.js';
+import { statusToBadgeClass } from '../../components/status-badge.js';
+import { supabase } from '../../config/supabase.js';
+import { authService } from '../../services/auth.service.js';
+import { jobsService } from '../../services/jobs.service.js';
 
 /**
- * Jobs source: localStorage "linkup_employer_jobs"
- * Payment history: localStorage "linkup_payments"
- *
- * We’ll treat these job statuses as "needs employer approval":
- * - "Submitted"
- * - "Awaiting Approval"
- * - "Awaiting Payment"
- * (Your system naming can vary; we’ll handle common names.)
+ * Mock Data for Pitch
  */
+const MOCK_PENDING = [
+  {
+    id: 'mock-pay-1',
+    title: 'Event Crew: Tech Showcase',
+    status: 'Submitted',
+    salary: 150,
+    deposit: 15,
+    deadline: '2026-03-25',
+    applications: [{ studentName: 'Rachel Ng', status: 'Submitted' }],
+  },
+  {
+    id: 'mock-pay-2',
+    title: 'Campus Delivery Rider',
+    status: 'Ongoing',
+    salary: 150,
+    deposit: 15,
+    deadline: '2026-04-10',
+    applications: [{ studentName: 'Wei Kang', status: 'Accepted' }],
+  },
+];
 
-function getJobs(){
-  return JSON.parse(localStorage.getItem("linkup_employer_jobs") || "[]");
+const MOCK_HISTORY = [
+  {
+    id: 501,
+    jobTitle: 'Library Assistant',
+    salary: 450,
+    depositRefunded: 45,
+    releasedAt: '2026-03-20T14:30:00Z',
+    status: 'Released',
+  },
+  {
+    id: 502,
+    jobTitle: 'Programming Tutor',
+    salary: 400,
+    depositRefunded: 40,
+    releasedAt: '2026-03-15T10:00:00Z',
+    status: 'Released',
+  },
+];
+
+function getLocalJobs() {
+  return JSON.parse(localStorage.getItem('linkup_employer_jobs') || '[]');
 }
-function saveJobs(jobs){
-  localStorage.setItem("linkup_employer_jobs", JSON.stringify(jobs));
+function saveLocalJobs(jobs) {
+  localStorage.setItem('linkup_employer_jobs', JSON.stringify(jobs));
 }
 
-function getPayments(){
-  return JSON.parse(localStorage.getItem("linkup_payments") || "[]");
+function getLocalPayments() {
+  return JSON.parse(localStorage.getItem('linkup_payments') || '[]');
 }
-function savePayments(payments){
-  localStorage.setItem("linkup_payments", JSON.stringify(payments));
-}
-
-function normalizeStatus(s){
-  return (s || "").toLowerCase().replace(/\s+/g, "_");
+function saveLocalPayments(payments) {
+  localStorage.setItem('linkup_payments', JSON.stringify(payments));
 }
 
-function jobIsPendingApproval(job){
+function normalizeStatus(s) {
+  return (s || '').toLowerCase().replace(/\s+/g, '');
+}
+
+function jobIsPendingApproval(job) {
   const s = normalizeStatus(job.status);
-  return ["submitted", "awaiting_approval", "awaiting_payment", "in_progress"].includes(s);
+  return ['submitted', 'awaitingapproval', 'awaitingpayment', 'inprogress', 'ongoing'].includes(s);
 }
 
-function renderPendingList(list){
-  const el = $("#paymentList");
+function renderPendingList(list) {
+  const el = $('#paymentList');
 
-  if (!list.length){
+  if (!list.length) {
     el.innerHTML = `
       <div class="card pad">
         <p>No pending payment approvals right now.</p>
@@ -49,174 +84,210 @@ function renderPendingList(list){
     return;
   }
 
-  el.innerHTML = list.map(job => {
-    const badgeClass = statusToBadgeClass(job.status);
+  el.innerHTML = list
+    .map((job) => {
+      const badgeClass = statusToBadgeClass(job.status);
+      const deposit = Number(job.deposit || 0);
+      const salary = Number(job.salary || 0);
 
-    // Pick a “student” to display if you accepted someone
-    const accepted = (job.applications || []).find(a =>
-      ["awaiting commitment fee","accepted","confirmed","in progress","submitted","completed"]
-      .includes((a.status || "").toLowerCase())
-    );
+      const accepted = (job.applications || []).find((a) =>
+        [
+          'awaitingcommitmentfee',
+          'accepted',
+          'confirmed',
+          'inprogress',
+          'ongoing',
+          'submitted',
+          'completed',
+        ].includes(normalizeStatus(a.status))
+      );
+      const studentName = accepted?.studentName || accepted?.profiles?.full_name || '—';
 
-    const studentName = accepted?.studentName || "—";
-    const deposit = Number(job.deposit || 0);
-    const salary = Number(job.salary || 0);
-
-    return `
-      <div class="card pay-row">
+      return `
+      <div class="card pay-row" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; margin-bottom: 15px;">
         <div class="pay-left">
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
             <h3 style="margin:0;">${job.title}</h3>
             <span class="badge ${badgeClass}">${job.status}</span>
           </div>
 
-          <div class="pay-meta">
-            <span class="kv">👤 Student: ${studentName}</span>
-            <span class="kv">💰 Salary: RM ${salary}</span>
-            <span class="kv">💳 Refund Fee: RM ${deposit}</span>
-            <span class="kv">📅 Deadline: ${job.deadline || "-"}</span>
+          <div class="pay-meta" style="margin-top: 10px; display: flex; gap: 15px; font-size: 14px; color: var(--muted);">
+            <span>👤 Student: <strong>${studentName}</strong></span>
+            <span>💰 Salary: <strong>RM ${salary}</strong></span>
+            <span>💳 Refund Fee: <strong>RM ${deposit}</strong></span>
           </div>
 
-          <div class="small-note">
-            Approve completion to release salary (and refund commitment fee if applicable).
+          <div class="small-note" style="margin-top: 8px; font-size: 12px; color: #888;">
+            Approve completion to release salary and refund the commitment fee.
           </div>
         </div>
 
-        <div class="pay-actions">
-          <button class="btn btn-outline" data-view="${job.id}">View</button>
+        <div class="pay-actions" style="display: flex; gap: 10px;">
           <button class="btn btn-primary" data-approve="${job.id}">
             Approve & Release
           </button>
-          <button class="btn btn-outline" data-dispute="${job.id}">Report Issue</button>
+          <button class="btn btn-outline">Report Issue</button>
         </div>
       </div>
     `;
-  }).join("");
+    })
+    .join('');
 
-  // Wire actions
-  $$("[data-view]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      // Optional: you can redirect to job-manage detail later
-      alert("MVP: view details page coming soon.");
-    });
-  });
-
-  $$("[data-dispute]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      alert("MVP: dispute flow coming soon (opens support ticket).");
-    });
-  });
-
-  $$("[data-approve]").forEach(btn => {
-    btn.addEventListener("click", () => approveAndRelease(Number(btn.dataset.approve)));
+  $$('[data-approve]').forEach((btn) => {
+    btn.addEventListener('click', () => approveAndRelease(btn.dataset.approve));
   });
 }
 
-function approveAndRelease(jobId){
-  const jobs = getJobs();
-  const payments = getPayments();
+async function approveAndRelease(jobId) {
+  const localJobs = getLocalJobs();
+  const localPayments = getLocalPayments();
 
-  const job = jobs.find(j => j.id === jobId);
-  if (!job) return;
+  // Try to find in local storage first
+  let job = localJobs.find((j) => String(j.id) === String(jobId));
 
-  // Update job status
-  job.status = "Completed";
+  if (!job) {
+    // Try Supabase
+    try {
+      const { error: jobErr } = await supabase
+        .from('jobs')
+        .update({ status: 'Completed' })
+        .eq('id', jobId);
 
-  // Update accepted applicant status (if exists)
-  if (job.applications && job.applications.length){
-    const chosen = job.applications.find(a =>
-      ["awaiting commitment fee", "accepted", "confirmed", "in progress", "submitted"]
-      .includes((a.status || "").toLowerCase())
-    );
-    if (chosen) chosen.status = "Completed";
+      if (!jobErr) {
+        alert('Payment released. Job marked as Completed.');
+        await loadAndRender();
+        return;
+      }
+    } catch {
+      // fall through to mock
+    }
+
+    // Fallback to mock data
+    job = MOCK_PENDING.find((j) => String(j.id) === String(jobId));
+    if (!job) return;
+    alert('Demo: Approval for mock job processed.');
+  } else {
+    // Update real job status
+    job.status = 'Completed';
+    if (job.applications && job.applications.length) {
+      const chosen = job.applications.find((a) =>
+        [
+          'awaitingcommitmentfee',
+          'accepted',
+          'confirmed',
+          'inprogress',
+          'ongoing',
+          'submitted',
+        ].includes(normalizeStatus(a.status))
+      );
+      if (chosen) chosen.status = 'Completed';
+    }
+    saveLocalJobs(localJobs);
   }
 
   // Create payment record
-  payments.unshift({
+  const newPayment = {
     id: Date.now(),
     jobId: job.id,
     jobTitle: job.title,
     salary: Number(job.salary || 0),
     depositRefunded: Number(job.deposit || 0),
     releasedAt: new Date().toISOString(),
-    status: "Released"
-  });
+    status: 'Released',
+  };
 
-  saveJobs(jobs);
-  savePayments(payments);
+  localPayments.unshift(newPayment);
+  saveLocalPayments(localPayments);
 
-  // re-render
-  loadAndRender();
-  alert("Payment released ✅ Job marked as Completed.");
+  await loadAndRender();
+  alert('Payment released. Salary transferred to student.');
 }
 
-function renderPaymentHistory(payments){
-  const el = $("#paymentHistory");
+function renderPaymentHistory(payments) {
+  const el = $('#paymentHistory');
 
-  if (!payments.length){
+  if (!payments || !payments.length) {
     el.innerHTML = `
       <div class="card pad">
-        <p>No payments yet.</p>
+        <p>No payouts released yet.</p>
       </div>
     `;
     return;
   }
 
-  el.innerHTML = payments.slice(0, 8).map(p => `
-    <div class="card pad" style="display:flex; justify-content:space-between; gap:14px;">
+  el.innerHTML = payments
+    .slice(0, 10)
+    .map(
+      (p) => `
+    <div class="card pad" style="display:flex; justify-content:space-between; align-items: center; gap:14px; margin-bottom: 10px;">
       <div>
-        <h3 style="margin:0;">${p.jobTitle}</h3>
-        <p style="margin:6px 0 0;">Released: ${new Date(p.releasedAt).toLocaleString()}</p>
+        <h3 style="margin:0; font-size: 1rem;">${p.jobTitle || p.title}</h3>
+        <p style="margin:6px 0 0; font-size: 13px; color: var(--muted);">Released: ${p.releasedAt ? new Date(p.releasedAt).toLocaleString() : 'N/A'}</p>
       </div>
       <div style="text-align:right;">
-        <div class="kv">💰 RM ${p.salary}</div>
-        <div class="kv">💳 Refund RM ${p.depositRefunded}</div>
-        <span class="badge accepted">${p.status}</span>
+        <div style="font-weight: 700; color: var(--green);">RM ${p.salary || p.salary || 0}</div>
+        <div style="font-size: 12px; color: var(--muted);">+ RM ${p.depositRefunded || p.deposit || 0} Refund</div>
+        <span class="badge accepted" style="margin-top: 5px;">${p.status || 'Released'}</span>
       </div>
     </div>
-  `).join("");
+  `
+    )
+    .join('');
 }
 
-function loadAndRender(){
-  const jobs = getJobs();
-  const payments = getPayments();
+async function loadAndRender() {
+  const localJobs = getLocalJobs();
+  const dbJobs = await jobsService.getMyJobs();
+
+  // Combine all jobs
+  const remoteIds = new Set(dbJobs.map((j) => String(j.id)));
+  const uniqueLocal = localJobs.filter((j) => !remoteIds.has(String(j.id)));
+  const allJobs = [...dbJobs, ...uniqueLocal, ...MOCK_PENDING];
+
+  // Combine payments (local + mock history)
+  const localPayments = getLocalPayments();
+  const allPayments = [...localPayments, ...MOCK_HISTORY];
 
   // pending jobs list
-  let pending = jobs.filter(jobIsPendingApproval);
+  let pending = allJobs.filter(jobIsPendingApproval);
 
   // Apply filters
-  const statusFilter = $("#payStatusFilter")?.value || "all";
-  const search = ($("#paySearch")?.value || "").toLowerCase();
+  const statusFilter = $('#payStatusFilter')?.value || 'all';
+  const search = ($('#paySearch')?.value || '').toLowerCase();
 
-  if (search){
-    pending = pending.filter(j => (j.title || "").toLowerCase().includes(search));
+  if (search) {
+    pending = pending.filter((j) => (j.title || '').toLowerCase().includes(search));
   }
 
-  if (statusFilter !== "all"){
-    pending = pending.filter(j => {
+  if (statusFilter !== 'all') {
+    pending = pending.filter((j) => {
       const s = normalizeStatus(j.status);
-      if (statusFilter === "awaiting_approval") return ["submitted","awaiting_approval","awaiting_payment"].includes(s);
-      if (statusFilter === "in_progress") return s === "in_progress";
-      if (statusFilter === "completed") return s === "completed";
+      if (statusFilter === 'awaiting_approval')
+        return ['submitted', 'awaitingapproval', 'awaitingpayment'].includes(s);
+      if (statusFilter === 'in_progress') return s === 'inprogress' || s === 'ongoing';
       return true;
     });
   }
 
   // pending count badge
-  const pendingCount = jobs.filter(jobIsPendingApproval).length;
-  $("#pendingCountBadge").textContent = `${pendingCount} Pending`;
-  $("#pendingCountBadge").className = "badge " + (pendingCount ? "pending" : "accepted");
+  const pendingCount = pending.length;
+  $('#pendingCountBadge').textContent = `${pendingCount} Pending`;
+  $('#pendingCountBadge').className = 'badge ' + (pendingCount ? 'pending' : 'accepted');
 
   renderPendingList(pending);
-  renderPaymentHistory(payments);
+  renderPaymentHistory(allPayments);
 }
 
-function init(){
+async function init() {
+  const user = await authService.requireAuth('employer');
+  if (!user) return;
+
   setActiveNav();
-  loadAndRender();
 
-  $("#payStatusFilter").addEventListener("change", loadAndRender);
-  $("#paySearch").addEventListener("input", loadAndRender);
+  $('#payStatusFilter').addEventListener('change', loadAndRender);
+  $('#paySearch').addEventListener('input', loadAndRender);
+
+  await loadAndRender();
 }
 
-document.addEventListener("DOMContentLoaded", init);
+document.addEventListener('DOMContentLoaded', init);

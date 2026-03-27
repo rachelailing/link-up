@@ -1,147 +1,152 @@
 // js/pages/auth/employer-login.js
-import { isEmail, minLength } from "../../utils/validators.js";
+import { isEmail, minLength } from '../../utils/validators.js';
+import { authService } from '../../services/auth.service.js';
 
-const STORAGE = {
-  // where we saved employer registration mock
-  EMPLOYER_REGISTER: "linkup_employer_register",
-  // logged in session
-  SESSION: "linkup_session",
-  REMEMBER_EMAIL: "linkup_employer_remember_email",
-};
+/**
+ * Employer Login Controller
+ */
+class EmployerLogin {
+  constructor() {
+    this.form = document.getElementById('employerLoginForm');
+    if (!this.form) return;
 
-export function initEmployerLogin() {
-  const form = document.getElementById("employerLoginForm");
-  if (!form) return;
+    this.banner = document.getElementById('errorBanner');
+    this.emailInput = document.getElementById('email');
+    this.passwordInput = document.getElementById('password');
+    this.remember = document.getElementById('remember');
+  }
 
-  const banner = document.getElementById("errorBanner");
-  const email = document.getElementById("email");
-  const password = document.getElementById("password");
-  const remember = document.getElementById("remember");
+  init() {
+    if (!this.form) return;
 
-  // --- Password toggle (Show/Hide) ---
-  document.querySelectorAll("[data-toggle-password]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const selector = btn.getAttribute("data-toggle-password");
-      const input = document.querySelector(selector);
-      if (!input) return;
+    this.prefillEmail();
+    this.wirePasswordToggles();
+    this.wireLiveCleanup();
+    this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+  }
 
-      const hidden = input.type === "password";
-      input.type = hidden ? "text" : "password";
-      btn.textContent = hidden ? "Hide" : "Show";
+  prefillEmail() {
+    const savedEmail = authService.getRememberedEmail();
+    if (savedEmail) {
+      this.emailInput.value = savedEmail;
+      this.remember.checked = true;
+    }
+  }
+
+  wirePasswordToggles() {
+    document.querySelectorAll('[data-toggle-password]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const selector = btn.getAttribute('data-toggle-password');
+        const input = document.querySelector(selector);
+        if (!input) return;
+
+        const hidden = input.type === 'password';
+        input.type = hidden ? 'text' : 'password';
+        btn.textContent = hidden ? 'Hide' : 'Show';
+      });
     });
-  });
-
-  // --- Remember email (optional) ---
-  const savedEmail = localStorage.getItem(STORAGE.REMEMBER_EMAIL);
-  if (savedEmail) {
-    email.value = savedEmail;
-    remember.checked = true;
   }
 
-  // Helpers
-  function showBanner(msg) {
-    if (!banner) return;
-    banner.textContent = msg;
-    banner.classList.add("show");
+  wireLiveCleanup() {
+    this.emailInput.addEventListener('input', () => {
+      this.hideBanner();
+      this.clearFieldError('email');
+    });
+    this.passwordInput.addEventListener('input', () => {
+      this.hideBanner();
+      this.clearFieldError('password');
+    });
   }
 
-  function hideBanner() {
-    if (!banner) return;
-    banner.textContent = "";
-    banner.classList.remove("show");
+  async handleSubmit(e) {
+    e.preventDefault();
+    if (!this.validate()) return;
+
+    const submitBtn = this.form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Logging in...';
+
+    console.log('[EmployerLogin] Form submitted, calling AuthService...');
+
+    try {
+      const email = this.emailInput.value.trim();
+      const password = this.passwordInput.value;
+
+      const user = await authService.login(email, password);
+
+      // Verify role
+      if (user.user_metadata?.role !== 'employer') {
+        console.warn('[EmployerLogin] Role mismatch: user is not an employer.', user.user_metadata);
+        await authService.logout();
+        throw new Error('This account is not registered as an employer.');
+      }
+
+      console.log('[EmployerLogin] Login successful, redirecting to dashboard...');
+      // Remember email if checked
+      authService.setRememberMe(email, this.remember.checked);
+
+      // Redirect to employer homepage
+      window.location.href = '../employer/employer_homepage.html';
+    } catch (err) {
+      console.error('[EmployerLogin] Login error:', err);
+      this.showBanner(err.message || 'Invalid email or password.');
+      this.setFieldError('email', '');
+      this.setFieldError('password', '');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Login';
+    }
   }
 
-  function setFieldError(name, msg) {
-    const field = form.querySelector(`#${name}`)?.closest(".field");
-    const err = form.querySelector(`[data-error-for="${name}"]`);
-    if (field) field.classList.add("is-invalid");
-    if (err) err.textContent = msg || "";
-  }
-
-  function clearFieldError(name) {
-    const field = form.querySelector(`#${name}`)?.closest(".field");
-    const err = form.querySelector(`[data-error-for="${name}"]`);
-    if (field) field.classList.remove("is-invalid");
-    if (err) err.textContent = "";
-  }
-
-  // Live validation cleanup
-  email.addEventListener("input", () => { hideBanner(); clearFieldError("email"); });
-  password.addEventListener("input", () => { hideBanner(); clearFieldError("password"); });
-
-  function validate() {
-    hideBanner();
+  validate() {
+    this.hideBanner();
     let ok = true;
 
-    if (!email.value.trim()) {
-      setFieldError("email", "Email is required.");
+    if (!this.emailInput.value.trim()) {
+      this.setFieldError('email', 'Email is required.');
       ok = false;
-    } else if (!isEmail(email.value)) {
-      setFieldError("email", "Please enter a valid email.");
-      ok = false;
-    }
-
-    if (!password.value) {
-      setFieldError("password", "Password is required.");
-      ok = false;
-    } else if (!minLength(password.value, 8)) {
-      // you can remove this if you don't want length check on login
-      setFieldError("password", "Password must be at least 8 characters.");
+    } else if (!isEmail(this.emailInput.value)) {
+      this.setFieldError('email', 'Please enter a valid email.');
       ok = false;
     }
 
-    if (!ok) showBanner("Please fix the highlighted fields and try again.");
+    if (!this.passwordInput.value) {
+      this.setFieldError('password', 'Password is required.');
+      ok = false;
+    } else if (!minLength(this.passwordInput.value, 8)) {
+      this.setFieldError('password', 'Password must be at least 8 characters.');
+      ok = false;
+    }
+
+    if (!ok) this.showBanner('Please fix the highlighted fields and try again.');
     return ok;
   }
 
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+  showBanner(msg) {
+    if (!this.banner) return;
+    this.banner.textContent = msg;
+    this.banner.classList.add('show');
+  }
 
-    // --- Mock authentication ---
-    // For now, compare with the stored registration record.
-    const regRaw = localStorage.getItem(STORAGE.EMPLOYER_REGISTER);
-    if (!regRaw) {
-      showBanner("No employer account found. Please register first.");
-      return;
-    }
+  hideBanner() {
+    if (!this.banner) return;
+    this.banner.textContent = '';
+    this.banner.classList.remove('show');
+  }
 
-    const reg = JSON.parse(regRaw);
+  setFieldError(name, msg) {
+    const errorEl = this.form.querySelector(`[data-error-for="${name}"]`);
+    if (errorEl) errorEl.textContent = msg || '';
+  }
 
-    // NOTE: In a real app, password is never stored in localStorage.
-    // For now, we just simulate:
-    const storedEmail = (reg.businessEmail || "").toLowerCase();
-    const inputEmail = email.value.trim().toLowerCase();
-
-    // If you didn't store password at register, we can accept any password for demo.
-    // If you DID store it later, you can enable password check:
-    const storedPassword = reg.password; // may be undefined
-    const passwordMatches = storedPassword ? (password.value === storedPassword) : true;
-
-    if (inputEmail !== storedEmail || !passwordMatches) {
-      showBanner("Invalid email or password.");
-      setFieldError("email", "");
-      setFieldError("password", "");
-      return;
-    }
-
-    // Remember email if checked
-    if (remember.checked) {
-      localStorage.setItem(STORAGE.REMEMBER_EMAIL, email.value.trim());
-    } else {
-      localStorage.removeItem(STORAGE.REMEMBER_EMAIL);
-    }
-
-    // Create a session object
-    const session = {
-      role: "employer",
-      businessName: reg.businessName || "",
-      businessEmail: reg.businessEmail || "",
-      createdAt: new Date().toISOString(),
-    };
-    localStorage.setItem(STORAGE.SESSION, JSON.stringify(session));
-
-    // Redirect to employer dashboard
-    window.location.href = "../employer/dashboard.html";
-  });
+  clearFieldError(name) {
+    const errorEl = this.form.querySelector(`[data-error-for="${name}"]`);
+    if (errorEl) errorEl.textContent = '';
+  }
 }
+
+// Bootstrap
+document.addEventListener('DOMContentLoaded', () => {
+  const page = new EmployerLogin();
+  page.init();
+});

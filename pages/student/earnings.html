@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Earning History — Link Up</title>
+
+    <link rel="stylesheet" href="../../css/main.css" />
+  </head>
+
+  <body>
+    <div class="app">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">
+          <img src="../../assets/images/link_up_icon.jpeg" alt="Link Up" />
+          <div class="logo-title">Link <span>Up</span></div>
+        </div>
+
+        <nav class="nav">
+          <a data-nav href="marketplace.html">🏠 Home Page</a>
+          <a data-nav href="earnings.html" class="active">💰 Earning History</a>
+          <a data-nav href="purchase.html">🛍️ Purchase History</a>
+
+          <div class="nav-logout">
+            <a href="#" id="logoutBtn">🚪 Logout</a>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-nav">
+          <a href="job-section.html" class="topbar-nav-link">Job Section</a>
+          <a href="marketplace.html" class="topbar-nav-link active">Marketplace Section</a>
+        </div>
+
+        <div style="display: flex; gap: 10px">
+          <button class="btn btn-outline">🔔</button>
+          <button class="btn btn-blue">My Profile</button>
+        </div>
+      </header>
+
+      <!-- Main -->
+      <main class="main">
+        <div class="container">
+          <div class="section-title">
+            <h2>Marketplace Earning History</h2>
+          </div>
+
+          <div class="grid cols-3">
+            <div class="card pad">
+              <h3>Total Sales</h3>
+              <p style="font-size: 1.5rem; font-weight: bold; color: var(--linkup-green)">
+                RM 545.00
+              </p>
+            </div>
+            <div class="card pad">
+              <h3>Pending</h3>
+              <p style="font-size: 1.5rem; font-weight: bold; color: #b45309">RM 45.00</p>
+            </div>
+            <div class="card pad">
+              <h3>Items Sold</h3>
+              <p style="font-size: 1.5rem; font-weight: bold">5</p>
+            </div>
+          </div>
+
+          <div style="height: 32px"></div>
+
+          <div class="section-title">
+            <h2>Recent Sales</h2>
+          </div>
+
+          <div class="list">
+            <!-- 1. Service Earning -->
+            <div
+              class="card pad"
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+              "
+            >
+              <div>
+                <h3 style="margin: 0">Logo Design for Tech Startup</h3>
+                <p class="muted" style="margin: 4px 0 0 0">Type: Service • 2026-03-20</p>
+              </div>
+              <div style="text-align: right">
+                <div style="font-weight: bold; color: #15803d">+ RM 250.00</div>
+                <span class="badge completed">Received</span>
+              </div>
+            </div>
+
+            <!-- 2. Product Earning -->
+            <div
+              class="card pad"
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+              "
+            >
+              <div>
+                <h3 style="margin: 0">Handmade Crochet Bottle Holder</h3>
+                <p class="muted" style="margin: 4px 0 0 0">Type: Product • 2026-03-18</p>
+              </div>
+              <div style="text-align: right">
+                <div style="font-weight: bold; color: #15803d">+ RM 35.00</div>
+                <span class="badge completed">Received</span>
+              </div>
+            </div>
+
+            <!-- 3. Academic Service -->
+            <div
+              class="card pad"
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+              "
+            >
+              <div>
+                <h3 style="margin: 0">Calculus 1 Intensive Tutoring (2 hrs)</h3>
+                <p class="muted" style="margin: 4px 0 0 0">Type: Service • 2026-03-15</p>
+              </div>
+              <div style="text-align: right">
+                <div style="font-weight: bold; color: #15803d">+ RM 60.00</div>
+                <span class="badge completed">Received</span>
+              </div>
+            </div>
+
+            <!-- 4. Second hand item -->
+            <div
+              class="card pad"
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+              "
+            >
+              <div>
+                <h3 style="margin: 0">Engineering Mathematics Textbook</h3>
+                <p class="muted" style="margin: 4px 0 0 0">Type: Product • 2026-03-12</p>
+              </div>
+              <div style="text-align: right">
+                <div style="font-weight: bold; color: #15803d">+ RM 200.00</div>
+                <span class="badge completed">Received</span>
+              </div>
+            </div>
+
+            <!-- 5. Pending Sale -->
+            <div
+              class="card pad"
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+              "
+            >
+              <div>
+                <h3 style="margin: 0">Custom Portrait Illustration</h3>
+                <p class="muted" style="margin: 4px 0 0 0">Type: Service • 2026-03-24</p>
+              </div>
+              <div style="text-align: right">
+                <div style="font-weight: bold; color: #b45309">RM 45.00</div>
+                <span class="badge pending">Awaiting Payment</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script type="module">
+      import { setActiveNav, wireLogout } from '/js/components/navbar.js';
+      document.addEventListener('DOMContentLoaded', () => {
+        setActiveNav();
+        wireLogout();
+      });
+    </script>
+  </body>
+</html>

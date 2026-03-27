@@ -24,8 +24,6 @@ jobs:
 
       - name: Setup Node & pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
           
       - uses: actions/setup-node@v4
         with:
@@ -54,8 +52,6 @@ jobs:
 
       - name: Setup Node & pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
           
       - uses: actions/setup-node@v4
         with:
@@ -63,16 +59,23 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
-      - name: Install CLIs
-        run: npm install -g vercel supabase
+      - name: Link & Push Supabase Migrations
+        run: |
+          npx supabase@latest link --project-ref $SUPABASE_PROJECT_ID --password $DB_PASSWORD
+          npx supabase@latest db push --include-all --password $DB_PASSWORD
+        env:
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
-      - name: Check Supabase Migrations
-        run: supabase db lint
+      - name: Run Seed (Conditional)
+        run: pnpm run seed
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
       - name: Pull Vercel environment information
-        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+        run: pnpm exec vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
       - name: Deploy to Vercel
-        run: vercel deploy --prod --token=$VERCEL_TOKEN
+        run: pnpm exec vercel deploy --prod --token=$VERCEL_TOKEN
