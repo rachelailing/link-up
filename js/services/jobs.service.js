@@ -81,19 +81,35 @@ export class JobService {
   }
 
   /**
-   * Fetches recommended jobs for a student using a scoring algorithm.
-   * @param {Object} profile - Student profile metadata { skills, interests, campus, etc. }
+   * Fetches recommended jobs for a student using an enhanced scoring algorithm.
+   * Features: Regex word bounds, Urgency, Salary weighting, and Rating multipliers.
+   * @param {Object} profile - Student profile { skills, interests, campus, historyTags }
    * @returns {Promise<Array>}
    */
   async getRecommendedJobs(profile = {}) {
     const jobs = await this.getJobs();
     
-    // Algorithm: Score each job based on profile matches
+    // Helper for robust matching (word boundary vs substring)
+    const matchTerm = (text, term) => {
+      try {
+        const regex = new RegExp(`\\b${term}\\b`, 'i');
+        return regex.test(text) ? 2 : (text.includes(term) ? 1 : 0);
+      } catch (e) {
+        return text.includes(term) ? 1 : 0;
+      }
+    };
+
+    // Extract dynamic history interests to act as "hidden" implicit skills
+    const implicitInterests = (profile.historyTags || []).map(t => t.toLowerCase());
+    
+    // Algorithm: Score each job based on multiple weighted dimensions
     const scoredJobs = jobs.map(job => {
       let score = 0;
       
       const studentSkills = (profile.skills || []).map(s => s.toLowerCase());
       const studentInterests = (profile.interests || []).map(i => i.toLowerCase());
+      const allInterests = [...new Set([...studentInterests, ...implicitInterests])];
+      
       const jobTags = (job.tags || []).map(t => t.toLowerCase());
       const jobTitle = job.title.toLowerCase();
       const jobDesc = (job.description || "").toLowerCase();
@@ -101,25 +117,44 @@ export class JobService {
       // 1. Skill Match (High weight)
       studentSkills.forEach(skill => {
         if (jobTags.includes(skill)) score += 10;
-        if (jobTitle.includes(skill)) score += 5;
-        if (jobDesc.includes(skill)) score += 2;
+        else if (matchTerm(jobTitle, skill) === 2) score += 6; // Exact word boundary
+        else if (matchTerm(jobTitle, skill) === 1) score += 3; // Substring
+        else if (matchTerm(jobDesc, skill)) score += 2; // In description
       });
 
       // 2. Interest Match (Medium weight)
-      studentInterests.forEach(interest => {
+      allInterests.forEach(interest => {
         if (jobTags.includes(interest)) score += 5;
-        if (jobTitle.includes(interest)) score += 3;
-        if (jobDesc.includes(interest)) score += 1;
+        else if (matchTerm(jobTitle, interest) === 2) score += 4;
+        else if (matchTerm(jobTitle, interest) === 1) score += 2;
+        else if (matchTerm(jobDesc, interest)) score += 1;
       });
 
-      // 3. Location/Campus Match (Bonus)
+      // 3. Location/Campus Match Context
       if (profile.campus && job.location && job.location.includes(profile.campus)) {
         score += 5;
+      } else if (!profile.campus && job.location && job.location.toLowerCase().includes("remote")) {
+        score += 3;
       }
 
-      // 4. Remote Preference (Small bonus if no campus set)
-      if (!profile.campus && job.location && job.location.toLowerCase().includes("remote")) {
-        score += 2;
+      // 4. Urgency Bonus (Time sensitivity)
+      if (job.deadline) {
+        const daysUntil = (new Date(job.deadline) - new Date()) / (1000 * 60 * 60 * 24);
+        if (daysUntil > 0 && daysUntil <= 3) score += 5;      // Urgent
+        else if (daysUntil > 3 && daysUntil <= 7) score += 2; // Upcoming
+        else if (daysUntil < 0) score -= 10;                  // Expired (Penalty)
+      }
+
+      // 5. Financial Value (Logarithmic Salary scale)
+      if (job.salary > 0) {
+        score += Math.max(0, Math.log10(job.salary)); // Subtle boost for higher paying gigs
+      }
+
+      // 6. Reputation Multiplier (Employer Rating)
+      // Assumes rating out of 5. Penalizes low-rated employers, leaves unrated at 1x.
+      if (job.rating) {
+        const ratingMultiplier = Math.max(0.5, job.rating / 5); // Caps penalty drop
+        score *= ratingMultiplier;
       }
 
       return { ...job, matchScore: score };
@@ -127,7 +162,7 @@ export class JobService {
 
     // Sort by score (descending) and return top matches
     const recommendations = scoredJobs
-      .filter(j => j.status === "Open")
+      .filter(j => j.status === "Open" && j.matchScore >= 0)
       .sort((a, b) => b.matchScore - a.matchScore);
 
     return recommendations.slice(0, 3);

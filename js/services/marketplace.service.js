@@ -21,14 +21,19 @@ class MarketplaceService {
 
   /**
    * Smart recommendation algorithm for marketplace items.
-   * Filters out items owned by the current user.
+   * Filters out items owned by the current user and optionally by type.
    */
-  async getRecommended(profile = {}, userId = null) {
+  async getRecommended(profile = {}, userId = null, type = null) {
     let items = await this.getAllItems();
     
     // Filter out user's own items
     if (userId) {
       items = items.filter(item => item.user_id !== userId);
+    }
+
+    // Filter by type if provided
+    if (type) {
+      items = items.filter(item => item.type === type);
     }
     
     const scoredItems = items.map(item => {

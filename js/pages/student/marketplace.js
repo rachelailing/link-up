@@ -9,7 +9,8 @@ import { marketplaceService } from "../../services/marketplace.service.js";
  */
 class Marketplace {
   constructor() {
-    this.recommendedEl = $("#recommendedPreview");
+    this.productsEl = $("#productsPreview");
+    this.servicesEl = $("#servicesPreview");
     this.myListingsEl = $("#myListingsPreview");
   }
 
@@ -20,7 +21,8 @@ class Marketplace {
     setActiveNav();
     wireLogout();
 
-    await this.renderRecommended(user);
+    await this.renderProducts(user);
+    await this.renderServices(user);
     await this.renderMyListings();
     this.wireEvents();
   }
@@ -39,27 +41,45 @@ class Marketplace {
       : "";
 
     return `
-      <a href="marketplace-details?id=${item.id}" class="market-card" style="text-decoration: none; color: inherit; position: relative;">
+      <a href="marketplace-details.html?id=${item.id}" class="market-card" style="text-decoration: none; color: inherit; position: relative;">
         ${matchBadge}
         <img src="${item.image || placeholderImg}" alt="${item.title}" class="market-card-image">
         <div class="market-card-content">
           <h3>${item.title}</h3>
           <div class="price">${displayPrice}</div>
           <div class="meta">📍 ${item.location}</div>
-          <div class="meta">📅 Posted: ${item.date}</div>
+          <div class="meta">📅 Posted: ${item.date || 'Recently'}</div>
         </div>
       </a>
     `;
   }
 
   /**
-   * Render Recommended section
+   * Render Products section
    */
-  async renderRecommended(user) {
-    if (!this.recommendedEl) return;
+  async renderProducts(user) {
+    if (!this.productsEl) return;
     const profile = user.user_metadata || {};
-    const items = await marketplaceService.getRecommended(profile, user.id);
-    this.recommendedEl.innerHTML = items.map(item => this.createCard(item)).join("");
+    const items = await marketplaceService.getRecommended(profile, user.id, "Product");
+    if (items.length === 0) {
+      this.productsEl.innerHTML = '<div class="empty-state">No products found.</div>';
+      return;
+    }
+    this.productsEl.innerHTML = items.map(item => this.createCard(item)).join("");
+  }
+
+  /**
+   * Render Services section
+   */
+  async renderServices(user) {
+    if (!this.servicesEl) return;
+    const profile = user.user_metadata || {};
+    const items = await marketplaceService.getRecommended(profile, user.id, "Service");
+    if (items.length === 0) {
+      this.servicesEl.innerHTML = '<div class="empty-state">No services found.</div>';
+      return;
+    }
+    this.servicesEl.innerHTML = items.map(item => this.createCard(item)).join("");
   }
 
   /**
@@ -68,17 +88,28 @@ class Marketplace {
   async renderMyListings() {
     if (!this.myListingsEl) return;
     const items = await marketplaceService.getMyListings();
+    if (items.length === 0) {
+      this.myListingsEl.innerHTML = '<div class="empty-state">You haven\'t listed anything yet.</div>';
+      return;
+    }
     const preview = items.slice(0, 4);
     this.myListingsEl.innerHTML = preview.map(item => this.createCard(item)).join("");
   }
 
   wireEvents() {
-    const seeMoreRec = $("#seeMoreRecommended");
+    const seeMoreProducts = $("#seeMoreProducts");
+    const seeMoreServices = $("#seeMoreServices");
     const seeMoreMine = $("#seeMoreMyListings");
 
-    if (seeMoreRec) {
-      seeMoreRec.addEventListener("click", () => {
-        window.location.href = "/pages/student/marketplace-recommended.html";
+    if (seeMoreProducts) {
+      seeMoreProducts.addEventListener("click", () => {
+        window.location.href = "/pages/student/marketplace-recommended.html?type=Product";
+      });
+    }
+
+    if (seeMoreServices) {
+      seeMoreServices.addEventListener("click", () => {
+        window.location.href = "/pages/student/marketplace-recommended.html?type=Service";
       });
     }
 

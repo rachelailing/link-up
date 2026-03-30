@@ -8,6 +8,8 @@ class RecommendedMarketplace {
   constructor() {
     this.productsGrid = $("#productsGrid");
     this.servicesGrid = $("#servicesGrid");
+    this.productsSection = this.productsGrid ? this.productsGrid.closest(".market-section") : null;
+    this.servicesSection = this.servicesGrid ? this.servicesGrid.closest(".market-section") : null;
   }
 
   async init() {
@@ -17,12 +19,24 @@ class RecommendedMarketplace {
     setActiveNav();
     wireLogout();
 
-    const profile = user.user_metadata || {};
-    const products = await marketplaceService.getProducts(user.id);
-    const services = await marketplaceService.getServices(user.id);
+    const params = new URLSearchParams(window.location.search);
+    const typeFilter = params.get("type");
 
-    this.renderItems(this.scoreItems(products, profile), this.productsGrid);
-    this.renderItems(this.scoreItems(services, profile), this.servicesGrid);
+    const profile = user.user_metadata || {};
+
+    if (!typeFilter || typeFilter === "Product") {
+      const products = await marketplaceService.getProducts(user.id);
+      this.renderItems(this.scoreItems(products, profile), this.productsGrid);
+    } else if (this.productsSection) {
+      this.productsSection.style.display = "none";
+    }
+
+    if (!typeFilter || typeFilter === "Service") {
+      const services = await marketplaceService.getServices(user.id);
+      this.renderItems(this.scoreItems(services, profile), this.servicesGrid);
+    } else if (this.servicesSection) {
+      this.servicesSection.style.display = "none";
+    }
   }
 
   scoreItems(items, profile) {
@@ -51,7 +65,7 @@ class RecommendedMarketplace {
   createCard(item) {
     const placeholderImg = `https://via.placeholder.com/300x160/f0f0f0/999?text=${encodeURIComponent(item.title)}`;
     const displayPrice = typeof item.price === 'number' ? `RM ${item.price.toFixed(2)}` : item.price;
-    const detailsUrl = `marketplace-details?id=${item.id}`;
+    const detailsUrl = `marketplace-details.html?id=${item.id}`;
 
     // High Match logic (Badge threshold: 12)
     const isHighMatch = item.matchScore && item.matchScore >= 12;
