@@ -92,12 +92,32 @@ link-up/
 
 ---
 
-## 🗺️ Roadmap (Phase 2)
-- [ ] **Backend Integration:** Replace mock data with a live Node.js/Firebase backend.
+## 🗺️ Roadmap (Phase 2 & 3)
+- [x] **Backend Integration:** Supabase integration for Auth, Database, and Storage.
 - [ ] **Real-time Notifications:** Alerts for job status changes and payment releases.
-- [ ] **Marketplace Expansion:** Allow students to open digital "stalls" for products (food, crafts, etc.).
-- [ ] **In-app Chat:** Direct communication between employers and students.
-- [ ] **Mobile App:** Native mobile experience using Capacitor or PWA.
+- [ ] **Marketplace Expansion:** Allow students to open digital "stalls" for products.
+- [ ] **Mobile App:** Rebuild as a cross-platform native app using **React Native + Expo**.
+
+---
+
+## 📱 Mobile Transition Strategy (Web to React Native)
+
+Converting Link Up to a mobile app involves a strategic shift from DOM-based rendering to Native components while preserving the core business logic.
+
+### 1. Core Logic Portability
+- **Preserve:** All `js/services/*.js` (Auth, Jobs, Payments) are 85% portable.
+- **Update:** Replace `window.location` redirects with `React Navigation` actions.
+- **Storage:** Migrate from `localStorage` to `@react-native-async-storage/async-storage`.
+
+### 2. UI Reconstruction (The Native Map)
+- **Layouts:** `div` → `View`, `span/p/h1` → `Text`, `img` → `Image`.
+- **Styling:** Convert `css/` files into JavaScript `StyleSheet` objects.
+- **Interactions:** Replace `onclick` with `onPress` using `TouchableOpacity`.
+
+### 3. Native Features Integration
+- **Verification:** Swap HTML file inputs for `expo-image-picker` to allow students to take photos of IDs.
+- **Engagement:** Implement `expo-notifications` for instant job alerts and payment confirmations.
+- **Security:** Utilize `expo-secure-store` for sensitive session data.
 
 ---
 
