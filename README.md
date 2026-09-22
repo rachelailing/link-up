@@ -50,6 +50,78 @@ Link Up is built with a focus on performance and simplicity using a modern Vanil
 
 ---
 
+## 🏗️ System Architecture
+
+The current MVP is a client-side application deployed as static assets on Vercel. Students and employers use the same web application through role-specific pages. Browser-side services use the Supabase JavaScript client for authentication and persistent data, while a few in-progress job and payment flows still use local browser storage.
+
+```mermaid
+flowchart TB
+    Student[Student]
+    Employer[Employer]
+    Hosting[Vercel static hosting]
+
+    subgraph Browser[Web application]
+        direction TB
+        WebApp[HTML and CSS pages]
+        UI[Page controllers and reusable UI components]
+        Services[Auth, jobs, and marketplace services]
+        Client[Supabase client]
+        LocalStore[(Browser localStorage)]
+
+        WebApp --> UI
+        UI --> Services
+        UI --> LocalStore
+        Services --> LocalStore
+        Services --> Client
+    end
+
+    subgraph Supabase[Supabase backend]
+        direction LR
+        API[Supabase APIs]
+        Auth[Authentication]
+        Database[(PostgreSQL database<br/>jobs and marketplace items)]
+        Storage[(Object storage<br/>verification files and listing images)]
+
+        API --> Auth
+        API --> Database
+        API --> Storage
+    end
+
+    Mobile[React Native and Expo scaffold]
+
+    Hosting -. serves .-> WebApp
+    Student -->|Sign in, browse and apply for jobs,<br/>manage profile and marketplace listings| WebApp
+    Employer -->|Sign in, post jobs, review applicants,<br/>approve work and rate students| WebApp
+    Client --> API
+    Mobile -. planned integration .-> API
+```
+
+The service modules provide the boundary between the UI and Supabase. This keeps authentication, job, and marketplace data access separate from rendering logic and provides a migration path for the mobile application.
+
+### Core Job Journey
+
+```mermaid
+sequenceDiagram
+    actor Student
+    participant App as Link Up Web App
+    actor Employer
+
+    Employer->>App: Create and publish a job
+    Student->>App: Browse jobs and submit an application
+    Employer->>App: Review and accept applicant
+    App-->>Student: Show acceptance and commitment fee
+    Student->>App: Pay commitment fee
+    App-->>Student: Confirm the job slot
+    Student->>App: Complete the job
+    Employer->>App: Approve completed work
+    App-->>Student: Release salary and refund commitment fee
+    Employer->>App: Rate the student
+```
+
+The sequence above represents the intended end-to-end commitment-fee workflow. Some job, application, and payment steps are currently simulated in browser storage in the MVP.
+
+---
+
 ## 📂 Project Structure
 
 ```text
